@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33530.505
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Windetta.Gateway", "Windetta.Gateway\src\Windetta.Gateway.csproj", "{BB9B6C5C-DC22-42CC-9E61-2AAF5CAD735F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Windetta.Common", "Windetta.Common\src\Windetta.Common.csproj", "{1EA326D8-2447-4FE0-96F5-39EEF94A1BED}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BB9B6C5C-DC22-42CC-9E61-2AAF5CAD735F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB9B6C5C-DC22-42CC-9E61-2AAF5CAD735F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB9B6C5C-DC22-42CC-9E61-2AAF5CAD735F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB9B6C5C-DC22-42CC-9E61-2AAF5CAD735F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1EA326D8-2447-4FE0-96F5-39EEF94A1BED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EA326D8-2447-4FE0-96F5-39EEF94A1BED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EA326D8-2447-4FE0-96F5-39EEF94A1BED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EA326D8-2447-4FE0-96F5-39EEF94A1BED}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8236D9C0-4521-4D71-A1C3-30D6E29ED273}
+	EndGlobalSection
+EndGlobal
