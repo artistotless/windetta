@@ -1,0 +1,57 @@
+﻿using Autofac;
+using System.Reflection;
+
+namespace Windetta.Common.Types;
+
+public static class Extensions
+{
+    /// <summary>
+    /// Resolves all dependencies from calling assembly.
+    /// Interfaces are used to obtain the service lifecycle : IScopedService, ISingletonService, ITransientService
+    /// In general, this code automates the process
+    /// of registering services in the dependency injection container, 
+    /// determining the lifetime of the service based on the interface implemented by it.
+    /// </summary>
+    public static void ResolveDependenciesFromAssembly(this ContainerBuilder builder)
+    {
+        var typesFromCallingAssembly = Assembly.GetCallingAssembly().GetTypes();
+        var typesFromCommonAssembly = Assembly.GetExecutingAssembly().GetTypes();
+
+        var allTypes = new List<Type>();
+        allTypes.AddRange(typesFromCallingAssembly);
+        allTypes.AddRange(typesFromCommonAssembly);
+
+        var implementationServices = allTypes.Where(x => x.IsClass && x.IsAssignableTo(typeof(IServiceLifetime)));
+
+        var assignableFilter = delegate (Type typeObj, object? criteriaObj)
+        {
+            return typeObj.IsAssignableTo(typeof(IServiceLifetime));
+        };
+
+        var filter = new TypeFilter(assignableFilter);
+
+        foreach (var s in implementationServices)
+        {
+            var serviceType = s.FindInterfaces(filter, null).First();
+            var lifetimeType = serviceType.FindInterfaces(filter, null).FirstOrDefault();
+
+            AddToContainer(builder, lifetimeType, s, serviceType);
+        }
+    }
+
+    private static void AddToContainer(ContainerBuilder builder, Type? lifetimeType, Type implementationType, Type serviceType)
+    {
+        var registered = builder.RegisterType(implementationType).As(serviceType);
+
+        // pattern matching
+        Action serviceLifeTimeApply = lifetimeType switch
+        {
+            Type type when type.Equals(typeof(ITransientService)) => () => registered.InstancePerDependency(),
+            Type type when type.Equals(typeof(IScopedService)) => () => registered.InstancePerLifetimeScope(),
+            Type type when type.Equals(typeof(ISingletonService)) => () => registered.SingleInstance(),
+            _ => throw new Exception("Invalid lifetime type")
+        };
+
+        serviceLifeTimeApply();
+    }
+}

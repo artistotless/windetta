@@ -1,4 +1,6 @@
-﻿namespace Windetta.Common.Authentication;
+﻿using System.Text.Json;
+
+namespace Windetta.Common.Authentication;
 
 public class JsonWebToken : JsonWebTokenBase
 {
@@ -8,5 +10,10 @@ public class JsonWebToken : JsonWebTokenBase
         RefreshToken = refreshToken;
         Expires = accessToken.Expires;
         Id = accessToken.UserId;
+    }
+
+    public override string ToString()
+    {
+        return JsonSerializer.Serialize(this);
     }
 }

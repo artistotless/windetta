@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using Autofac;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -8,7 +9,6 @@ using Windetta.Common.Authentication;
 using Windetta.Common.Options;
 using Windetta.Identity.Data;
 using Windetta.Identity.Domain.Entities;
-using Windetta.Identity.Services;
 
 namespace Windetta.Identity.Extensions
 {
@@ -43,11 +43,10 @@ namespace Windetta.Identity.Extensions
             if (configuration["Authentication:Vk:Enabled"] == "false")
                 return;
 
-            builder.AddVkontakte(options =>
+            builder.AddVkontakte("vk", options =>
             {
                 options.ClientId = configuration["Authentication:Vk:ClientId"]!;
                 options.ClientSecret = configuration["Authentication:Vk:ClientSecret"]!;
-                options.SaveTokens = true;
             });
         }
 
@@ -57,11 +56,10 @@ namespace Windetta.Identity.Extensions
             if (configuration["Authentication:Google:Enabled"] == "false")
                 return;
 
-            builder.AddGoogle(options =>
+            builder.AddGoogle("google", options =>
             {
                 options.ClientId = configuration["Authentication:Google:ClientId"]!;
                 options.ClientSecret = configuration["Authentication:Google:ClientSecret"]!;
-                options.SaveTokens = true;
             });
         }
 
@@ -79,9 +77,19 @@ namespace Windetta.Identity.Extensions
                 .AddDefaultTokenProviders();
         }
 
-        public static void AddAppliacationServices(this IServiceCollection services)
-        {
-            services.AddScoped<IIdentityService, IdentityService>();
-        }
+        //public static void AddIdentityDbContext(this ContainerBuilder builder)
+        //{
+        //    builder.RegisterInstance()
+
+        //    var settings = configuration.GetSection("Mysql").Get<MysqlSettings>();
+        //    var connString = $"server={settings.Server};port={settings.Port};user={settings.User};password={settings.Password};database={settings.DbName}";
+
+        //    services.AddDbContext<IdentityDbContext>(options => options.UseMySql(connString, new MySqlServerVersion(settings.Version),
+        //         b => b.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName)));
+
+        //    services.AddIdentity<User, Role>()
+        //        .AddEntityFrameworkStores<IdentityDbContext>()
+        //        .AddDefaultTokenProviders();
+        //}
     }
 }

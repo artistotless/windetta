@@ -1,8 +1,8 @@
-﻿using System.Security.Claims;
+﻿using Windetta.Common.Types;
 
 namespace Windetta.Common.Authentication;
 
-public interface IAccessTokenCreator
+public interface IAccessTokenCreator : IScopedService
 {
-    public AccessToken Create(Guid userId, IEnumerable<Claim> claims);
+    public AccessToken Create(Guid userId, IDictionary<string, string> claimsKeyValue);
 }

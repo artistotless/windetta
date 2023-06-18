@@ -10,8 +10,6 @@ namespace Windetta.Identity.Data
 {
     public class IdentityDbContext : IdentityDbContext<User, Role, Guid>
     {
-        //public DbSet<Game> Games { get; set; }
-
         public IdentityDbContext([NotNullAttribute] DbContextOptions options) : base(options)
         {
             var dbCreator = Database.GetService<IDatabaseCreator>();

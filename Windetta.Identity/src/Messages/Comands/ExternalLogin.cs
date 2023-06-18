@@ -1,11 +1,11 @@
-﻿
+﻿using System.Security.Principal;
 using Windetta.Common.Messages;
 
 namespace Windetta.Identity.Messages.Comands;
 
-public class ExternalLogin : ICommand
+public class ExternalLogin : IRequest
 {
-    public Guid UserId { get; set; }
-    public string UniqueIdentifier { get; set; }
+    public IIdentity Identity { get; set; }
     public string Provider { get; set; }
+    public string ReturnUrl { get; set; }
 }

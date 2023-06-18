@@ -4,7 +4,7 @@ public class WindettaException : Exception
 {
     public string ErrorCode { get; set; }
 
-    public WindettaException(string? message, string errorCode) : base(message)
+    public WindettaException(string errorCode, string? message) : base(message)
     {
         ErrorCode = errorCode.ToLower();
     }

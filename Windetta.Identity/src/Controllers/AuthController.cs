@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
-using Windetta.Common.Authentication;
 using Windetta.Identity.Messages.Comands;
 using Windetta.Identity.Services;
 
@@ -10,11 +9,11 @@ namespace Windetta.Identity.Controllers;
 [Route("[controller]")]
 public class AuthController : BaseController
 {
-    private readonly IIdentityService _identityService;
+    private readonly IRequestDispatcher _dispatcher;
 
-    public AuthController(IIdentityService identityService)
+    public AuthController(IRequestDispatcher dispatcher)
     {
-        _identityService = identityService;
+        _dispatcher = dispatcher;
     }
 
     /// <summary>
@@ -23,95 +22,61 @@ public class AuthController : BaseController
     /// <returns>JsonWebToken object</returns>
     [HttpPost]
     [Route("signin")]
-    public async Task<ActionResult<JsonWebToken>> SignIn([FromBody] Login command)
-    {
-        await Task.Delay(100);
-
-        return Ok(new JsonWebToken());
-    }
+    public async Task<IActionResult> SignIn([FromBody] Login command)
+        => await _dispatcher.HandleAsync(command);
 
     /// <summary>
     /// Register new user using email & password
     /// </summary>
-    /// <returns></returns>
     [HttpPost]
     [Route("register")]
     public async Task<IActionResult> Register([FromBody] Register command)
-    {
-        await _identityService.RegisterAsync(command);
-
-        return NoContent();
-    }
+        => await _dispatcher.HandleAsync(command);
 
     /// <summary>
-    /// Authenticate user using external auth provider 'vk.com'
+    /// Authenticate user using external auth provider
     /// </summary>
     [HttpGet]
-    [Route("signin/vk")]
-    public async Task SignInWithVk(string returnUrl)
-    {
-        var properties = new AuthenticationProperties
-        {
-            RedirectUri = Url.Action(nameof(SignInWithVkCallback), new { returnUrl })
-        };
-
-        await HttpContext.ChallengeAsync("Vkontakte", properties);
-    }
+    [Route("signin/{provider}")]
+    public async Task SignInWithVk(string provider, string returnUrl)
+        => await ChallengeAsync(provider.ToLower(), returnUrl);
 
     /// <summary>
-    /// Handle the response recieved from Vk OAuth
+    /// Handle the response recieved from external Oauth provider
     /// </summary>
     [HttpGet]
-    [Route("signin/vk/callback")]
-    public async Task<IActionResult> SignInWithVkCallback(string returnUrl)
+    [Route("signin/external/callback")]
+    public async Task<IActionResult> ExternalSignInCallback(string returnUrl, string provider)
     {
-        var result = await HttpContext.AuthenticateAsync("Vkontakte");
+        var result = await HttpContext.AuthenticateAsync(provider);
 
         // Authentication failed
         if (result is null || !result.Succeeded)
             return Unauthorized();
 
-        var jwt = await _identityService.ExternalLoginAsync(new ExternalLogin()
+        var command = new ExternalLogin()
         {
-            Provider = "Vkontakte",
-            UniqueIdentifier = result.Principal.Identity!.Name!,
-            UserId = UserId,
-        });
+            Provider = provider,
+            Identity = result.Principal.Identity,
+            ReturnUrl = returnUrl
+        };
 
-        return Redirect(returnUrl);
+        // Authentication passed.
+        // Return authCode across api gateway to end cliend.
+        return await _dispatcher.HandleAsync(command);
     }
 
     /// <summary>
-    /// Authenticate user using external auth provider 'google.com'
+    /// Redirect to external OAuth screen page
     /// </summary>
-    [HttpGet]
-    [Route("signin/google")]
-    public async Task SignInWithGoogle()
+    private Task ChallengeAsync(string scheme, string returnUrl)
     {
         var properties = new AuthenticationProperties
         {
-            RedirectUri = Url.Action(nameof(SignInWithGoogleCallback))
+            RedirectUri = Url.Action(nameof(ExternalSignInCallback),
+            new { returnUrl = returnUrl, provider = scheme })
         };
 
-        await HttpContext.ChallengeAsync("Google", properties);
-    }
-
-    /// <summary>
-    /// Handle the response recieved from Google OAuth
-    /// </summary>
-    [HttpGet]
-    [Route("signin/google/callback")]
-    public async Task<IActionResult> SignInWithGoogleCallback()
-    {
-        var result = await HttpContext.AuthenticateAsync("Google");
-        if (result?.Succeeded == true)
-        {
-            // Аутентификация прошла успешно
-            // Вы можете получить информацию об аутентифицированном пользователе через `result.Principal`
-            return Ok();
-        }
-
-        // Аутентификация не удалась или отсутствует
-        return Unauthorized();
+        return HttpContext.ChallengeAsync(scheme, properties);
     }
 }

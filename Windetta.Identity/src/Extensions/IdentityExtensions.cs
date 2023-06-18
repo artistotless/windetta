@@ -9,6 +9,6 @@ public static class IdentityExtensions
     {
         var firstError = errors.First();
 
-        return new WindettaException(firstError.Description, firstError.Code);
+        return new WindettaException(firstError.Code, firstError.Description);
     }
 }

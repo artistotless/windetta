@@ -1,29 +1,32 @@
+using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Windetta.Common.Types;
 using Windetta.Identity.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-ConfigureServices(builder.Services, builder.Configuration);
+IConfiguration configuration = builder.Configuration;
+IServiceCollection services = builder.Services;
+
+services.AddIdentityDbContext(configuration);
+services.AddAuthorization();
+services.AddControllers();
+
+services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+}).AddAuthenticationMethods(configuration); // Adding vk, google .. external auth providers
+
+builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory(builder =>
+{
+    builder.ResolveDependenciesFromAssembly();
+}));
+
+// ---------------------
 
 var app = builder.Build();
-
-void ConfigureServices(IServiceCollection services, IConfiguration configuration)
-{
-    services.AddIdentityDbContext(configuration);
-
-    var authBuilder = services.AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    });
-
-    // Adding vk, google .. external auth providers
-    authBuilder.AddAuthenticationMethods(configuration);
-
-    services.AddAppliacationServices();
-    services.AddAuthorization();
-    services.AddControllers();
-}
 
 app.MapGet("/", () => "Windetta Identity Service");
 
@@ -32,4 +35,3 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
-
