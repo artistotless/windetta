@@ -6,11 +6,11 @@ public class WindettaException : Exception
 
     public WindettaException(string errorCode)
     {
-        ErrorCode = errorCode.ToLower();
+        ErrorCode = errorCode;
     }
 
     public WindettaException(string errorCode, string message) : base(message)
     {
-        ErrorCode = errorCode.ToLower();
+        ErrorCode = errorCode;
     }
 }

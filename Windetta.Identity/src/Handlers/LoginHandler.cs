@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Windetta.Common.Types;
 using Windetta.Identity.Domain.Entities;
-using Windetta.Identity.Messages.Comands;
+using Windetta.Identity.Messages.Requests;
 using Windetta.Identity.Services;
 
 namespace Windetta.Identity.Handlers;

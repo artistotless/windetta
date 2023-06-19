@@ -15,4 +15,24 @@ public class RedirectUrlBuilderTests
 
         Assert.Equal(expected, result, StringComparer.Ordinal);
     }
+
+    [Fact]
+    public void BuildRedirectUrl_ThrowArgumentNullExceptionIfReturnUrlIsNull()
+    {
+        string? returnUrl = null;
+        string authCode = "someCode";
+
+        Assert.Throws<ArgumentNullException>(
+            () => ExternalLoginHandler.BuildRedirectUrl(returnUrl, authCode));
+    }
+
+    [Fact]
+    public void BuildRedirectUrl_ThrowArgumentNullExceptionIfAuthCodeIsNull()
+    {
+        string returnUrl = "https://somesite.com";
+        string? authCode = null;
+
+        Assert.Throws<ArgumentNullException>(
+            () => ExternalLoginHandler.BuildRedirectUrl(returnUrl, authCode));
+    }
 }

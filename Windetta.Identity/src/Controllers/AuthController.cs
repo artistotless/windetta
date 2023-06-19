@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using Windetta.Identity.Messages.Comands;
+using Windetta.Identity.Messages.Requests;
 using Windetta.Identity.Services;
 
 namespace Windetta.Identity.Controllers;

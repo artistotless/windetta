@@ -1,8 +1,7 @@
 ﻿using System.Security.Claims;
-using System.Security.Principal;
 using Windetta.Common.Messages;
 
-namespace Windetta.Identity.Messages.Comands;
+namespace Windetta.Identity.Messages.Requests;
 
 public class ExternalLogin : IRequest
 {

@@ -72,7 +72,7 @@ namespace Windetta.Identity.Extensions
             services.AddDbContext<IdentityDbContext>(options => options.UseMySql(connString, new MySqlServerVersion(settings.Version),
                  b => b.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName)));
 
-            services.AddIdentity<User, Role>()
+            services.AddIdentity<User, Role>(o => o.User.RequireUniqueEmail = true)
                 .AddEntityFrameworkStores<IdentityDbContext>()
                 .AddDefaultTokenProviders();
         }

@@ -5,7 +5,7 @@ using Windetta.Common.Authentication;
 using Windetta.Identity.Domain.Entities;
 using Windetta.Identity.Dtos;
 using Windetta.Identity.Extensions;
-using Windetta.Identity.Messages.Comands;
+using Windetta.Identity.Messages.Requests;
 using Windetta.Identity.Services;
 
 namespace Windetta.Identity.Handlers;
@@ -104,6 +104,12 @@ public class ExternalLoginHandler : IRequestHandler<ExternalLogin>
 
     public static string BuildRedirectUrl(string returnUrl, string authCode)
     {
+        if (returnUrl is null)
+            throw new ArgumentNullException(nameof(returnUrl));
+
+        if (authCode is null)
+            throw new ArgumentNullException(nameof(authCode));
+
         var builder = new UriBuilder(returnUrl);
         builder.Query = $"{nameof(authCode)}={authCode}";
 
