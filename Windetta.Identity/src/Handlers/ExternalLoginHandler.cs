@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using System.Security.Principal;
 using Windetta.Common.Authentication;
 using Windetta.Identity.Domain.Entities;
 using Windetta.Identity.Dtos;
@@ -29,19 +28,25 @@ public class ExternalLoginHandler : IRequestHandler<ExternalLogin>
     public async Task<IActionResult> HandleAsync(ExternalLogin request)
     {
         var identity = ParseIdentity(request.Provider, request.Identity);
+
         var user = await _userManager.FindByLoginAsync(request.Provider, identity.UniqueId);
 
         // If the user not found - create a new user with attached the external login
         if (user is null)
         {
-            user = new User();
+            user = new User()
+            {
+                DisplayName = identity.DisplayName,
+                UserName = identity.UserName,
+            };
+
             var createdResult = await _userManager.CreateAsync(user);
 
             if (!createdResult.Succeeded)
                 throw createdResult.Errors.FirstErrorAsException();
 
             var attachedResult = await _userManager.AddLoginAsync(user,
-                new UserLoginInfo(request.Provider, identity.UniqueId, null));
+                new UserLoginInfo(request.Provider, identity.UniqueId, identity.DisplayName));
 
             if (!attachedResult.Succeeded)
                 throw attachedResult.Errors.FirstErrorAsException();
@@ -83,7 +88,7 @@ public class ExternalLoginHandler : IRequestHandler<ExternalLogin>
     /// <param name="identity">The identity to parse.</param>
     /// <returns>An instance of ExternalIdentityDto that represents the parsed identity.</returns>
 
-    private ExternalIdentityDto ParseIdentity(string provider, IIdentity identity)
+    private ExternalIdentityDto ParseIdentity(string provider, ClaimsIdentity identity)
     {
         var parser = _parsersFactory.GetParser(provider);
 

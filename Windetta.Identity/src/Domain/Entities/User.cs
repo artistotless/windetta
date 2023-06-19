@@ -4,13 +4,10 @@ namespace Windetta.Identity.Domain.Entities;
 
 public class User : IdentityUser<Guid>
 {
+    public string? DisplayName { get; set; }
+
     public User()
     {
         Id = Guid.NewGuid();
-
-        if (Email is not null)
-        {
-            UserName = Email.Substring(0, Email.IndexOf('@'));
-        }
     }
 }

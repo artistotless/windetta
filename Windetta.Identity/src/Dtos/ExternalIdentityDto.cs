@@ -6,4 +6,5 @@ public class ExternalIdentityDto
     public string? UserName { get; set; } = null;
     public string? ImageUrl { get; set; } = null;
     public string? ProfileLink { get; set; } = null;
+    public string? DisplayName { get; set; } = null;
 }

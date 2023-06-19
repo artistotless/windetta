@@ -4,7 +4,7 @@ using Windetta.Common.Types;
 
 namespace Windetta.Identity.Handlers;
 
-public interface IRequestHandler<TRequest> : IScopedService where TRequest : IRequest
+public interface IRequestHandler<TRequest> : ITransientService where TRequest : IRequest
 {
     Task<IActionResult> HandleAsync(TRequest request);
 }

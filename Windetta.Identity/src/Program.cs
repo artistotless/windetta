@@ -1,5 +1,6 @@
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Windetta.Common.Redis;
 using Windetta.Common.Types;
 using Windetta.Identity.Extensions;
 
@@ -11,6 +12,7 @@ IServiceCollection services = builder.Services;
 services.AddIdentityDbContext(configuration);
 services.AddAuthorization();
 services.AddControllers();
+services.AddRedis(configuration);
 
 services.AddAuthentication(options =>
 {
@@ -29,6 +31,7 @@ builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory(builder
 var app = builder.Build();
 
 app.MapGet("/", () => "Windetta Identity Service");
+app.MapGet("/ping", () => Results.Ok());
 
 app.UseAuthentication();
 app.UseHttpsRedirection();

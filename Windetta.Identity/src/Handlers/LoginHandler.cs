@@ -24,12 +24,12 @@ public class LoginHandler : IRequestHandler<Login>
         var user = await _userManager.FindByEmailAsync(request.Email);
 
         if (user == null)
-            throw new WindettaException("User with email not registered", ErrorCodes.UserNotFound);
+            throw new WindettaException(ErrorCodes.UserNotFound, "User with email not registered");
 
         var passwordMatch = await _userManager.CheckPasswordAsync(user, request.Password);
 
         if (!passwordMatch)
-            throw new WindettaException("Email or password invalid", ErrorCodes.UserNotFound);
+            throw new WindettaException(ErrorCodes.UserNotFound, "Email or password invalid");
 
         var claims = new Dictionary<string, string>() {
             { ClaimTypes.Role,Roles.USER}

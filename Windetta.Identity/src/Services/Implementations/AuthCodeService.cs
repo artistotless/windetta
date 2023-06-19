@@ -13,17 +13,11 @@ public class AuthCodeService : IAuthCodeService
     }
 
     public Task AddCodeAsync(AuthorizationCode code)
-    {
-        throw new NotImplementedException();
-    }
+        => _repository.AddAsync(code);
 
     public Task<AuthorizationCode> GetCodeAsync(string code)
-    {
-        throw new NotImplementedException();
-    }
+        => _repository.GetAsync(code);
 
     public Task RemoveCodeAsync(string code)
-    {
-        throw new NotImplementedException();
-    }
+        => _repository.RemoveAsync(code);
 }

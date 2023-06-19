@@ -21,7 +21,7 @@ public class RequestDispatcher : IRequestDispatcher
     /// which upon completion will yield the result of the request handling, 
     /// encapsulated as an IActionResult.</returns>
 
-    public Task<IActionResult> HandleAsync(IRequest request)
+    public async Task<IActionResult> HandleAsync(IRequest request)
     {
         using var scope = _scopeFactory.CreateScope();
 
@@ -35,6 +35,8 @@ public class RequestDispatcher : IRequestDispatcher
         // Explicitly cast the request to the expected type.
         dynamic castedRequest = Convert.ChangeType(request, request.GetType());
 
-        return handler.HandleAsync(castedRequest); ;
+        var result = await handler.HandleAsync(castedRequest);
+
+        return result;
     }
 }

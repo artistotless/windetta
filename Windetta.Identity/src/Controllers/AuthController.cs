@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Windetta.Identity.Messages.Comands;
 using Windetta.Identity.Services;
 
@@ -57,7 +58,7 @@ public class AuthController : BaseController
         var command = new ExternalLogin()
         {
             Provider = provider,
-            Identity = result.Principal.Identity,
+            Identity = (ClaimsIdentity)result.Principal.Identity,
             ReturnUrl = returnUrl
         };
 

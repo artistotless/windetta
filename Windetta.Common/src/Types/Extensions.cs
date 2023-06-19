@@ -21,7 +21,11 @@ public static class Extensions
         allTypes.AddRange(typesFromCallingAssembly);
         allTypes.AddRange(typesFromCommonAssembly);
 
-        var implementationServices = allTypes.Where(x => x.IsClass && x.IsAssignableTo(typeof(IServiceLifetime)));
+        var implementationServices = allTypes
+            .Where(x => x.IsClass)
+            .Where(x => x.IsAssignableTo(typeof(IServiceLifetime)))
+            .Where(x => x.IsAbstract == false)
+            .ToList();
 
         var assignableFilter = delegate (Type typeObj, object? criteriaObj)
         {

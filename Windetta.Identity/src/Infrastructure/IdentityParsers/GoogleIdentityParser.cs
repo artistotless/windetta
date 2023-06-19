@@ -1,15 +1,20 @@
-﻿using System.Security.Principal;
+﻿using System.Security.Claims;
 using Windetta.Identity.Dtos;
-using Windetta.Identity.Services;
 
 namespace Windetta.Identity.Infrastructure.IdentityParsers;
 
-public class GoogleIdentityParser : IExternalIdentityParser
+public class GoogleIdentityParser : BaseIdentityParser
 {
-    public string ProviderName => "google";
+    public override string ProviderName => "google";
 
-    public ExternalIdentityDto Parse(IIdentity identity)
+    public override ExternalIdentityDto Parse(ClaimsIdentity identity)
     {
-        throw new NotImplementedException();
+        var baseIdentity = base.Parse(identity);
+
+        var nameClaim = identity.FindFirst(ClaimTypes.Name);
+
+        baseIdentity.DisplayName = nameClaim is null ? null : nameClaim.Value;
+
+        return baseIdentity;
     }
 }

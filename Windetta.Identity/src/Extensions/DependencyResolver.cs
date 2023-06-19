@@ -76,20 +76,5 @@ namespace Windetta.Identity.Extensions
                 .AddEntityFrameworkStores<IdentityDbContext>()
                 .AddDefaultTokenProviders();
         }
-
-        //public static void AddIdentityDbContext(this ContainerBuilder builder)
-        //{
-        //    builder.RegisterInstance()
-
-        //    var settings = configuration.GetSection("Mysql").Get<MysqlSettings>();
-        //    var connString = $"server={settings.Server};port={settings.Port};user={settings.User};password={settings.Password};database={settings.DbName}";
-
-        //    services.AddDbContext<IdentityDbContext>(options => options.UseMySql(connString, new MySqlServerVersion(settings.Version),
-        //         b => b.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName)));
-
-        //    services.AddIdentity<User, Role>()
-        //        .AddEntityFrameworkStores<IdentityDbContext>()
-        //        .AddDefaultTokenProviders();
-        //}
     }
 }
