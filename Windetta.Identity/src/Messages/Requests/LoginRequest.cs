@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Windetta.Common.Authentication;
 using Windetta.Common.Messages;
 
 namespace Windetta.Identity.Messages.Requests;
 
-public class Login : IRequest
+public class LoginRequest : IRequest<JsonWebTokenBase>
 {
     [EmailAddress]
     [Required]

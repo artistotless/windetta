@@ -3,7 +3,7 @@ using Windetta.Common.Messages;
 
 namespace Windetta.Identity.Messages.Requests;
 
-public class Register : IRequest
+public class RegisterRequest : IRequest
 {
     [EmailAddress]
     [Required]

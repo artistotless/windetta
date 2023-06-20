@@ -1,4 +1,6 @@
-﻿using Windetta.Identity.Domain.Entities;
+﻿using Microsoft.AspNetCore.Mvc;
+using Windetta.Common.Authentication;
+using Windetta.Identity.Domain.Entities;
 using Windetta.Identity.Handlers;
 using Windetta.Identity.Messages.Requests;
 using Windetta.Identity.Tests.Mocks;
@@ -18,15 +20,19 @@ public class LoginHandlerTests
     [Fact]
     public void HandleAsync_ReturnJwt()
     {
-
+        // arrange
         var tokenBuilderMock = JsonWebTokenBuilderFactory.Create();
         var userManagerMock = UserManagerMockFactory.Create(_users);
-        var request = new Login() { Email = "user@gmail.com", Password = "p@55word" };
-
+        var request = new LoginRequest() { Email = "user1gmail.com", Password = "user1Password" };
         var sut = new LoginHandler(userManagerMock.Object, tokenBuilderMock.Object);
 
-        var result = sut.HandleAsync(request).GetAwaiter().GetResult();
+        // act
+        var token = sut.HandleAsync(request).GetAwaiter().GetResult();
 
-        //tokenBuilderMock.Verify(x => x.BuildAsync(It.IsAny(),),)
+        // assert
+        token.AccessToken.ShouldNotBeNullOrEmpty();
+        token.RefreshToken.ShouldNotBeNullOrEmpty();
+        token.Expires.ShouldNotBe(0);
+        token.Id.ShouldNotBe(Guid.Empty);
     }
 }

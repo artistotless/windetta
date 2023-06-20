@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Windetta.Common.Messages;
+﻿using Windetta.Common.Messages;
 using Windetta.Identity.Handlers;
 
 namespace Windetta.Identity.Services;
@@ -21,13 +20,13 @@ public class RequestDispatcher : IRequestDispatcher
     /// which upon completion will yield the result of the request handling, 
     /// encapsulated as an IActionResult.</returns>
 
-    public async Task<IActionResult> HandleAsync(IRequest request)
+    public async Task<TResult> HandleAsync<TResult>(IRequest<TResult> request)
     {
         using var scope = _scopeFactory.CreateScope();
 
         // Create a generic request handler type based on the type of the request
-        var handlerType = typeof(IRequestHandler<>)
-                .MakeGenericType(request.GetType());
+        var handlerType = typeof(IRequestHandler<,>)
+                .MakeGenericType(request.GetType(), typeof(TResult));
 
         // Resolve the appropriate request handler from the service provider
         dynamic handler = scope.ServiceProvider.GetRequiredService(handlerType);
@@ -38,5 +37,18 @@ public class RequestDispatcher : IRequestDispatcher
         var result = await handler.HandleAsync(castedRequest);
 
         return result;
+    }
+
+    public async Task HandleAsync(IRequest request)
+    {
+        using var scope = _scopeFactory.CreateScope();
+
+        var handlerType = typeof(IRequestHandler<>)
+                .MakeGenericType(request.GetType());
+
+        dynamic handler = scope.ServiceProvider.GetRequiredService(handlerType);
+        dynamic castedRequest = Convert.ChangeType(request, request.GetType());
+
+        await handler.HandleAsync(castedRequest);
     }
 }

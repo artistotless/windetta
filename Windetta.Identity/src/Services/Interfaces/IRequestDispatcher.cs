@@ -6,6 +6,7 @@ namespace Windetta.Identity.Services
 {
     public interface IRequestDispatcher : ISingletonService
     {
-        Task<IActionResult> HandleAsync(IRequest command);
+        Task<TResult> HandleAsync<TResult>(IRequest<TResult> request);
+        Task HandleAsync(IRequest request);
     }
 }

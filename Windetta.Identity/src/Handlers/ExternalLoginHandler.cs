@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Windetta.Common.Authentication;
 using Windetta.Identity.Domain.Entities;
@@ -10,7 +9,7 @@ using Windetta.Identity.Services;
 
 namespace Windetta.Identity.Handlers;
 
-public class ExternalLoginHandler : IRequestHandler<ExternalLogin>
+public class ExternalLoginHandler : IRequestHandler<ExternalLoginRequest, string>
 {
     private readonly IAuthCodeService _authCodeService;
     private readonly IExternalIdentityParserFactory _parsersFactory;
@@ -25,7 +24,7 @@ public class ExternalLoginHandler : IRequestHandler<ExternalLogin>
         _userManager = userManager;
     }
 
-    public async Task<IActionResult> HandleAsync(ExternalLogin request)
+    public async Task<string> HandleAsync(ExternalLoginRequest request)
     {
         var identity = ParseIdentity(request.Provider, request.Identity);
 
@@ -54,9 +53,7 @@ public class ExternalLoginHandler : IRequestHandler<ExternalLogin>
 
         var code = await CreateAuthCodeAsync(user.Id, identity.UniqueId);
 
-        var redirectUrl = BuildRedirectUrl(request.ReturnUrl, code);
-
-        return new RedirectResult(redirectUrl);
+        return BuildRedirectUrl(request.ReturnUrl, code);
     }
 
     /// <summary>

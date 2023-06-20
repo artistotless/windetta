@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
 using System.Text;
 using Windetta.Common.Authentication;
+using Windetta.Common.Configuration;
 using Windetta.Common.Options;
 using Windetta.Identity.Data;
 using Windetta.Identity.Domain.Entities;
@@ -17,8 +18,10 @@ namespace Windetta.Identity.Extensions
         // Adding jwt authentication
         public static void AddAuthenticationMethods(this AuthenticationBuilder builder, IConfiguration configuration)
         {
-            var jwtOptions = configuration.GetSection("Authentication:Jwt").Get<JwtOptions>();
+            var jwtSection = configuration.GetSection("Authentication:Jwt");
+            var jwtOptions = configuration.GetOptions<JwtOptions>("Authentication:Jwt");
 
+            builder.Services.Configure<JwtOptions>(jwtSection);
             builder.AddJwtBearer(options =>
                 {
                     options.TokenValidationParameters = new TokenValidationParameters

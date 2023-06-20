@@ -23,48 +23,51 @@ public class AuthController : BaseController
     /// <returns>JsonWebToken object</returns>
     [HttpPost]
     [Route("signin")]
-    public async Task<IActionResult> SignIn([FromBody] Login command)
-        => await _dispatcher.HandleAsync(command);
+    public async Task<IActionResult> SignIn([FromBody] LoginRequest command)
+        => Single(await _dispatcher.HandleAsync(command));
 
     /// <summary>
     /// Register new user using email & password
     /// </summary>
     [HttpPost]
     [Route("register")]
-    public async Task<IActionResult> Register([FromBody] Register command)
-        => await _dispatcher.HandleAsync(command);
+    public IActionResult Register([FromBody] RegisterRequest command)
+        => NoContent(async () => await _dispatcher.HandleAsync(command));
 
     /// <summary>
     /// Authenticate user using external auth provider
     /// </summary>
     [HttpGet]
     [Route("signin/{provider}")]
-    public async Task SignInWithVk(string provider, string returnUrl)
+    public async Task SignInWithExternal(string provider, string returnUrl)
         => await ChallengeAsync(provider.ToLower(), returnUrl);
 
     /// <summary>
     /// Handle the response recieved from external Oauth provider
     /// </summary>
     [HttpGet]
-    [Route("signin/external/callback")]
-    public async Task<IActionResult> ExternalSignInCallback(string returnUrl, string provider)
+    [Route("signin/{provider}/callback")]
+    public async Task<IActionResult> ExternalSignInCallback(string provider, string returnUrl)
     {
-        var result = await HttpContext.AuthenticateAsync(provider);
+        var authentication = await HttpContext.AuthenticateAsync(provider);
 
         // Authentication failed
-        if (result is null || !result.Succeeded)
+        if (authentication is null || !authentication.Succeeded)
             return Unauthorized();
 
-        var command = new ExternalLogin()
+        var identity = authentication.Principal.Identity;
+        var command = new ExternalLoginRequest()
         {
             Provider = provider,
-            Identity = (ClaimsIdentity)result.Principal.Identity,
+            Identity = identity as ClaimsIdentity,
             ReturnUrl = returnUrl
         };
 
         // Authentication passed.
         // Return authCode across api gateway to end cliend.
-        return await _dispatcher.HandleAsync(command);
+        var redirectUrl = await _dispatcher.HandleAsync(command);
+
+        return new RedirectResult(redirectUrl);
     }
 
     /// <summary>

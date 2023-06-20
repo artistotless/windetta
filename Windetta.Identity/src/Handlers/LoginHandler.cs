@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Windetta.Common.Authentication;
 using Windetta.Common.Types;
 using Windetta.Identity.Domain.Entities;
 using Windetta.Identity.Messages.Requests;
@@ -8,7 +8,7 @@ using Windetta.Identity.Services;
 
 namespace Windetta.Identity.Handlers;
 
-public class LoginHandler : IRequestHandler<Login>
+public class LoginHandler : IRequestHandler<LoginRequest, JsonWebTokenBase>
 {
     private readonly UserManager<User> _userManager;
     private readonly IJsonWebTokenBuilder _jwtBuilder;
@@ -19,7 +19,7 @@ public class LoginHandler : IRequestHandler<Login>
         _jwtBuilder = jwtBuilder;
     }
 
-    public async Task<IActionResult> HandleAsync(Login request)
+    public async Task<JsonWebTokenBase> HandleAsync(LoginRequest request)
     {
         var user = await _userManager.FindByEmailAsync(request.Email);
 
@@ -37,6 +37,6 @@ public class LoginHandler : IRequestHandler<Login>
 
         var jwt = await _jwtBuilder.BuildAsync(user.Id, claims);
 
-        return new OkObjectResult(jwt);
+        return jwt;
     }
 }

@@ -8,4 +8,19 @@ public class BaseController : ControllerBase
         => string.IsNullOrWhiteSpace(User?.Identity?.Name) ?
             Guid.Empty :
             Guid.Parse(User.Identity.Name);
+
+    protected IActionResult NoContent(Action action)
+    {
+        action?.Invoke();
+
+        return NoContent();
+    }
+
+    protected IActionResult Single<T>(T model)
+    {
+        if (model is null)
+            return NotFound();
+        else
+            return Ok(model);
+    }
 }

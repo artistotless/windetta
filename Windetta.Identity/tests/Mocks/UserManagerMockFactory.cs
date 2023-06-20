@@ -17,8 +17,8 @@ internal static class UserManagerMockFactory
         manager.Object.PasswordValidators.Add(new PasswordValidator<TUser>());
         manager.Object.Options = options;
 
-        manager.Setup(x => x.CheckPasswordAsync(It.IsAny<TUser>(), It.IsAny<string>())).Returns((TUser user, string passHash) => ls.Any(u => u.Id == user.Id && u.PasswordHash == passHash));
-        manager.Setup(x => x.FindByEmailAsync(It.IsAny<string>())).Returns((string email) => ls.Find(u => u.Email == email));
+        manager.Setup(x => x.CheckPasswordAsync(It.IsAny<TUser>(), It.IsAny<string>())).ReturnsAsync((TUser user, string passHash) => ls.Any(u => u.Id == user.Id && u.PasswordHash == passHash));
+        manager.Setup(x => x.FindByEmailAsync(It.IsAny<string>())).ReturnsAsync((string email) => ls.Find(u => u.Email == email));
         manager.Setup(x => x.DeleteAsync(It.IsAny<TUser>())).ReturnsAsync(IdentityResult.Success).Callback<TUser>(x => ls.Remove(x));
         manager.Setup(x => x.CreateAsync(It.IsAny<TUser>(), It.IsAny<string>())).ReturnsAsync(IdentityResult.Success).Callback<TUser, string>((x, y) => ls.Add(x));
         manager.Setup(x => x.CreateAsync(It.IsIn(ls, new UserNameComparer<TUser>()), It.IsAny<string>())).ReturnsAsync(IdentityResult.Failed(new IdentityError()

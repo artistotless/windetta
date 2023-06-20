@@ -1,4 +1,5 @@
 ﻿using Windetta.Common.Authentication;
+using Windetta.Common.Helpers;
 using Windetta.Common.Types;
 
 namespace Windetta.Identity.Services;
@@ -11,6 +12,9 @@ public interface IAuthCodeService : IScopedService
 
     static string GenerateCode()
     {
-        return "";
+        var part1 = Guid.NewGuid().ToString().Cut(10);
+        var part2 = Guid.NewGuid().ToString().Cut(10);
+
+        return $"{part1}{part2}";
     }
 }

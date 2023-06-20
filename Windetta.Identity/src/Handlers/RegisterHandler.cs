@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Windetta.Identity.Domain.Entities;
 using Windetta.Identity.Extensions;
 using Windetta.Identity.Messages.Requests;
 
 namespace Windetta.Identity.Handlers;
 
-public class RegisterHandler : IRequestHandler<Register>
+public class RegisterHandler : IRequestHandler<RegisterRequest>
 {
     private readonly UserManager<User> _userManager;
 
@@ -15,7 +14,7 @@ public class RegisterHandler : IRequestHandler<Register>
         _userManager = userManager;
     }
 
-    public async Task<IActionResult> HandleAsync(Register request)
+    public async Task HandleAsync(RegisterRequest request)
     {
         Validate(request);
 
@@ -29,11 +28,9 @@ public class RegisterHandler : IRequestHandler<Register>
 
         if (!result.Succeeded)
             throw result.Errors.FirstErrorAsException();
-
-        return new OkResult();
     }
 
-    private static void Validate(Register request)
+    private static void Validate(RegisterRequest request)
     {
         if (request.Email is null)
             throw new ArgumentNullException(nameof(request.Email));

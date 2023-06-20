@@ -9,7 +9,7 @@ namespace Windetta.Tests.Identity.HandlersTests;
 
 public class RegisterHandlerTests
 {
-    private readonly Register _sampleRequest;
+    private readonly RegisterRequest _sampleRequest;
 
     private const string USER_EMAIL = "test@gmail.com";
     private const string USER_PASS = "Pa55W@rd";
@@ -17,7 +17,7 @@ public class RegisterHandlerTests
 
     public RegisterHandlerTests()
     {
-        _sampleRequest = new Register()
+        _sampleRequest = new RegisterRequest()
         {
             Email = USER_EMAIL,
             Password = USER_PASS,
@@ -26,29 +26,17 @@ public class RegisterHandlerTests
     }
 
     [Fact]
-    public void HandleAsync_ReturnsOkResultType()
-    {
-        var userStore = new List<User>();
-        var userManagerMock = UserManagerMockFactory.Create(userStore);
-
-        var sut = new RegisterHandler(userManagerMock.Object);
-
-        var result = sut.HandleAsync(_sampleRequest).GetAwaiter().GetResult();
-
-        Assert.NotNull(result);
-        Assert.IsType<OkResult>(result);
-    }
-
-    [Fact]
     public void HandleAsync_CreatesNewUser()
     {
+        // arrange
         var userStore = new List<User>();
         var userManagerMock = UserManagerMockFactory.Create(userStore);
-
         var sut = new RegisterHandler(userManagerMock.Object);
 
+        // act
         sut.HandleAsync(_sampleRequest).GetAwaiter().GetResult();
 
+        // assert
         userStore.Count.ShouldBe(1);
     }
 
@@ -58,6 +46,7 @@ public class RegisterHandlerTests
     public void HandleAsync_CreatesNewUserFail_CredentialsAlreadyTaken(
         string email, string userName, string expectedErrorMessage)
     {
+        // arrange
         var userStore = new List<User>
         {
             new User() {
@@ -67,9 +56,9 @@ public class RegisterHandlerTests
         };
 
         var userManagerMock = UserManagerMockFactory.Create(userStore);
-
         var sut = new RegisterHandler(userManagerMock.Object);
 
+        // act, assert
         Should.Throw<IdentityException>(() => sut.HandleAsync(_sampleRequest).GetAwaiter().GetResult())
             .ErrorCode.ShouldBe(expectedErrorMessage);
     }
@@ -81,7 +70,8 @@ public class RegisterHandlerTests
     public void HandleAsync_ThrowArgumentNullExceptionIfArgumentsNull(
         string email, string userName, string password)
     {
-        var request = new Register()
+        // arrange
+        var request = new RegisterRequest()
         {
             Email = email,
             Password = password,
@@ -90,6 +80,7 @@ public class RegisterHandlerTests
 
         var sut = new RegisterHandler(null);
 
+        // act, assert
         Should.Throw<ArgumentNullException>(() => sut.HandleAsync(request).GetAwaiter().GetResult());
     }
 }
