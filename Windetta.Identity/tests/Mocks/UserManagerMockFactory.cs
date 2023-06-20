@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Moq;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Windetta.Tests.Identity.Mocks;
 
-internal class UserManagerMockFactory
+internal static class UserManagerMockFactory
 {
     public static Mock<UserManager<TUser>> Create<TUser>(List<TUser> ls) where TUser : IdentityUser<Guid>
     {
@@ -18,6 +17,8 @@ internal class UserManagerMockFactory
         manager.Object.PasswordValidators.Add(new PasswordValidator<TUser>());
         manager.Object.Options = options;
 
+        manager.Setup(x => x.CheckPasswordAsync(It.IsAny<TUser>(), It.IsAny<string>())).Returns((TUser user, string passHash) => ls.Any(u => u.Id == user.Id && u.PasswordHash == passHash));
+        manager.Setup(x => x.FindByEmailAsync(It.IsAny<string>())).Returns((string email) => ls.Find(u => u.Email == email));
         manager.Setup(x => x.DeleteAsync(It.IsAny<TUser>())).ReturnsAsync(IdentityResult.Success).Callback<TUser>(x => ls.Remove(x));
         manager.Setup(x => x.CreateAsync(It.IsAny<TUser>(), It.IsAny<string>())).ReturnsAsync(IdentityResult.Success).Callback<TUser, string>((x, y) => ls.Add(x));
         manager.Setup(x => x.CreateAsync(It.IsIn(ls, new UserNameComparer<TUser>()), It.IsAny<string>())).ReturnsAsync(IdentityResult.Failed(new IdentityError()
@@ -38,7 +39,7 @@ internal class UserManagerMockFactory
         return manager;
     }
 
-    internal class UserEmailComparer<TUser> : IEqualityComparer<TUser> where TUser : IdentityUser<Guid>
+    internal sealed class UserEmailComparer<TUser> : IEqualityComparer<TUser> where TUser : IdentityUser<Guid>
     {
         public bool Equals(TUser? x, TUser? y)
         {
@@ -57,7 +58,7 @@ internal class UserManagerMockFactory
         }
     }
 
-    internal class UserNameComparer<TUser> : IEqualityComparer<TUser> where TUser : IdentityUser<Guid>
+    internal sealed class UserNameComparer<TUser> : IEqualityComparer<TUser> where TUser : IdentityUser<Guid>
     {
         public bool Equals(TUser? x, TUser? y)
         {

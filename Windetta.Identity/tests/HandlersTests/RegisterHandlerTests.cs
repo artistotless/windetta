@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Shouldly;
 using Windetta.Identity.Domain.Entities;
 using Windetta.Identity.Handlers;
 using Windetta.Identity.Infrastructure.Exceptions;
@@ -27,7 +26,7 @@ public class RegisterHandlerTests
     }
 
     [Fact]
-    public void HandleAsync_ReturnsOkResult()
+    public void HandleAsync_ReturnsOkResultType()
     {
         var userStore = new List<User>();
         var userManagerMock = UserManagerMockFactory.Create(userStore);

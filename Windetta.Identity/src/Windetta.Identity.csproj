@@ -9,6 +9,7 @@
   <ItemGroup>
     <Folder Include="Messages\Queries\" />
     <Folder Include="Messages\Events\" />
+    <Folder Include="Tests\" />
   </ItemGroup>
 
   <ItemGroup>

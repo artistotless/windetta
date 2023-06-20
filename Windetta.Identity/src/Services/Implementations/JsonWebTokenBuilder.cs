@@ -1,5 +1,4 @@
-﻿using System.Security.Claims;
-using Windetta.Common.Authentication;
+﻿using Windetta.Common.Authentication;
 
 namespace Windetta.Identity.Services;
 
