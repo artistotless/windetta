@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Windetta.Common.Authentication;
+﻿using Windetta.Common.Types;
+using Windetta.Identity;
 using Windetta.Identity.Domain.Entities;
 using Windetta.Identity.Handlers;
 using Windetta.Identity.Messages.Requests;
@@ -34,5 +34,35 @@ public class LoginHandlerTests
         token.RefreshToken.ShouldNotBeNullOrEmpty();
         token.Expires.ShouldNotBe(0);
         token.Id.ShouldNotBe(Guid.Empty);
+    }
+
+    [Fact]
+    public void HandleAsync_ShouldThrowExceptionIfUserNotFound()
+    {
+        // arrange
+        var userManagerMock = UserManagerMockFactory.Create(_users);
+        var request = new LoginRequest() { Email = "notfounduser@gmail.com", Password = "somePassword" };
+        var sut = new LoginHandler(userManagerMock.Object, null);
+
+        // act
+        var exception = Should.Throw<WindettaException>(() => sut.HandleAsync(request).GetAwaiter().GetResult());
+
+        // assert
+        exception.ErrorCode.ShouldBe(ErrorCodes.UserNotFound);
+    }
+
+    [Fact]
+    public void HandleAsync_ShouldThrowExceptionIfPasswordDoesNotMatch()
+    {
+        // arrange
+        var userManagerMock = UserManagerMockFactory.Create(_users);
+        var request = new LoginRequest() { Email = _users.First().Email, Password = "fakepass" };
+        var sut = new LoginHandler(userManagerMock.Object, null);
+
+        // act
+        var exception = Should.Throw<WindettaException>(() => sut.HandleAsync(request).GetAwaiter().GetResult());
+
+        // assert
+        exception.ErrorCode.ShouldBe(ErrorCodes.UserNotFound);
     }
 }

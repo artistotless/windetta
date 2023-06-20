@@ -49,18 +49,18 @@ public class RegisterHandlerTests
         // arrange
         var userStore = new List<User>
         {
-            new User() {
-                Email = email,
-                UserName = userName
-            }
+            new User() {Email = email,UserName = userName}
         };
 
         var userManagerMock = UserManagerMockFactory.Create(userStore);
         var sut = new RegisterHandler(userManagerMock.Object);
 
-        // act, assert
-        Should.Throw<IdentityException>(() => sut.HandleAsync(_sampleRequest).GetAwaiter().GetResult())
-            .ErrorCode.ShouldBe(expectedErrorMessage);
+        // act
+        var exception = Should.Throw<IdentityException>(
+            () => sut.HandleAsync(_sampleRequest).GetAwaiter().GetResult());
+
+        // assert
+        exception.ErrorCode.ShouldBe(expectedErrorMessage);
     }
 
     [Theory]
@@ -78,9 +78,12 @@ public class RegisterHandlerTests
             UserName = userName
         };
 
+        // act 
         var sut = new RegisterHandler(null);
+        var exception = Should.Throw<ArgumentNullException>(
+            () => sut.HandleAsync(request).GetAwaiter().GetResult());
 
-        // act, assert
-        Should.Throw<ArgumentNullException>(() => sut.HandleAsync(request).GetAwaiter().GetResult());
+        // assert
+        exception.ShouldNotBeNull();
     }
 }
