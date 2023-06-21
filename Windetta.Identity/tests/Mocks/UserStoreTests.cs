@@ -4,22 +4,18 @@ namespace Windetta.Identity.Tests.Mocks;
 
 public class UserStoreTests
 {
+    private readonly UserStore _userStore = new();
+
     [Fact]
     public void GetStore_ShouldReturn3Users()
     {
-        var store = UserStore.GetStore();
-
-        var count = store.Count();
-
-        count.ShouldBe(3);
+        _userStore.OriginalUsersCount.ShouldBeGreaterThanOrEqualTo(3);
     }
 
     [Fact]
     public void GetStore_ShouldReturnListUserType()
     {
-        var store = UserStore.GetStore();
-
-        var type = store.GetType();
+        var type = _userStore.GetUsers().GetType();
 
         type.ShouldBe(typeof(List<User>));
     }

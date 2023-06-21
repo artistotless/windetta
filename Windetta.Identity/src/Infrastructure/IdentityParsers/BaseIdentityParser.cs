@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 using Windetta.Common.Helpers;
-using Windetta.Identity.Dtos;
+using Windetta.Identity.Extensions;
 using Windetta.Identity.Services;
 
 namespace Windetta.Identity.Infrastructure.IdentityParsers;
@@ -9,14 +9,14 @@ public abstract class BaseIdentityParser : IExternalIdentityParser
 {
     public abstract string ProviderName { get; }
 
-    public virtual ExternalIdentityDto Parse(ClaimsIdentity identity)
+    public virtual ExternalIdentity Parse(IEnumerable<Claim> claims)
     {
-        var idClaim = identity.FindFirst(ClaimTypes.NameIdentifier);
+        var idClaim = claims.FindFirst(ClaimTypes.NameIdentifier);
 
         if (idClaim is null)
             throw new Exception("Unable to retrieve user identifier from external authentication service.");
 
-        return new ExternalIdentityDto()
+        return new ExternalIdentity()
         {
             UniqueId = idClaim.Value,
             UserName = $"user@{idClaim.Value.Cut(6)}"

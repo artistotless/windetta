@@ -1,6 +1,6 @@
-﻿namespace Windetta.Identity.Dtos;
+﻿namespace Windetta.Identity.Infrastructure.IdentityParsers;
 
-public class ExternalIdentityDto
+public class ExternalIdentity
 {
     public string UniqueId { get; set; }
     public string? UserName { get; set; } = null;

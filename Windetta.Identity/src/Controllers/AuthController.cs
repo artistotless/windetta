@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using Windetta.Common.Types;
 using Windetta.Identity.Messages.Requests;
 using Windetta.Identity.Services;
 
@@ -55,11 +56,15 @@ public class AuthController : BaseController
         if (authentication is null || !authentication.Succeeded)
             return Unauthorized();
 
+        // Authentication failed
+        if (authentication.Principal is null || authentication.Principal.Identity is null)
+            throw new WindettaException("Fetching data from external OpenID provider failed");
+
         var identity = authentication.Principal.Identity;
         var command = new ExternalLoginRequest()
         {
             Provider = provider,
-            Identity = identity as ClaimsIdentity,
+            Claims = (identity as ClaimsIdentity)!.Claims,
             ReturnUrl = returnUrl
         };
 
@@ -71,14 +76,14 @@ public class AuthController : BaseController
     }
 
     /// <summary>
-    /// Redirect to external OAuth screen page
+    /// Redirect to external OpenID page
     /// </summary>
     private Task ChallengeAsync(string scheme, string returnUrl)
     {
         var properties = new AuthenticationProperties
         {
             RedirectUri = Url.Action(nameof(ExternalSignInCallback),
-            new { returnUrl = returnUrl, provider = scheme })
+            new { returnUrl = returnUrl, provider = scheme })?.ToLower()
         };
 
         return HttpContext.ChallengeAsync(scheme, properties);

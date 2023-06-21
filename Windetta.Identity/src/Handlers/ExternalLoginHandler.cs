@@ -2,8 +2,8 @@
 using System.Security.Claims;
 using Windetta.Common.Authentication;
 using Windetta.Identity.Domain.Entities;
-using Windetta.Identity.Dtos;
 using Windetta.Identity.Extensions;
+using Windetta.Identity.Infrastructure.IdentityParsers;
 using Windetta.Identity.Messages.Requests;
 using Windetta.Identity.Services;
 
@@ -24,10 +24,10 @@ public class ExternalLoginHandler : IRequestHandler<ExternalLoginRequest, string
         _userManager = userManager;
     }
 
+    // TODO: Do cover by unit test
     public async Task<string> HandleAsync(ExternalLoginRequest request)
     {
-        var identity = ParseIdentity(request.Provider, request.Identity);
-
+        var identity = ParseIdentity(request.Provider, request.Claims);
         var user = await _userManager.FindByLoginAsync(request.Provider, identity.UniqueId);
 
         // If the user not found - create a new user with attached the external login
@@ -51,7 +51,7 @@ public class ExternalLoginHandler : IRequestHandler<ExternalLoginRequest, string
                 throw attachedResult.Errors.FirstErrorAsException();
         }
 
-        var code = await CreateAuthCodeAsync(user.Id, identity.UniqueId);
+        var code = await CreateAuthCodeAsync(user.Id);
 
         return BuildRedirectUrl(request.ReturnUrl, code);
     }
@@ -64,7 +64,7 @@ public class ExternalLoginHandler : IRequestHandler<ExternalLoginRequest, string
     /// <returns>A task that represents the asynchronous operation. 
     /// The task result contains the generated authorization code.</returns>
 
-    private async Task<string> CreateAuthCodeAsync(Guid userId, string providerKey)
+    private async Task<string> CreateAuthCodeAsync(Guid userId)
     {
         var code = IAuthCodeService.GenerateCode();
 
@@ -79,17 +79,17 @@ public class ExternalLoginHandler : IRequestHandler<ExternalLoginRequest, string
     }
 
     /// <summary>
-    /// Parses the provided identity according to the given provider.
+    /// Parses the provided claims according to the given provider.
     /// </summary>
-    /// <param name="provider">The name of the provider to use for parsing the identity: e.g vk, google, steam ..</param>
-    /// <param name="identity">The identity to parse.</param>
-    /// <returns>An instance of ExternalIdentityDto that represents the parsed identity.</returns>
+    /// <param name="provider">The name of the provider to use for parsing the claims: e.g vk, google, steam ..</param>
+    /// <param name="claims">The claims parse.</param>
+    /// <returns>An instance of ExternalIdentity that represents the parsed claims.</returns>
 
-    private ExternalIdentityDto ParseIdentity(string provider, ClaimsIdentity identity)
+    private ExternalIdentity ParseIdentity(string provider, IEnumerable<Claim> claims)
     {
         var parser = _parsersFactory.GetParser(provider);
 
-        return parser.Parse(identity);
+        return parser.Parse(claims);
     }
 
     /// <summary>

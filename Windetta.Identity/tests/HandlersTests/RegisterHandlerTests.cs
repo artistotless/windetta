@@ -1,63 +1,60 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
 using Windetta.Identity.Domain.Entities;
 using Windetta.Identity.Handlers;
 using Windetta.Identity.Infrastructure.Exceptions;
 using Windetta.Identity.Messages.Requests;
+using Windetta.Identity.Tests.Mocks;
 using Windetta.Tests.Identity.Mocks;
 
 namespace Windetta.Tests.Identity.HandlersTests;
 
 public class RegisterHandlerTests
 {
-    private readonly RegisterRequest _sampleRequest;
-
-    private const string USER_EMAIL = "test@gmail.com";
-    private const string USER_PASS = "Pa55W@rd";
-    private const string USER_NAME = "user1";
+    private readonly UserStore _userStore = new();
+    private readonly Mock<UserManager<User>> _userManagerMock;
 
     public RegisterHandlerTests()
     {
-        _sampleRequest = new RegisterRequest()
-        {
-            Email = USER_EMAIL,
-            Password = USER_PASS,
-            UserName = USER_NAME,
-        };
+        _userManagerMock = UserManagerMockFactory.Create(_userStore.GetUsers());
     }
 
     [Fact]
     public void HandleAsync_CreatesNewUser()
     {
         // arrange
-        var userStore = new List<User>();
-        var userManagerMock = UserManagerMockFactory.Create(userStore);
-        var sut = new RegisterHandler(userManagerMock.Object);
+        var sut = new RegisterHandler(_userManagerMock.Object);
+        var request = new RegisterRequest()
+        {
+            Email = "unique-email@gmai.com",
+            Password = "password",
+            UserName = "unique-username",
+        };
 
         // act
-        sut.HandleAsync(_sampleRequest).GetAwaiter().GetResult();
+        sut.HandleAsync(request).GetAwaiter().GetResult();
 
         // assert
-        userStore.Count.ShouldBe(1);
+        _userStore.DeltaUsersCount.ShouldBe(1);
     }
 
     [Theory]
-    [InlineData(USER_EMAIL, "username", "DuplicateEmail")]
-    [InlineData("email@gmail.com", USER_NAME, "DuplicateUserName")]
+    [InlineData("user1gmail.com", "unique-username", "DuplicateEmail")]
+    [InlineData("unique-email@gmail.com", "user1", "DuplicateUserName")]
     public void HandleAsync_CreatesNewUserFail_CredentialsAlreadyTaken(
         string email, string userName, string expectedErrorMessage)
     {
         // arrange
-        var userStore = new List<User>
+        var sut = new RegisterHandler(_userManagerMock.Object);
+        var request = new RegisterRequest()
         {
-            new User() {Email = email,UserName = userName}
+            Email = email,
+            UserName = userName,
+            Password = "password",
         };
-
-        var userManagerMock = UserManagerMockFactory.Create(userStore);
-        var sut = new RegisterHandler(userManagerMock.Object);
 
         // act
         var exception = Should.Throw<IdentityException>(
-            () => sut.HandleAsync(_sampleRequest).GetAwaiter().GetResult());
+            () => sut.HandleAsync(request).GetAwaiter().GetResult());
 
         // assert
         exception.ErrorCode.ShouldBe(expectedErrorMessage);
