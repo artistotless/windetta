@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using IdentityServer4.EntityFramework.DbContexts;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -10,7 +11,7 @@ namespace Windetta.Identity.Data;
 
 public class IdentityDbContext : IdentityDbContext<User, Role, Guid>
 {
-    public IdentityDbContext([NotNull] DbContextOptions options) : base(options)
+    public IdentityDbContext(DbContextOptions<IdentityDbContext> options) : base(options)
     {
         var dbCreator = Database.GetService<IDatabaseCreator>();
 
