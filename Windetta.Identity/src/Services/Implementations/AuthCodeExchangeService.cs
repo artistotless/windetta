@@ -2,12 +2,12 @@
 
 namespace Windetta.Identity.Services;
 
-public class CodeExchangeService : ICodeExchangeService
+public class AuthCodeExchangeService : ITokenExchangeService
 {
     private readonly IAuthCodeService _authCodeService;
     private readonly IJsonWebTokenBuilder _jwtBuilder;
 
-    public CodeExchangeService(IAuthCodeService authCodeService, IJsonWebTokenBuilder jwtBuilder)
+    public AuthCodeExchangeService(IAuthCodeService authCodeService, IJsonWebTokenBuilder jwtBuilder)
     {
         _authCodeService = authCodeService;
         _jwtBuilder = jwtBuilder;

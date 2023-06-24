@@ -5,24 +5,25 @@ namespace Windetta.Identity.Services;
 public class RefreshTokenService : IRefreshTokenService
 {
     private readonly IRefreshTokensRepository _repository;
+    private readonly IJsonWebTokenBuilder _jwtBuilder;
 
-    public RefreshTokenService(IRefreshTokensRepository repository)
+    public RefreshTokenService(IRefreshTokensRepository repository, IJsonWebTokenBuilder jwtBuilder)
     {
         _repository = repository;
+        _jwtBuilder = jwtBuilder;
     }
 
-    public Task<string> CreateTokenAsync(Guid userId)
+    public async Task<string> CreateTokenAsync(Guid userId)
     {
-        throw new NotImplementedException();
+        var token = IRefreshTokenService.GenerateToken();
+        await _repository.SetAsync(userId, token);
+
+        return token;
     }
 
-    public Task<string> RefreshTokenAsync(Guid userId, string refreshToken)
-    {
-        throw new NotImplementedException();
-    }
+    public async Task<string> RefreshTokenAsync(Guid userId)
+        => await CreateTokenAsync(userId);
 
-    public Task RevokeTokenAsync(Guid userId, string refreshToken)
-    {
-        throw new NotImplementedException();
-    }
+    public async Task RevokeTokenAsync(Guid userId)
+        => await _repository.RemoveAsync(userId);
 }

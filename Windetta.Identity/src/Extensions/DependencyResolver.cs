@@ -1,11 +1,9 @@
-﻿using Autofac;
+﻿using IdentityServer4;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Options;
 using System.Reflection;
-using System.Text;
-using Windetta.Common.Authentication;
 using Windetta.Common.Configuration;
 using Windetta.Common.Options;
 using Windetta.Identity.Data;
@@ -15,27 +13,35 @@ namespace Windetta.Identity.Extensions
 {
     public static class DependencyResolver
     {
-        // Adding jwt authentication
+        // Adding IdentityServer4
+        public static void AddIdentityServer4(this IServiceCollection services)
+        {
+            var migrationsAssembly = typeof(Program).GetTypeInfo().Assembly.GetName().Name;
+            var builder = services.AddIdentityServer(options =>
+            {
+                // see https://identityserver4.readthedocs.io/en/latest/topics/resources.html
+                options.EmitStaticAudienceClaim = true;
+            });
+
+            using var provider = services.BuildServiceProvider();
+            var settings = provider.GetRequiredService<IOptions<MysqlSettings>>().Value;
+            var connectionString = GetConnectionString(settings);
+
+            builder.AddConfigurationStore(options =>
+             {
+                 options.ConfigureDbContext = b => b.UseMySql(connectionString, new MySqlServerVersion(settings.Version),
+                     sql => sql.MigrationsAssembly(migrationsAssembly));
+             });
+
+            builder.AddOperationalStore(options =>
+            {
+                options.ConfigureDbContext = b => b.UseMySql(connectionString, new MySqlServerVersion(settings.Version),
+                    sql => sql.MigrationsAssembly(migrationsAssembly));
+            });
+        }
+
         public static void AddAuthenticationMethods(this AuthenticationBuilder builder, IConfiguration configuration)
         {
-            var jwtSection = configuration.GetSection("Authentication:Jwt");
-            var jwtOptions = configuration.GetOptions<JwtOptions>("Authentication:Jwt");
-
-            builder.Services.Configure<JwtOptions>(jwtSection);
-            builder.AddJwtBearer(options =>
-                {
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = jwtOptions.ValidateIssuer,
-                        ValidateAudience = jwtOptions.ValidateAudience,
-                        ValidateLifetime = jwtOptions.ValidateLifetime,
-                        ValidateIssuerSigningKey = true,
-                        ValidIssuer = jwtOptions.Issuer,
-                        ValidAudience = jwtOptions.ValidAudience,
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.SecretKey))
-                    };
-                });
-
             builder.AddVk(configuration);
             builder.AddGoogle(configuration);
         }
@@ -48,6 +54,7 @@ namespace Windetta.Identity.Extensions
 
             builder.AddVkontakte("vk", options =>
             {
+                options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
                 options.ClientId = configuration["Authentication:Vk:ClientId"]!;
                 options.ClientSecret = configuration["Authentication:Vk:ClientSecret"]!;
             });
@@ -61,6 +68,7 @@ namespace Windetta.Identity.Extensions
 
             builder.AddGoogle("google", options =>
             {
+                options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
                 options.ClientId = configuration["Authentication:Google:ClientId"]!;
                 options.ClientSecret = configuration["Authentication:Google:ClientSecret"]!;
             });
@@ -69,8 +77,10 @@ namespace Windetta.Identity.Extensions
         // Configure Db connection to storing users, roles, claims and so on.
         public static void AddIdentityDbContext(this IServiceCollection services, IConfiguration configuration)
         {
-            var settings = configuration.GetSection("Mysql").Get<MysqlSettings>();
-            var connString = $"server={settings.Server};port={settings.Port};user={settings.User};password={settings.Password};database={settings.DbName}";
+            services.Configure<MysqlSettings>(configuration.GetSection("Mysql"));
+
+            var settings = configuration.GetOptions<MysqlSettings>("Mysql");
+            var connString = GetConnectionString(settings);
 
             services.AddDbContext<IdentityDbContext>(options => options.UseMySql(connString, new MySqlServerVersion(settings.Version),
                  b => b.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName)));
@@ -79,5 +89,9 @@ namespace Windetta.Identity.Extensions
                 .AddEntityFrameworkStores<IdentityDbContext>()
                 .AddDefaultTokenProviders();
         }
+
+        private static string GetConnectionString(MysqlSettings settings)
+            => string.Format("server={0};port={1};user={2};password={3};database={4}",
+                settings.Server, settings.Port, settings.User, settings.Password, settings.DbName);
     }
 }

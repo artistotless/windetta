@@ -4,5 +4,7 @@ namespace Windetta.Identity.Data.Repositories;
 
 public interface IRefreshTokensRepository : IScopedService
 {
-    Task AddAsync();
+    Task SetAsync(Guid userId, string refreshToken);
+    Task<string?> GetAsync(Guid userId);
+    Task RemoveAsync(Guid userId);
 }

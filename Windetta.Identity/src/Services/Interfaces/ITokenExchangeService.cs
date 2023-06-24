@@ -3,7 +3,7 @@ using Windetta.Common.Types;
 
 namespace Windetta.Identity.Services
 {
-    public interface ICodeExchangeService : IScopedService
+    public interface ITokenExchangeService : IScopedService
     {
         Task<JsonWebTokenBase> Exchange(string code);
     }

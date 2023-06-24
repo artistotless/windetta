@@ -1,5 +1,4 @@
-﻿using AutoFixture.Kernel;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using Windetta.Common.Authentication;
 using Windetta.Identity.Domain.Entities;
