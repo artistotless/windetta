@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Windetta.Common.Redis;
 using Windetta.Common.Types;
+using Windetta.Identity.Data.Seed;
 using Windetta.Identity.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -31,6 +32,9 @@ builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory(builder
 // ---------------------
 
 var app = builder.Build();
+
+IdentitySeeder.Seed(app);
+IdentityServerConfigurationSeeder.Seed(app);
 
 app.MapGet("/", () => "Windetta Identity Service");
 app.MapGet("/ping", () => Results.Ok());
