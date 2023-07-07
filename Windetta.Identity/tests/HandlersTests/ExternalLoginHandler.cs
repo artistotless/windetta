@@ -21,7 +21,6 @@ public class ExternalLoginHandlerTests
     public ExternalLoginHandlerTests()
     {
         _codes = new List<AuthorizationCode>();
-        _authCodeServiceMock = AuthCodeServiceMockFactory.Create(_codes);
         _userManagerMock = UserManagerMockFactory.Create(_userStore.GetUsers());
         _parserFactoryMock = ExternalIdentityParserMockFactory.Create();
     }
@@ -32,8 +31,7 @@ public class ExternalLoginHandlerTests
         // arrange
         _userManagerMock.Setup(x => x.FindByLoginAsync(It.IsAny<string>(), It.IsAny<string>()))
             .ReturnsAsync(_userStore.GetUsers().First());
-        var handler = new ExternalLoginHandler(
-            _authCodeServiceMock.Object, _parserFactoryMock.Object, _userManagerMock.Object);
+        var handler = new ExternalLoginHandler(_parserFactoryMock.Object, _userManagerMock.Object);
         var request = new Fixture().Build<ExternalLoginRequest>()
             .With(x => x.Claims, new List<Claim>())
             .Create();
@@ -48,8 +46,7 @@ public class ExternalLoginHandlerTests
     [Fact]
     public void HandleAsync_ShouldCreateNewUserIfUserNotFound()
     {
-        var handler = new ExternalLoginHandler(
-      _authCodeServiceMock.Object, _parserFactoryMock.Object, _userManagerMock.Object);
+        var handler = new ExternalLoginHandler(_parserFactoryMock.Object, _userManagerMock.Object);
         var request = new Fixture().Build<ExternalLoginRequest>()
             .With(x => x.Claims, new List<Claim>())
             .Create();

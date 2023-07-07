@@ -1,10 +1,9 @@
 using Autofac.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Windetta.Common.Redis;
 using Windetta.Common.Types;
 using Windetta.Identity.Data.Seed;
 using Windetta.Identity.Extensions;
+using Windetta.Identity.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,17 +11,14 @@ IConfiguration configuration = builder.Configuration;
 IServiceCollection services = builder.Services;
 
 services.AddIdentityDbContext(configuration);
+services.AddControllersWithViews();
 services.AddIdentityServer4();
 services.AddAuthorization();
 services.AddControllers();
+services.AddHttpContextAccessor();
 services.AddRedis(configuration);
-
-services.AddAuthentication(options =>
-{
-    options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
-
-}).AddAuthenticationMethods(configuration); // Adding vk, google .. external auth providers
+services.AddAuthenticationMethods(configuration); // Adding vk, google .. external auth providers
+services.ConfigureCustomViewsRouting();
 
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory(builder =>
 {
@@ -39,8 +35,8 @@ IdentityServerConfigurationSeeder.Seed(app);
 app.MapGet("/", () => "Windetta Identity Service");
 app.MapGet("/ping", () => Results.Ok());
 
+app.UseStaticFiles();
 app.UseIdentityServer();
-app.UseAuthentication();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();

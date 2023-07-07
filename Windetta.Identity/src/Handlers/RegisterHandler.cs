@@ -5,7 +5,7 @@ using Windetta.Identity.Messages.Requests;
 
 namespace Windetta.Identity.Handlers;
 
-public class RegisterHandler : IRequestHandler<RegisterRequest>
+public class RegisterHandler : IRequestHandler<LocalRegisterRequest>
 {
     private readonly UserManager<User> _userManager;
 
@@ -14,7 +14,7 @@ public class RegisterHandler : IRequestHandler<RegisterRequest>
         _userManager = userManager;
     }
 
-    public async Task HandleAsync(RegisterRequest request)
+    public async Task HandleAsync(LocalRegisterRequest request)
     {
         Validate(request);
 
@@ -30,7 +30,7 @@ public class RegisterHandler : IRequestHandler<RegisterRequest>
             throw result.Errors.FirstErrorAsException();
     }
 
-    private static void Validate(RegisterRequest request)
+    private static void Validate(LocalRegisterRequest request)
     {
         if (request.Email is null)
             throw new ArgumentNullException(nameof(request.Email));

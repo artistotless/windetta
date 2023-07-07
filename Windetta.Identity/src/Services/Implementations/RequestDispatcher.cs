@@ -26,7 +26,7 @@ public class RequestDispatcher : IRequestDispatcher
 
         // Create a generic request handler type based on the type of the request
         var handlerType = typeof(IRequestHandler<,>)
-                .MakeGenericType(request.GetType(), typeof(TResult));
+                    .MakeGenericType(request.GetType(), typeof(TResult));
 
         // Resolve the appropriate request handler from the service provider
         dynamic handler = scope.ServiceProvider.GetRequiredService(handlerType);
@@ -51,4 +51,5 @@ public class RequestDispatcher : IRequestDispatcher
 
         await handler.HandleAsync(castedRequest);
     }
+
 }

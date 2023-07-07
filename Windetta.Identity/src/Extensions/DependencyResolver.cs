@@ -27,6 +27,8 @@ namespace Windetta.Identity.Extensions
             var settings = provider.GetRequiredService<IOptions<MysqlSettings>>().Value;
             var connectionString = GetConnectionString(settings);
 
+            builder.AddAspNetIdentity<User>();
+
             builder.AddConfigurationStore(options =>
              {
                  options.ConfigureDbContext = b => b.UseMySql(connectionString, new MySqlServerVersion(settings.Version),
@@ -38,10 +40,14 @@ namespace Windetta.Identity.Extensions
                 options.ConfigureDbContext = b => b.UseMySql(connectionString, new MySqlServerVersion(settings.Version),
                     sql => sql.MigrationsAssembly(migrationsAssembly));
             });
+
+            builder.AddDeveloperSigningCredential();
         }
 
-        public static void AddAuthenticationMethods(this AuthenticationBuilder builder, IConfiguration configuration)
+        public static void AddAuthenticationMethods(this IServiceCollection services, IConfiguration configuration)
         {
+            var builder = services.AddAuthentication();
+
             builder.AddVk(configuration);
             builder.AddGoogle(configuration);
         }
@@ -85,7 +91,15 @@ namespace Windetta.Identity.Extensions
             services.AddDbContext<IdentityDbContext>(options => options.UseMySql(connString, new MySqlServerVersion(settings.Version),
                  b => b.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName)));
 
-            services.AddIdentity<User, Role>(o => o.User.RequireUniqueEmail = true)
+            services.AddIdentity<User, Role>(o =>
+            {
+                o.User.RequireUniqueEmail = true;
+                o.Password.RequireDigit = true;
+                o.Password.RequireUppercase = true;
+                o.Password.RequireLowercase = true;
+                o.Password.RequiredLength = 6;
+                o.Password.RequiredUniqueChars = 2;
+            })
                 .AddEntityFrameworkStores<IdentityDbContext>()
                 .AddDefaultTokenProviders();
         }

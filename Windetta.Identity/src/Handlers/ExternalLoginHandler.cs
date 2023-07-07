@@ -11,15 +11,12 @@ namespace Windetta.Identity.Handlers;
 
 public class ExternalLoginHandler : IRequestHandler<ExternalLoginRequest, string>
 {
-    private readonly IAuthCodeService _authCodeService;
     private readonly IExternalIdentityParserFactory _parsersFactory;
     private readonly UserManager<User> _userManager;
 
-    public ExternalLoginHandler(IAuthCodeService authCodeService,
-        IExternalIdentityParserFactory parsersFactory,
+    public ExternalLoginHandler(IExternalIdentityParserFactory parsersFactory,
         UserManager<User> userManager)
     {
-        _authCodeService = authCodeService;
         _parsersFactory = parsersFactory;
         _userManager = userManager;
     }
@@ -51,32 +48,12 @@ public class ExternalLoginHandler : IRequestHandler<ExternalLoginRequest, string
                 throw attachedResult.Errors.FirstErrorAsException();
         }
 
-        var code = await CreateAuthCodeAsync(user.Id);
+        // TODO: Replace
+        var code = "code";
 
         return BuildRedirectUrl(request.ReturnUrl, code);
     }
 
-    /// <summary>
-    /// Asynchronously creates an authorization code for a specific user.
-    /// </summary>
-    /// <param name="userId">The unique identifier of the user.</param>
-    /// <param name="providerKey">The key of the identity provider associated with the user.</param>
-    /// <returns>A task that represents the asynchronous operation. 
-    /// The task result contains the generated authorization code.</returns>
-
-    private async Task<string> CreateAuthCodeAsync(Guid userId)
-    {
-        var code = IAuthCodeService.GenerateCode();
-
-        await _authCodeService.AddCodeAsync(new AuthorizationCode()
-        {
-            Claims = new Dictionary<string, string> { { ClaimTypes.Role, Roles.USER } },
-            UserId = userId,
-            Value = code
-        });
-
-        return code;
-    }
 
     /// <summary>
     /// Parses the provided claims according to the given provider.

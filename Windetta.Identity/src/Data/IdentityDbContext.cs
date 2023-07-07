@@ -11,10 +11,6 @@ public class IdentityDbContext : IdentityDbContext<User, Role, Guid>
 {
     public IdentityDbContext(DbContextOptions<IdentityDbContext> options) : base(options)
     {
-        var dbCreator = Database.GetService<IDatabaseCreator>();
-
-        if (!dbCreator.CanConnect())
-            dbCreator.EnsureCreated();
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default(CancellationToken))

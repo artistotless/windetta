@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Windetta.Common.Messages;
+﻿using Windetta.Common.Messages;
 using Windetta.Common.Types;
 
 namespace Windetta.Identity.Services

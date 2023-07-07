@@ -23,7 +23,7 @@ public class RegisterHandlerTests
     {
         // arrange
         var sut = new RegisterHandler(_userManagerMock.Object);
-        var request = new RegisterRequest()
+        var request = new LocalRegisterRequest()
         {
             Email = "unique-email@gmai.com",
             Password = "password",
@@ -45,7 +45,7 @@ public class RegisterHandlerTests
     {
         // arrange
         var sut = new RegisterHandler(_userManagerMock.Object);
-        var request = new RegisterRequest()
+        var request = new LocalRegisterRequest()
         {
             Email = email,
             UserName = userName,
@@ -68,7 +68,7 @@ public class RegisterHandlerTests
         string email, string userName, string password)
     {
         // arrange
-        var request = new RegisterRequest()
+        var request = new LocalRegisterRequest()
         {
             Email = email,
             Password = password,

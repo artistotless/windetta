@@ -7,9 +7,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Folder Include="Data\Migrations\IdentityServer\" />
     <Folder Include="Messages\Queries\" />
     <Folder Include="Messages\Events\" />
-    <Folder Include="Tests\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -35,7 +35,7 @@
       <HintPath>..\..\iamLibs\IdentityServer4.EntityFramework\bin\Release\net7.0\IdentityServer4.EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="IdentityServer4.EntityFramework.Storage">
-      <HintPath>..\..\iamLibs\IdentityServer4.EntityFramework\bin\Release\net7.0\IdentityServer4.EntityFramework.Storage.dll</HintPath>
+      <HintPath>..\..\iamLibs\IdentityServer4.EntityFramework.Storage\bin\Release\net7.0\IdentityServer4.EntityFramework.Storage.dll</HintPath>
     </Reference>
   </ItemGroup>
 

@@ -12,4 +12,3 @@ public interface IRequestHandler<TRequest> : ITransientService where TRequest : 
 {
     Task HandleAsync(TRequest request);
 }
-

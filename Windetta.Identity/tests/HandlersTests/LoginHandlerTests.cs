@@ -26,8 +26,14 @@ public class LoginHandlerTests
     public void HandleAsync_ReturnJwt()
     {
         // arrange
-        var request = new LoginRequest() { Email = "user1gmail.com", Password = "user1Password" };
-        var sut = new LoginHandler(_userManagerMock.Object, _tokenBuilderMock.Object);
+        var request = new LocalLoginRequest()
+        {
+            Username = "user1gmail.com",
+            Password = "user1Password",
+            RememberLogin = false,
+            ReturnUrl = "~/"
+        };
+        var sut = new LocalLoginHandler(_userManagerMock.Object, _tokenBuilderMock.Object);
 
         // act
         var token = sut.HandleAsync(request).GetAwaiter().GetResult();
@@ -43,8 +49,8 @@ public class LoginHandlerTests
     public void HandleAsync_ShouldThrowExceptionIfUserNotFound()
     {
         // arrange
-        var request = new LoginRequest() { Email = "notfounduser@gmail.com", Password = "somePassword" };
-        var sut = new LoginHandler(_userManagerMock.Object, null);
+        var request = new LocalLoginRequest() { Username = "notfounduser@gmail.com", Password = "somePassword" };
+        var sut = new LocalLoginHandler(_userManagerMock.Object, null);
 
         // act
         var exception = Should.Throw<WindettaException>(() => sut.HandleAsync(request).GetAwaiter().GetResult());
@@ -57,13 +63,13 @@ public class LoginHandlerTests
     public void HandleAsync_ShouldThrowExceptionIfPasswordDoesNotMatch()
     {
         // arrange
-        var request = new LoginRequest()
+        var request = new LocalLoginRequest()
         {
-            Email = _userStore.GetUsers().First().Email!,
+            Username = _userStore.GetUsers().First().Email!,
             Password = "fakepass"
         };
 
-        var sut = new LoginHandler(_userManagerMock.Object, null);
+        var sut = new LocalLoginHandler(_userManagerMock.Object, null);
 
         // act
         var exception = Should.Throw<WindettaException>(() => sut.HandleAsync(request).GetAwaiter().GetResult());
