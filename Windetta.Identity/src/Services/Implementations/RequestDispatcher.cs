@@ -1,5 +1,5 @@
 ﻿using Windetta.Common.Messages;
-using Windetta.Identity.Handlers;
+using Windetta.Identity.Messages.Requests;
 
 namespace Windetta.Identity.Services;
 

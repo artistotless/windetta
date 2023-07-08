@@ -1,7 +1,7 @@
 ﻿using Windetta.Common.Messages;
 using Windetta.Common.Types;
 
-namespace Windetta.Identity.Handlers;
+namespace Windetta.Identity.Messages.Requests;
 
 public interface IRequestHandler<TRequest, TResult> : ITransientService where TRequest : IRequest<TResult>
 {

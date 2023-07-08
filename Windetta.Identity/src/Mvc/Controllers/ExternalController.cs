@@ -1,13 +1,16 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using IdentityServer4;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using Windetta.Common.Types;
 using Windetta.Identity.Controllers;
+using Windetta.Identity.Extensions;
 using Windetta.Identity.Messages.Requests;
+using Windetta.Identity.Mvc.Models;
 using Windetta.Identity.Services;
 
 namespace Windetta.Identity.Mvc.Controllers;
 
+[Route("[controller]")]
 public class ExternalController : BaseController
 {
     private readonly IRequestDispatcher _dispatcher;
@@ -19,55 +22,95 @@ public class ExternalController : BaseController
 
     /// <summary>
     /// Authenticate user using external auth provider
+    /// Redirects to external OIDC page
     /// </summary>
     [HttpGet]
-    [Route("signin/{provider}")]
-    public async Task SignInWithExternal(string provider, string returnUrl)
-        => await ChallengeAsync(provider.ToLower(), returnUrl);
+    [Route("{provider}")]
+    public async Task ExternalSignIn(string provider, string? returnUrl = null)
+    {
+        var properties = new AuthenticationProperties
+        {
+            RedirectUri = Url.Action(nameof(ExternalSignInCallback),
+            new { returnUrl = returnUrl, provider = provider.ToLower() })?.ToLower()
+        };
+
+        await HttpContext.ChallengeAsync(provider.ToLower(), properties);
+    }
 
     /// <summary>
     /// Handle the response recieved from external Oauth provider
     /// </summary>
     [HttpGet]
-    [Route("signin/{provider}/callback")]
-    public async Task<IActionResult> ExternalSignInCallback(string provider, string returnUrl)
+    [Route("{provider}/callback")]
+    public async Task<IActionResult> ExternalSignInCallback([FromRoute] ExternalSignInCallbackModel model)
     {
-        var authentication = await HttpContext.AuthenticateAsync(provider);
+        var authResult = await HttpContext
+            .AuthenticateAsync(IdentityServerConstants.ExternalCookieAuthenticationScheme);
 
         // Authentication failed
-        if (authentication is null || !authentication.Succeeded)
+        if (authResult is null || !authResult.Succeeded)
             return Unauthorized();
 
         // Authentication failed
-        if (authentication.Principal is null || authentication.Principal.Identity is null)
+        if (authResult.Principal is null || authResult.Principal.Identity is null)
             throw new WindettaException("Fetching data from external OpenID provider failed");
 
-        var identity = authentication.Principal.Identity;
-        var command = new ExternalLoginRequest()
+        var externalIdentity = await _dispatcher.HandleAsync(
+            new ParseExternalIdentityRequest()
+            {
+                AuthResult = authResult,
+                Provider = model.Provider,
+            });
+
+        // if external oidc provider does not return email
+        // show input email page
+        if ((externalIdentity.Email = model.Email ?? externalIdentity.Email) is null)
+            return View("InputEmail", model);
+
+        var request = new ExternalLoginRequest()
         {
-            Provider = provider,
-            Claims = (identity as ClaimsIdentity)!.Claims,
-            ReturnUrl = returnUrl
+            Provider = model.Provider,
+            Identity = externalIdentity,
+            ReturnUrl = model.ReturnUrl,
+            Email = model.Email,
         };
 
-        // Authentication passed.
-        // Return authCode across api gateway to end cliend.
-        var redirectUrl = await _dispatcher.HandleAsync(command);
+        var context = await _dispatcher.HandleAsync(request);
 
-        return new RedirectResult(redirectUrl);
+        await HttpContext.SignOutAsync(IdentityServerConstants.ExternalCookieAuthenticationScheme);
+
+        if (context != null)
+        {
+            if (context.IsNativeClient())
+            {
+                // The client is native, so this change in how to
+                // return the response is for better UX for the end user.
+                return this.LoadingPage("Redirect", request.ReturnUrl);
+            }
+        }
+
+        return new RedirectResult(request.ReturnUrl);
     }
 
-    /// <summary>
-    /// Redirect to external OpenID page
-    /// </summary>
-    private Task ChallengeAsync(string scheme, string returnUrl)
+    [HttpPost]
+    [Route("[action]")]
+    public async Task<IActionResult> InputEmail([FromForm] ExternalSignInCallbackModel model)
     {
-        var properties = new AuthenticationProperties
-        {
-            RedirectUri = Url.Action(nameof(ExternalSignInCallback),
-            new { returnUrl = returnUrl, provider = scheme })?.ToLower()
-        };
+        if (!ModelState.IsValid)
+            return View("InputEmail", model);
 
-        return HttpContext.ChallengeAsync(scheme, properties);
+        var existUserWithEmail = await _dispatcher.HandleAsync(
+            new ExistUserWithEmailRequest()
+            {
+                Email = model.Email
+            });
+
+        if (existUserWithEmail is true)
+        {
+            ModelState.AddModelError(nameof(model.Email), "The email is already registered");
+            return View("InputEmail", model);
+        }
+
+        return await ExternalSignInCallback(model);
     }
 }

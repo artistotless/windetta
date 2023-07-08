@@ -16,7 +16,7 @@ public class ExternalLoginHandlerTests
     private readonly List<AuthorizationCode> _codes;
     private readonly Mock<IAuthCodeService> _authCodeServiceMock;
     private readonly Mock<UserManager<User>> _userManagerMock;
-    private readonly Mock<IExternalIdentityParserFactory> _parserFactoryMock;
+    private readonly Mock<IExternalClaimsProcessorFactory> _parserFactoryMock;
 
     public ExternalLoginHandlerTests()
     {

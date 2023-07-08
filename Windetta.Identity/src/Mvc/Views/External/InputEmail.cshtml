@@ -1,0 +1,29 @@
+@model Windetta.Identity.Mvc.Models.ExternalSignInCallbackModel
+
+<div class="login-page">
+    <div class="lead">
+        <p>Input your email</p>
+    </div>
+    <partial name="_ValidationSummary" />
+
+    <div class="row">
+
+        <div class="col-sm-6">
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" asp-action="InputEmail" asp-controller="External">
+                        <input type="hidden" asp-for="ReturnUrl" />
+                        <input type="hidden" asp-for="Provider" />
+
+                        <div class="form-group">
+                            <label asp-for="Email"></label>
+                            <input class="form-control" asp-for="Email" autofocus>
+                        </div>
+
+                        <button class="btn btn-primary" name="button" value="login">Login</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

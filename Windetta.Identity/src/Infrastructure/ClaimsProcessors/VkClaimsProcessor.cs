@@ -3,17 +3,18 @@ using Windetta.Identity.Extensions;
 
 namespace Windetta.Identity.Infrastructure.IdentityParsers;
 
-public class GoogleIdentityParser : BaseIdentityParser
+public class VkClaimsProcessor : BaseClaimsProcessor
 {
-    public override string ProviderName => "google";
+    public override string ProviderName => "vk";
 
     public override ExternalIdentity Parse(IEnumerable<Claim> claims)
     {
         var baseIdentity = base.Parse(claims);
 
-        var nameClaim = claims.FindFirst(ClaimTypes.Name);
+        var imageClaim = claims.FindFirst("urn:vkontakte:photo:link");
 
-        baseIdentity.DisplayName = nameClaim is null ? null : nameClaim.Value;
+        if (imageClaim is not null)
+            baseIdentity.ImageUrl = imageClaim.Value;
 
         return baseIdentity;
     }
