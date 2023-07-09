@@ -1,9 +1,13 @@
 ﻿using IdentityServer4;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Windetta.Common.Types;
 using Windetta.Identity.Controllers;
+using Windetta.Identity.Domain.Entities;
 using Windetta.Identity.Extensions;
+using Windetta.Identity.Infrastructure.IdentityParsers;
 using Windetta.Identity.Messages.Requests;
 using Windetta.Identity.Mvc.Models;
 using Windetta.Identity.Services;
@@ -14,10 +18,12 @@ namespace Windetta.Identity.Mvc.Controllers;
 public class ExternalController : BaseController
 {
     private readonly IRequestDispatcher _dispatcher;
+    private readonly UserManager<User> _userManager;
 
-    public ExternalController(IRequestDispatcher dispatcher)
+    public ExternalController(IRequestDispatcher dispatcher, UserManager<User> userManager)
     {
         _dispatcher = dispatcher;
+        this._userManager = userManager;
     }
 
     /// <summary>
@@ -62,19 +68,54 @@ public class ExternalController : BaseController
                 Provider = model.Provider,
             });
 
-        // if external oidc provider does not return email
-        // show input email page
-        if ((externalIdentity.Email = model.Email ?? externalIdentity.Email) is null)
-            return View("InputEmail", model);
+        var user = await _userManager.FindByLoginAsync(model.Provider, externalIdentity.UniqueId);
+        if (user is null)
+        {
+            TempData.TryAdd("externalIdentity", JsonConvert.SerializeObject(externalIdentity));
+            // if external oidc provider does not return email
+            // show input email page
+            if (externalIdentity.Email is null)
+                return View("InputEmail", model);
+        }
 
-        var request = new ExternalLoginRequest()
+        return await ContinueExternalLogin(new ExternalLoginRequest()
         {
             Provider = model.Provider,
             Identity = externalIdentity,
             ReturnUrl = model.ReturnUrl,
-            Email = model.Email,
-        };
+        });
+    }
 
+    [HttpPost]
+    [Route("[action]")]
+    public async Task<IActionResult> InputEmail([FromForm] InputEmailViewModel model)
+    {
+        if (!ModelState.IsValid)
+            return View("InputEmail", model);
+
+        var user = await _userManager.FindByEmailAsync(model.Email);
+
+        if (user is not null)
+            ModelState.AddModelError(nameof(model.Email), "The email is already registered");
+
+        if (!TempData.TryGetValue("externalIdentity", out var identityValue) || identityValue is null)
+            ModelState.AddModelError(string.Empty, $"No identity info recieved from {model.Provider}");
+
+        if (ModelState.ErrorCount > 0)
+            return View("InputEmail", model);
+
+        var identityObject = JsonConvert.DeserializeObject<ExternalIdentity>(identityValue.ToString());
+
+        return await ContinueExternalLogin(new ExternalLoginRequest()
+        {
+            Provider = model.Provider,
+            Identity = identityObject,
+            ReturnUrl = model.ReturnUrl,
+        });
+    }
+
+    private async Task<IActionResult> ContinueExternalLogin(ExternalLoginRequest request)
+    {
         var context = await _dispatcher.HandleAsync(request);
 
         await HttpContext.SignOutAsync(IdentityServerConstants.ExternalCookieAuthenticationScheme);
@@ -90,27 +131,5 @@ public class ExternalController : BaseController
         }
 
         return new RedirectResult(request.ReturnUrl);
-    }
-
-    [HttpPost]
-    [Route("[action]")]
-    public async Task<IActionResult> InputEmail([FromForm] ExternalSignInCallbackModel model)
-    {
-        if (!ModelState.IsValid)
-            return View("InputEmail", model);
-
-        var existUserWithEmail = await _dispatcher.HandleAsync(
-            new ExistUserWithEmailRequest()
-            {
-                Email = model.Email
-            });
-
-        if (existUserWithEmail is true)
-        {
-            ModelState.AddModelError(nameof(model.Email), "The email is already registered");
-            return View("InputEmail", model);
-        }
-
-        return await ExternalSignInCallback(model);
     }
 }

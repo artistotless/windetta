@@ -1,4 +1,4 @@
-﻿using IdentityModel;
+using IdentityModel;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Identity;
@@ -13,8 +13,6 @@ namespace Windetta.Identity.Messages.Requests;
 public class ExternalLoginRequest : IRequest<AuthorizationRequest>
 {
     public ExternalIdentity Identity { get; set; }
-    public string Email { get; set; }
-    public bool IsPersistent { get; set; }
     public string Provider { get; set; }
     public string ReturnUrl { get; set; }
 }
@@ -45,8 +43,10 @@ public class ExternalLoginHandler : IRequestHandler<ExternalLoginRequest, Author
             user = await AutoProvisionUserAsync(request.Provider, request.Identity);
         }
 
+        _signinManager.SignInAsync()
+
         await _signinManager.ExternalLoginSignInAsync
-            (request.Provider, request.Identity.UniqueId, request.IsPersistent);
+            (request.Provider, request.Identity.UniqueId, isPersistent: true);
 
         var context = await _interaction.GetAuthorizationContextAsync(request.ReturnUrl);
 
