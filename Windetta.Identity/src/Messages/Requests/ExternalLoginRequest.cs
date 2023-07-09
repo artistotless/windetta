@@ -2,6 +2,7 @@ using IdentityModel;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using Windetta.Common.Messages;
@@ -41,17 +42,7 @@ public class ExternalLoginHandler : IRequestHandler<ExternalLoginRequest, Author
 
         // If the user not found - create a new user with attached the external login
         if (user is null)
-        {
             user = await AutoProvisionUserAsync(request.Provider, request.Identity);
-        }
-
-        var GetAllSchemesAsync = await _pr.GetAllSchemesAsync();
-        var GetDefaultAuthenticateSchemeAsync = await _pr.GetDefaultAuthenticateSchemeAsync();
-        var GetDefaultChallengeSchemeAsync = await _pr.GetDefaultChallengeSchemeAsync();
-        var GetDefaultForbidSchemeAsync = await _pr.GetDefaultForbidSchemeAsync();
-        var GetDefaultSignInSchemeAsync = await _pr.GetDefaultSignInSchemeAsync();
-        var GetDefaultSignOutSchemeAsync = await _pr.GetDefaultSignOutSchemeAsync();
-        ;
 
         await _signinManager.ExternalLoginSignInAsync
             (request.Provider, request.Identity.UniqueId, isPersistent: true);

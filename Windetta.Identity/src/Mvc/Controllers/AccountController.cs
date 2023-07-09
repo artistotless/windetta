@@ -34,6 +34,7 @@ public class AccountController : BaseController
 
     [HttpPost]
     [Route("login")]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Login([FromForm] LocalLoginRequest request)
     {
         if (!ModelState.IsValid)
@@ -70,6 +71,27 @@ public class AccountController : BaseController
     public IActionResult Register([FromBody] LocalRegisterRequest request)
         => NoContent(async () => await _dispatcher.HandleAsync(request));
 
+
+    /// <summary>
+    /// Show logout page
+    /// </summary>
+    [HttpGet]
+    public async Task<IActionResult> Logout([FromQuery] LocalLogoutRequest request)
+    {
+        await _dispatcher.HandleAsync(request);
+
+        // build a model so the logout page knows what to display
+        var vm = await BuildLogoutViewModelAsync(logoutId);
+
+        if (vm.ShowLogoutPrompt == false)
+        {
+            // if the request for logout was properly authenticated from IdentityServer, then
+            // we don't need to show the prompt and can just log the user out directly.
+            return await Logout(vm);
+        }
+
+        return View(vm);
+    }
 
     #region private helpers
 

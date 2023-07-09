@@ -8,7 +8,7 @@ public class InputEmailViewModel
     [Required]
     public string Email { get; set; }
 
-    public string ReturnUrl { get; set; }
+    public string? ReturnUrl { get; set; }
 
     [Required]
     public string Provider { get; set; }

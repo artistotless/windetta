@@ -62,8 +62,8 @@
                                 <li class="list-inline-item">
                                     <a class="btn btn-secondary"
                                asp-controller="External"
-                               asp-action="Challenge"
-                               asp-route-scheme="@provider.AuthenticationScheme"
+                               asp-action="SignIn"
+                               asp-route-provider="@provider.AuthenticationScheme"
                                asp-route-returnUrl="@Model.ReturnUrl">
                                         @provider.DisplayName
                                     </a>

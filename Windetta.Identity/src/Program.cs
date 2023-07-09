@@ -32,7 +32,7 @@ var app = builder.Build();
 IdentitySeeder.Seed(app);
 IdentityServerConfigurationSeeder.Seed(app);
 
-app.MapGet("/", () => "Windetta Identity Service");
+app.MapGet("/", () => "Windetta Identity Service").RequireAuthorization();
 app.MapGet("/ping", () => Results.Ok());
 
 app.UseStaticFiles();

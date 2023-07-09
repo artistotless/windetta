@@ -23,7 +23,7 @@ public class ExternalController : BaseController
     public ExternalController(IRequestDispatcher dispatcher, UserManager<User> userManager)
     {
         _dispatcher = dispatcher;
-        this._userManager = userManager;
+        _userManager = userManager;
     }
 
     /// <summary>
@@ -32,11 +32,11 @@ public class ExternalController : BaseController
     /// </summary>
     [HttpGet]
     [Route("{provider}")]
-    public async Task ExternalSignIn(string provider, string? returnUrl = null)
+    public async Task SignIn(string provider, string? returnUrl = null)
     {
         var properties = new AuthenticationProperties
         {
-            RedirectUri = Url.Action(nameof(ExternalSignInCallback),
+            RedirectUri = Url.Action(nameof(SignInCallback),
             new { returnUrl = returnUrl, provider = provider.ToLower() })?.ToLower()
         };
 
@@ -48,7 +48,7 @@ public class ExternalController : BaseController
     /// </summary>
     [HttpGet]
     [Route("{provider}/callback")]
-    public async Task<IActionResult> ExternalSignInCallback([FromRoute] ExternalSignInCallbackModel model)
+    public async Task<IActionResult> SignInCallback([FromRoute] ExternalSignInCallbackModel model)
     {
         var authResult = await HttpContext
             .AuthenticateAsync(IdentityServerConstants.ExternalCookieAuthenticationScheme);
@@ -75,7 +75,11 @@ public class ExternalController : BaseController
             // if external oidc provider does not return email
             // show input email page
             if (externalIdentity.Email is null)
-                return View("InputEmail", model);
+                return View("InputEmail", new InputEmailViewModel()
+                {
+                    Provider = model.Provider,
+                    ReturnUrl = model.ReturnUrl
+                });
         }
 
         return await ContinueExternalLogin(new ExternalLoginRequest()
@@ -87,6 +91,7 @@ public class ExternalController : BaseController
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     [Route("[action]")]
     public async Task<IActionResult> InputEmail([FromForm] InputEmailViewModel model)
     {
@@ -115,6 +120,7 @@ public class ExternalController : BaseController
         });
     }
 
+    [NonAction]
     private async Task<IActionResult> ContinueExternalLogin(ExternalLoginRequest request)
     {
         var context = await _dispatcher.HandleAsync(request);
