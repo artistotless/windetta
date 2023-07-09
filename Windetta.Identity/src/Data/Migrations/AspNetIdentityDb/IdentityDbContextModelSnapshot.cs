@@ -7,7 +7,7 @@ using Windetta.Identity.Data;
 
 #nullable disable
 
-namespace Windetta.Identity.Data.Migrations.AspNetIdentityb
+namespace Windetta.Identity.Data.Migrations.AspNetIdentityDb
 {
     [DbContext(typeof(IdentityDbContext))]
     partial class IdentityDbContextModelSnapshot : ModelSnapshot
@@ -159,6 +159,7 @@ namespace Windetta.Identity.Data.Migrations.AspNetIdentityb
                         .HasColumnType("longtext");
 
                     b.Property<string>("DisplayName")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("Email")

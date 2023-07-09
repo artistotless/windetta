@@ -8,10 +8,10 @@ using Windetta.Identity.Data;
 
 #nullable disable
 
-namespace Windetta.Identity.Data.Migrations.AspNetIdentityb
+namespace Windetta.Identity.Data.Migrations.AspNetIdentityDb
 {
     [DbContext(typeof(IdentityDbContext))]
-    [Migration("20230705172321_InitialAspNetIdentityDbMigration")]
+    [Migration("20230709180043_InitialAspNetIdentityDbMigration")]
     partial class InitialAspNetIdentityDbMigration
     {
         /// <inheritdoc />
@@ -162,6 +162,7 @@ namespace Windetta.Identity.Data.Migrations.AspNetIdentityb
                         .HasColumnType("longtext");
 
                     b.Property<string>("DisplayName")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("Email")

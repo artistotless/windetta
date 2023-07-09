@@ -1,6 +1,5 @@
 ﻿using IdentityModel;
 using System.Security.Claims;
-using Windetta.Common.Helpers;
 using Windetta.Identity.Extensions;
 using Windetta.Identity.Services;
 
@@ -30,7 +29,6 @@ public class BaseClaimsProcessor : IExternaClaimsProcessor
         return new ExternalIdentity()
         {
             UniqueId = idClaim.Value,
-            UserName = $"user@{idClaim.Value.Cut(6)}",
             DisplayName = displayName,
             Email = emailClaim?.Value
         };

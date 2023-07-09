@@ -105,6 +105,7 @@ public class ExternalController : BaseController
             return View("InputEmail", model);
 
         var identityObject = JsonConvert.DeserializeObject<ExternalIdentity>(identityValue.ToString());
+        identityObject.Email = model.Email;
 
         return await ContinueExternalLogin(new ExternalLoginRequest()
         {

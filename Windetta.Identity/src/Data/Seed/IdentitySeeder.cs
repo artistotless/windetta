@@ -23,6 +23,7 @@ public static class IdentitySeeder
                 EmailConfirmed = true,
                 Email = "root@root.com",
                 UserName = "root",
+                DisplayName = "root",
             };
 
             var result = userManager.CreateAsync(rootUser, "P@ssw0rd").GetAwaiter().GetResult();

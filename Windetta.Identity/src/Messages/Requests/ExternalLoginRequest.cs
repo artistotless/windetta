@@ -1,6 +1,7 @@
 using IdentityModel;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using Windetta.Common.Messages;
@@ -21,12 +22,13 @@ public class ExternalLoginHandler : IRequestHandler<ExternalLoginRequest, Author
 {
     private readonly SignInManager<User> _signinManager;
     private readonly IIdentityServerInteractionService _interaction;
+    private readonly IAuthenticationSchemeProvider _pr;
 
-    public ExternalLoginHandler(SignInManager<User> userManager,
-        IIdentityServerInteractionService interaction)
+    public ExternalLoginHandler(SignInManager<User> signinManager, IIdentityServerInteractionService interaction, IAuthenticationSchemeProvider pr)
     {
-        _signinManager = userManager;
+        _signinManager = signinManager;
         _interaction = interaction;
+        _pr = pr;
     }
 
     // TODO: Do cover by unit test
@@ -43,7 +45,13 @@ public class ExternalLoginHandler : IRequestHandler<ExternalLoginRequest, Author
             user = await AutoProvisionUserAsync(request.Provider, request.Identity);
         }
 
-        _signinManager.SignInAsync()
+        var GetAllSchemesAsync = await _pr.GetAllSchemesAsync();
+        var GetDefaultAuthenticateSchemeAsync = await _pr.GetDefaultAuthenticateSchemeAsync();
+        var GetDefaultChallengeSchemeAsync = await _pr.GetDefaultChallengeSchemeAsync();
+        var GetDefaultForbidSchemeAsync = await _pr.GetDefaultForbidSchemeAsync();
+        var GetDefaultSignInSchemeAsync = await _pr.GetDefaultSignInSchemeAsync();
+        var GetDefaultSignOutSchemeAsync = await _pr.GetDefaultSignOutSchemeAsync();
+        ;
 
         await _signinManager.ExternalLoginSignInAsync
             (request.Provider, request.Identity.UniqueId, isPersistent: true);
@@ -63,9 +71,10 @@ public class ExternalLoginHandler : IRequestHandler<ExternalLoginRequest, Author
     {
         var user = new User()
         {
-            UserName = identity.UserName,
+            UserName = identity.Email,
             Email = identity.Email,
             EmailConfirmed = false,
+            DisplayName = identity.DisplayName
         };
 
         var createdResult = await _signinManager.UserManager.CreateAsync(user);

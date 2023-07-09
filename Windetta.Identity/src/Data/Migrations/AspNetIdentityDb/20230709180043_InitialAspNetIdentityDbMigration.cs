@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Windetta.Identity.Data.Migrations.AspNetIdentityb
+namespace Windetta.Identity.Data.Migrations.AspNetIdentityDb
 {
     /// <inheritdoc />
     public partial class InitialAspNetIdentityDbMigration : Migration
@@ -38,7 +38,7 @@ namespace Windetta.Identity.Data.Migrations.AspNetIdentityb
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    DisplayName = table.Column<string>(type: "longtext", nullable: true)
+                    DisplayName = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     UserName = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
