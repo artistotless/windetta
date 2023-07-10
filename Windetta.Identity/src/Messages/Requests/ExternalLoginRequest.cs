@@ -2,7 +2,6 @@ using IdentityModel;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using Windetta.Common.Messages;
@@ -62,10 +61,10 @@ public class ExternalLoginHandler : IRequestHandler<ExternalLoginRequest, Author
     {
         var user = new User()
         {
-            UserName = identity.Email,
+            UserName = $"user@{provider}.{identity.UniqueId}",
             Email = identity.Email,
             EmailConfirmed = false,
-            DisplayName = identity.DisplayName
+            DisplayName = identity.DisplayName,
         };
 
         var createdResult = await _signinManager.UserManager.CreateAsync(user);

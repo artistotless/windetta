@@ -1,4 +1,5 @@
 ﻿using IdentityServer4.Models;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Windetta.Identity.Extensions;
 using Windetta.Identity.Messages.Requests;
@@ -71,26 +72,21 @@ public class AccountController : BaseController
     public IActionResult Register([FromBody] LocalRegisterRequest request)
         => NoContent(async () => await _dispatcher.HandleAsync(request));
 
-
     /// <summary>
     /// Show logout page
     /// </summary>
     [HttpGet]
-    public async Task<IActionResult> Logout([FromQuery] LocalLogoutRequest request)
+    [Route("logout")]
+    public async Task<IActionResult> Logout([FromQuery] Messages.Requests.LogoutRequest request)
     {
-        await _dispatcher.HandleAsync(request);
+        var loggedOutResponse = await _dispatcher.HandleAsync(request);
 
-        // build a model so the logout page knows what to display
-        var vm = await BuildLogoutViewModelAsync(logoutId);
+        await HttpContext.SignOutAsync();
 
-        if (vm.ShowLogoutPrompt == false)
-        {
-            // if the request for logout was properly authenticated from IdentityServer, then
-            // we don't need to show the prompt and can just log the user out directly.
-            return await Logout(vm);
-        }
+        if (loggedOutResponse.IsLocalLogout)
+            return Redirect("~/");
 
-        return View(vm);
+        return View(loggedOutResponse);
     }
 
     #region private helpers

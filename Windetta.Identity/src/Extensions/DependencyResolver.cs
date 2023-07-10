@@ -60,8 +60,6 @@ namespace Windetta.Identity.Extensions
 
             builder.AddVkontakte("vk", options =>
             {
-                options.Scope.Add("4194304");
-                options.SaveTokens = true;
                 options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
                 options.ClientId = configuration["Authentication:Vk:ClientId"]!;
                 options.ClientSecret = configuration["Authentication:Vk:ClientSecret"]!;
@@ -76,7 +74,6 @@ namespace Windetta.Identity.Extensions
 
             builder.AddGoogle("google", options =>
             {
-                options.SaveTokens = true;
                 options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
                 options.ClientId = configuration["Authentication:Google:ClientId"]!;
                 options.ClientSecret = configuration["Authentication:Google:ClientSecret"]!;

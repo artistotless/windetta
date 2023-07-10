@@ -1,6 +1,5 @@
 ﻿using IdentityServer4;
 using IdentityServer4.Models;
-using System.Net.Sockets;
 
 namespace Windetta.Identity.Data.Seed;
 
@@ -71,6 +70,7 @@ public static class IdentityServerBootstrapData
             {
                 IdentityServerConstants.StandardScopes.OpenId,
                 IdentityServerConstants.StandardScopes.Profile,
+                IdentityServerConstants.StandardScopes.Email,
                 "api1"
             }
         }

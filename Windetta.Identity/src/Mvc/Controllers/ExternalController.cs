@@ -36,8 +36,12 @@ public class ExternalController : BaseController
     {
         var properties = new AuthenticationProperties
         {
-            RedirectUri = Url.Action(nameof(SignInCallback),
-            new { returnUrl = returnUrl, provider = provider.ToLower() })?.ToLower()
+            RedirectUri = Url.Action(nameof(SignInCallback)),
+            Items =
+            {
+                { "returnUrl", returnUrl },
+                { "provider", provider },
+            }
         };
 
         await HttpContext.ChallengeAsync(provider.ToLower(), properties);
@@ -47,8 +51,8 @@ public class ExternalController : BaseController
     /// Handle the response recieved from external Oauth provider
     /// </summary>
     [HttpGet]
-    [Route("{provider}/callback")]
-    public async Task<IActionResult> SignInCallback([FromRoute] ExternalSignInCallbackModel model)
+    [Route("[action]")]
+    public async Task<IActionResult> SignInCallback()
     {
         var authResult = await HttpContext
             .AuthenticateAsync(IdentityServerConstants.ExternalCookieAuthenticationScheme);
@@ -61,14 +65,17 @@ public class ExternalController : BaseController
         if (authResult.Principal is null || authResult.Principal.Identity is null)
             throw new WindettaException("Fetching data from external OpenID provider failed");
 
+        var provider = authResult.Properties.Items["provider"];
+        var returnUrl = authResult.Properties.Items["returnUrl"];
+
         var externalIdentity = await _dispatcher.HandleAsync(
             new ParseExternalIdentityRequest()
             {
                 AuthResult = authResult,
-                Provider = model.Provider,
+                Provider = provider,
             });
 
-        var user = await _userManager.FindByLoginAsync(model.Provider, externalIdentity.UniqueId);
+        var user = await _userManager.FindByLoginAsync(provider, externalIdentity.UniqueId);
         if (user is null)
         {
             TempData.TryAdd("externalIdentity", JsonConvert.SerializeObject(externalIdentity));
@@ -77,16 +84,16 @@ public class ExternalController : BaseController
             if (externalIdentity.Email is null)
                 return View("InputEmail", new InputEmailViewModel()
                 {
-                    Provider = model.Provider,
-                    ReturnUrl = model.ReturnUrl
+                    Provider = provider,
+                    ReturnUrl = returnUrl
                 });
         }
 
         return await ContinueExternalLogin(new ExternalLoginRequest()
         {
-            Provider = model.Provider,
+            Provider = provider,
             Identity = externalIdentity,
-            ReturnUrl = model.ReturnUrl,
+            ReturnUrl = returnUrl,
         });
     }
 

@@ -7,7 +7,6 @@ namespace Windetta.Identity.Controllers;
 [Route("")]
 public class UsersController : BaseController
 {
-
     /// <summary>
     /// Get user info by ID
     /// </summary>
