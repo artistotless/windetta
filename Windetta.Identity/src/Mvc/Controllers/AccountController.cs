@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Windetta.Identity.Domain.Entities;
 using Windetta.Identity.Extensions;
+using Windetta.Identity.Infrastructure.Exceptions;
 using Windetta.Identity.Messages.Requests;
 using Windetta.Identity.Models;
 using Windetta.Identity.Services;
@@ -81,12 +82,20 @@ public class AccountController : BaseController
         if (!ModelState.IsValid)
             return View(model);
 
-        await _dispatcher.HandleAsync(new LocalRegisterRequest()
+        try
         {
-            Email = model.Email,
-            Password = model.Password,
-            UserName = model.Username
-        });
+            await _dispatcher.HandleAsync(new LocalRegisterRequest()
+            {
+                Email = model.Email,
+                Password = model.Password,
+                UserName = model.Username
+            });
+        }
+        catch (IdentityException e)
+        {
+            ModelState.AddModelError(string.Empty, e.Message);
+            return View(model);
+        }
 
         return View("Registered", model);
     }

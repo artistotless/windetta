@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using IdentityModel;
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using Windetta.Common.Messages;
 using Windetta.Identity.Domain.Entities;
 using Windetta.Identity.Extensions;
@@ -37,13 +39,22 @@ public class LocalRegisterHandler : IRequestHandler<LocalRegisterRequest>
         var user = new User
         {
             UserName = request.UserName,
-            Email = request.Email
+            Email = request.Email,
+            DisplayName = request.UserName
         };
 
         var result = await _userManager.CreateAsync(user, request.Password);
 
         if (!result.Succeeded)
             throw result.Errors.FirstErrorAsException();
+
+        var claims = new List<Claim>()
+        {
+            new(JwtClaimTypes.Email, user.Email),
+            new(JwtClaimTypes.GivenName, user.DisplayName),
+        };
+
+        await _userManager.AddClaimsAsync(user, claims);
     }
 
     private static void Validate(LocalRegisterRequest request)

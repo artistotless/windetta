@@ -7,6 +7,7 @@ public class RegisterInputModel
 {
     [Required]
     [MaxLength(40)]
+    [Display(Name = "Unique username")]
     [RegularExpression(@"^[a-zA-Z0-9]+$", ErrorMessage = "Username can only contain alphanumeric characters.")]
     public string Username { get; set; }
 
