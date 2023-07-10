@@ -1,21 +1,25 @@
 ﻿using IdentityServer4.Models;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Windetta.Identity.Domain.Entities;
 using Windetta.Identity.Extensions;
 using Windetta.Identity.Messages.Requests;
+using Windetta.Identity.Models;
 using Windetta.Identity.Services;
 
 namespace Windetta.Identity.Controllers;
 
-[ApiController]
 [Route("[controller]")]
 public class AccountController : BaseController
 {
     private readonly IRequestDispatcher _dispatcher;
+    private readonly UserManager<User> _userManager;
 
-    public AccountController(IRequestDispatcher dispatcher)
+    public AccountController(IRequestDispatcher dispatcher, UserManager<User> userManager)
     {
         _dispatcher = dispatcher;
+        _userManager = userManager;
     }
 
     /// <summary>
@@ -69,8 +73,23 @@ public class AccountController : BaseController
     /// </summary>
     [HttpPost]
     [Route("register")]
-    public IActionResult Register([FromBody] LocalRegisterRequest request)
-        => NoContent(async () => await _dispatcher.HandleAsync(request));
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Register([FromForm] RegisterInputModel model)
+    {
+        await ValidatePassword(model.Password);
+
+        if (!ModelState.IsValid)
+            return View(model);
+
+        await _dispatcher.HandleAsync(new LocalRegisterRequest()
+        {
+            Email = model.Email,
+            Password = model.Password,
+            UserName = model.Username
+        });
+
+        return View("Registered", model);
+    }
 
     /// <summary>
     /// Show logout page
@@ -90,6 +109,17 @@ public class AccountController : BaseController
     }
 
     #region private helpers
+    private async Task ValidatePassword(string password)
+    {
+        var passValidator = _userManager.PasswordValidators.First();
+
+        var passValidation = await passValidator.ValidateAsync(_userManager, null, password);
+        if (passValidation.Succeeded)
+            return;
+
+        foreach (var error in passValidation.Errors)
+            ModelState.AddModelError("Password", error.Description);
+    }
 
     private IActionResult BuildRedirectResult(AuthorizationRequest context, string returnUrl)
     {

@@ -96,7 +96,6 @@ namespace Windetta.Identity.Extensions
                 o.User.RequireUniqueEmail = true;
                 o.Password.RequireDigit = true;
                 o.Password.RequireUppercase = true;
-                o.Password.RequireLowercase = true;
                 o.Password.RequiredLength = 6;
                 o.Password.RequiredUniqueChars = 2;
             })

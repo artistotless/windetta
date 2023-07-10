@@ -1,0 +1,15 @@
+﻿@model RegisterInputModel
+
+<div>
+    <h1>
+        Register
+        <small>You are succesfully registered a new account!</small>
+    </h1>
+
+    <p>Please confirm your email "@Model.Email"</p>
+
+    <div>
+        Click <a href="@Url.ActionLink("Login","Account")">here</a> to sign in
+    </div>
+
+</div>
