@@ -1,6 +1,6 @@
 ﻿namespace Windetta.Common.IdentityServer;
 
-public class AccountOptions
+public sealed class AccountOptions
 {
     public static bool AllowLocalLogin = true;
     public static bool AllowRememberLogin = true;
