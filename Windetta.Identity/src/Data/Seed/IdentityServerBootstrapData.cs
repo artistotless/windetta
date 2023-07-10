@@ -64,7 +64,7 @@ public static class IdentityServerBootstrapData
             RedirectUris =           { "https://localhost:5003/callback.html" },
             PostLogoutRedirectUris = { "https://localhost:5003/index.html" },
             AllowedCorsOrigins =     { "https://localhost:5003" },
-            RequireConsent = false,
+            RequireConsent = true,
 
             AllowedScopes =
             {

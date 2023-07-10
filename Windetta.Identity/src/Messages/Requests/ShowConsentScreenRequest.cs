@@ -17,6 +17,11 @@ public class ShowConsentScreenHandler : IRequestHandler<ShowConsentScreenRequest
 {
     private readonly IIdentityServerInteractionService _interaction;
 
+    public ShowConsentScreenHandler(IIdentityServerInteractionService interaction)
+    {
+        _interaction = interaction;
+    }
+
     public async Task<ConsentViewModel?> HandleAsync(ShowConsentScreenRequest request)
     {
         var context = await _interaction.GetAuthorizationContextAsync(request.ReturnUrl);
@@ -34,9 +39,8 @@ public class ShowConsentScreenHandler : IRequestHandler<ShowConsentScreenRequest
         {
             RememberConsent = consent?.RememberConsent ?? true,
             ScopesConsented = consent?.ScopesConsented ?? Enumerable.Empty<string>(),
-
+            Description = consent?.Description,
             ReturnUrl = returnUrl,
-
             ClientName = context.Client.ClientName ?? context.Client.ClientId,
             ClientUrl = context.Client.ClientUri,
             ClientLogoUrl = context.Client.LogoUri,
