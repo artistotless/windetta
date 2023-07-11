@@ -43,10 +43,11 @@ public class LocalRegisterHandler : IRequestHandler<LocalRegisterRequest>
             DisplayName = request.UserName
         };
 
-        var result = await _userManager.CreateAsync(user, request.Password);
+        (await _userManager.CreateAsync(user, request.Password))
+            .HandleBadResult();
 
-        if (!result.Succeeded)
-            throw result.Errors.FirstErrorAsException();
+        (await _userManager.AddToRoleAsync(user, Roles.USER))
+            .HandleBadResult();
 
         var claims = new List<Claim>()
         {
@@ -54,7 +55,8 @@ public class LocalRegisterHandler : IRequestHandler<LocalRegisterRequest>
             new(JwtClaimTypes.GivenName, user.DisplayName),
         };
 
-        await _userManager.AddClaimsAsync(user, claims);
+        (await _userManager.AddClaimsAsync(user, claims))
+            .HandleBadResult();
     }
 
     private static void Validate(LocalRegisterRequest request)

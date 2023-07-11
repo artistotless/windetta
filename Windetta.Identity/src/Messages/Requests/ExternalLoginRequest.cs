@@ -67,13 +67,15 @@ public class ExternalLoginHandler : IRequestHandler<ExternalLoginRequest, Author
             DisplayName = identity.DisplayName,
         };
 
-        var createdResult = await _signinManager.UserManager.CreateAsync(user);
+        (await _signinManager.UserManager.CreateAsync(user))
+            .HandleBadResult();
 
-        if (!createdResult.Succeeded)
-            throw createdResult.Errors.FirstErrorAsException();
+        (await _signinManager.UserManager.AddToRoleAsync(user, Roles.USER))
+            .HandleBadResult();
 
-        var attachedResult = await _signinManager.UserManager.AddLoginAsync(user,
-        new UserLoginInfo(provider, identity.UniqueId, identity.DisplayName));
+        (await _signinManager.UserManager.AddLoginAsync(user,
+        new UserLoginInfo(provider, identity.UniqueId, identity.DisplayName)))
+            .HandleBadResult();
 
         var claims = new List<Claim>()
         {
@@ -82,10 +84,8 @@ public class ExternalLoginHandler : IRequestHandler<ExternalLoginRequest, Author
             new(JwtClaimTypes.Picture, identity.ImageUrl),
         };
 
-        await _signinManager.UserManager.AddClaimsAsync(user, claims);
-
-        if (!attachedResult.Succeeded)
-            throw attachedResult.Errors.FirstErrorAsException();
+        (await _signinManager.UserManager.AddClaimsAsync(user, claims))
+            .HandleBadResult();
 
         return user;
     }

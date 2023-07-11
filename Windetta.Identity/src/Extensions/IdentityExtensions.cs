@@ -36,4 +36,10 @@ public static class IdentityExtensions
 
         return controller.View(viewName, new RedirectViewModel { RedirectUrl = redirectUri });
     }
+
+    public static void HandleBadResult(this IdentityResult result)
+    {
+        if (!result.Succeeded)
+            throw result.Errors.FirstErrorAsException();
+    }
 }

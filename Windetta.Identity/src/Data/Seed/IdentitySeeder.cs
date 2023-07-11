@@ -12,9 +12,26 @@ public static class IdentitySeeder
         using var userManager = app.ApplicationServices
             .GetRequiredService<UserManager<User>>();
 
+        using var roleManager = app.ApplicationServices
+         .GetRequiredService<RoleManager<Role>>();
+
         using var dbContext = app.ApplicationServices
            .GetRequiredService<IdentityDbContext>();
         dbContext.Database.Migrate();
+
+        if (!roleManager.Roles.Any())
+        {
+            var roles = new List<Role>()
+            {
+                new(Roles.USER),
+                new(Roles.ADMIN),
+                new(Roles.MODERATOR),
+                new(Roles.SERVICE),
+            };
+
+            foreach (var role in roles)
+                roleManager.CreateAsync(role).GetAwaiter().GetResult();
+        }
 
         if (!userManager.Users.Any())
         {
@@ -26,10 +43,15 @@ public static class IdentitySeeder
                 DisplayName = "root",
             };
 
-            var result = userManager.CreateAsync(rootUser, "P@ssw0rd").GetAwaiter().GetResult();
+            var created = userManager.CreateAsync(rootUser, "P@ssw0rd").GetAwaiter().GetResult();
 
-            if (!result.Succeeded)
-                throw result.Errors.FirstErrorAsException();
+            if (!created.Succeeded)
+                throw created.Errors.FirstErrorAsException();
+
+            var addedtoRole = userManager.AddToRoleAsync(rootUser, Roles.ADMIN).GetAwaiter().GetResult();
+
+            if (!addedtoRole.Succeeded)
+                throw created.Errors.FirstErrorAsException();
         }
     }
 }

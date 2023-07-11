@@ -33,7 +33,6 @@ public static class IdentityServerBootstrapData
             Description= "Official windetta web appliccation",
             ClientId = "windetta.web",
             ClientSecrets = { new Secret("secret".Sha256()) },
-
             AllowedGrantTypes = GrantTypes.CodeAndClientCredentials,
 
             // where to redirect to after login

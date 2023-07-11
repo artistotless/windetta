@@ -2,12 +2,14 @@ using IdentityServer4.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Windetta.Identity.Attributes;
+using Windetta.Identity.Domain.Entities;
 using Windetta.Identity.Models;
 
 namespace IdentityServerHost.Quickstart.UI
 {
     [SecurityHeaders]
-    [AllowAnonymous]
+    //[AllowAnonymous]
+    [Authorize(Roles = Roles.ADMIN)]
     [Route("[controller]/[action]")]
     public class HomeController : Controller
     {
