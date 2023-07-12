@@ -1,13 +1,17 @@
 ﻿using IdentityServer4;
+using IdentityServer4.Services;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
 using Windetta.Common.Configuration;
 using Windetta.Common.Options;
 using Windetta.Identity.Data;
 using Windetta.Identity.Domain.Entities;
+using Windetta.Identity.Services;
 
 namespace Windetta.Identity.Extensions
 {
@@ -17,6 +21,9 @@ namespace Windetta.Identity.Extensions
         public static void AddIdentityServer4(this IServiceCollection services)
         {
             var migrationsAssembly = typeof(Program).GetTypeInfo().Assembly.GetName().Name;
+
+            services.AddTransient<IClaimsService, CustomClaimsService>();
+
             var builder = services.AddIdentityServer(options =>
             {
                 // see https://identityserver4.readthedocs.io/en/latest/topics/resources.html
@@ -47,6 +54,15 @@ namespace Windetta.Identity.Extensions
         public static void AddAuthenticationMethods(this IServiceCollection services, IConfiguration configuration)
         {
             var builder = services.AddAuthentication();
+
+            builder.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+             {
+                 options.Authority = "https://localhost:5001";
+                 options.TokenValidationParameters = new TokenValidationParameters
+                 {
+                     ValidateAudience = false
+                 };
+             });
 
             builder.AddVk(configuration);
             builder.AddGoogle(configuration);

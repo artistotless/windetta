@@ -10,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 IConfiguration configuration = builder.Configuration;
 IServiceCollection services = builder.Services;
 
+
 services.AddIdentityDbContext(configuration);
 services.AddControllersWithViews();
 services.AddIdentityServer4();

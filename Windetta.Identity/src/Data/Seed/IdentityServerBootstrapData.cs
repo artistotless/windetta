@@ -1,5 +1,7 @@
 ﻿using IdentityServer4;
 using IdentityServer4.Models;
+using IdentityServer4.Services;
+using System.Security.Claims;
 
 namespace Windetta.Identity.Data.Seed;
 
@@ -11,8 +13,9 @@ public static class IdentityServerBootstrapData
         new IdentityResources.OpenId(),
         new IdentityResources.Profile(),
         new IdentityResources.Email(),
+        new IdentityResource("role",new[]{ClaimTypes.Role}){Emphasize = true}
     };
-
+    
     public static IEnumerable<ApiResource> ApiResources =>
       new ApiResource[]
       {
@@ -59,17 +62,18 @@ public static class IdentityServerBootstrapData
             ClientName = "JavaScript Client",
             AllowedGrantTypes = GrantTypes.Code,
             RequireClientSecret = false,
-
             RedirectUris =           { "https://localhost:5003/callback.html" },
             PostLogoutRedirectUris = { "https://localhost:5003/index.html" },
             AllowedCorsOrigins =     { "https://localhost:5003" },
             RequireConsent = true,
+            Claims = new[]{ new ClientClaim("verified", "true") },
 
             AllowedScopes =
             {
                 IdentityServerConstants.StandardScopes.OpenId,
                 IdentityServerConstants.StandardScopes.Profile,
                 IdentityServerConstants.StandardScopes.Email,
+                "role",
                 "api1"
             }
         }
