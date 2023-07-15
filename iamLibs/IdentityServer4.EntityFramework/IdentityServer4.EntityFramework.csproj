@@ -21,7 +21,7 @@
 
   <ItemGroup>
     <Reference Include="IdentityServer4.EntityFramework.Storage">
-      <HintPath>..\IdentityServer4.EntityFramework.Storage\bin\Release\net7.0\IdentityServer4.EntityFramework.Storage.dll</HintPath>
+      <HintPath>..\IdentityServer4.EntityFramework.Storage\bin\Debug\net7.0\IdentityServer4.EntityFramework.Storage.dll</HintPath>
     </Reference>
   </ItemGroup>
 
