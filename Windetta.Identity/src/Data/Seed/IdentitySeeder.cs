@@ -26,7 +26,6 @@ public static class IdentitySeeder
                 new(Roles.USER),
                 new(Roles.ADMIN),
                 new(Roles.MODERATOR),
-                new(Roles.SERVICE),
             };
 
             foreach (var role in roles)

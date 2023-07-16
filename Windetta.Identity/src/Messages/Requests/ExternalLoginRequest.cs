@@ -1,7 +1,6 @@
 using IdentityModel;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using Windetta.Common.Messages;
@@ -22,13 +21,11 @@ public class ExternalLoginHandler : IRequestHandler<ExternalLoginRequest, Author
 {
     private readonly SignInManager<User> _signinManager;
     private readonly IIdentityServerInteractionService _interaction;
-    private readonly IAuthenticationSchemeProvider _pr;
 
-    public ExternalLoginHandler(SignInManager<User> signinManager, IIdentityServerInteractionService interaction, IAuthenticationSchemeProvider pr)
+    public ExternalLoginHandler(SignInManager<User> signinManager, IIdentityServerInteractionService interaction)
     {
         _signinManager = signinManager;
         _interaction = interaction;
-        _pr = pr;
     }
 
     // TODO: Do cover by unit test

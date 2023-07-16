@@ -1,10 +1,7 @@
-﻿using Microsoft.AspNetCore.Identity;
-using System.Security.Claims;
-using Windetta.Common.Authentication;
+﻿using IdentityServer4.Services;
+using Microsoft.AspNetCore.Identity;
 using Windetta.Identity.Domain.Entities;
-using Windetta.Identity.Handlers;
 using Windetta.Identity.Messages.Requests;
-using Windetta.Identity.Services;
 using Windetta.Identity.Tests.Mocks;
 using Windetta.Tests.Identity.Mocks;
 
@@ -13,46 +10,46 @@ namespace Windetta.Tests.Identity.HandlersTests;
 public class ExternalLoginHandlerTests
 {
     private readonly UserStore _userStore = new();
-    private readonly List<AuthorizationCode> _codes;
-    private readonly Mock<IAuthCodeService> _authCodeServiceMock;
     private readonly Mock<UserManager<User>> _userManagerMock;
-    private readonly Mock<IExternalClaimsProcessorFactory> _parserFactoryMock;
 
     public ExternalLoginHandlerTests()
     {
-        _codes = new List<AuthorizationCode>();
         _userManagerMock = UserManagerMockFactory.Create(_userStore.GetUsers());
-        _parserFactoryMock = ExternalIdentityParserMockFactory.Create();
     }
 
     [Fact]
-    public void HandleAsync_ReturnRedirectUrl()
+    public void HandleAsync_ReturnCorrectRedirectUrlIfPassNull()
     {
         // arrange
-        _userManagerMock.Setup(x => x.FindByLoginAsync(It.IsAny<string>(), It.IsAny<string>()))
-            .ReturnsAsync(_userStore.GetUsers().First());
-        var handler = new ExternalLoginHandler(_parserFactoryMock.Object, _userManagerMock.Object);
-        var request = new Fixture().Build<ExternalLoginRequest>()
-            .With(x => x.Claims, new List<Claim>())
-            .Create();
+        var signInManagerMock = SignInManagerMockFactory.Create(_userManagerMock.Object);
+        var is4InteractionMock = Mock.Of<IIdentityServerInteractionService>();
+        var sut = new ExternalLoginHandler(signInManagerMock.Object, is4InteractionMock);
+        var fixture = new Fixture();
+        var request = fixture.Build<ExternalLoginRequest>()
+        .Without(p => p.ReturnUrl)
+        .Create();
 
         // act
-        var result = handler.HandleAsync(request).GetAwaiter().GetResult();
+        var result = sut.HandleAsync(request).GetAwaiter().GetResult();
 
         // assert
-        result.ShouldNotBeNull();
+        request.ReturnUrl.ShouldBe("~/");
     }
 
     [Fact]
     public void HandleAsync_ShouldCreateNewUserIfUserNotFound()
     {
-        var handler = new ExternalLoginHandler(_parserFactoryMock.Object, _userManagerMock.Object);
-        var request = new Fixture().Build<ExternalLoginRequest>()
-            .With(x => x.Claims, new List<Claim>())
-            .Create();
+        // arrange
+        var signInManagerMock = SignInManagerMockFactory.Create(_userManagerMock.Object);
+        var is4InteractionMock = Mock.Of<IIdentityServerInteractionService>();
+        var sut = new ExternalLoginHandler(signInManagerMock.Object, is4InteractionMock);
+        var fixture = new Fixture();
+        var request = fixture.Build<ExternalLoginRequest>()
+        .Without(p => p.ReturnUrl)
+        .Create();
 
         // act
-        handler.HandleAsync(request).GetAwaiter().GetResult();
+        sut.HandleAsync(request).GetAwaiter().GetResult();
 
         // assert
         _userStore.DeltaUsersCount.ShouldBe(1);
@@ -60,5 +57,28 @@ public class ExternalLoginHandlerTests
             x => x.CreateAsync(It.IsNotNull<User>()), Times.Once());
         _userManagerMock.Verify(
             x => x.AddLoginAsync(It.IsNotNull<User>(), It.IsNotNull<UserLoginInfo>()), Times.Once());
+    }
+
+    [Fact]
+    public void HandleAsync_ShouldCall_ExternalLoginSignInAsync()
+    {
+        // arrange
+        var signInManagerMock = SignInManagerMockFactory.Create(_userManagerMock.Object);
+        var is4InteractionMock = Mock.Of<IIdentityServerInteractionService>();
+        var sut = new ExternalLoginHandler(signInManagerMock.Object, is4InteractionMock);
+        var fixture = new Fixture();
+        var request = fixture.Build<ExternalLoginRequest>()
+        .Without(p => p.ReturnUrl)
+        .Create();
+
+        // act
+        sut.HandleAsync(request).GetAwaiter().GetResult();
+
+        // assert
+        signInManagerMock.Verify(
+            x => x.ExternalLoginSignInAsync(
+                It.Is<string>(x => x.Equals(request.Provider)),
+                It.Is<string>(x => x.Equals(request.Identity.UniqueId)),
+                It.Is<bool>(x => x == true)), Times.Once());
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Windetta.Identity.Domain.Entities;
-using Windetta.Identity.Handlers;
 using Windetta.Identity.Infrastructure.Exceptions;
 using Windetta.Identity.Messages.Requests;
 using Windetta.Identity.Tests.Mocks;
