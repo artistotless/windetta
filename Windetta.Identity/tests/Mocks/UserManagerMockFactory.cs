@@ -19,6 +19,7 @@ internal static class UserManagerMockFactory
         manager.Object.Options = options;
 
         manager.Setup(x => x.FindByLoginAsync(It.IsAny<string>(), It.IsAny<string>()));
+        manager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).ReturnsAsync((string username) => ls.Find(x => x.UserName == username));
         manager.Setup(x => x.AddToRoleAsync(It.IsAny<TUser>(), It.IsAny<string>())).ReturnsAsync(IdentityResult.Success);
         manager.Setup(x => x.AddClaimsAsync(It.IsAny<TUser>(), It.IsAny<IEnumerable<Claim>>())).ReturnsAsync(IdentityResult.Success);
         manager.Setup(x => x.AddLoginAsync(It.IsAny<TUser>(), It.IsAny<UserLoginInfo>())).ReturnsAsync((TUser user, UserLoginInfo info) => ls.Any(u => u.Id == user.Id) ? IdentityResult.Success : IdentityResult.Failed());

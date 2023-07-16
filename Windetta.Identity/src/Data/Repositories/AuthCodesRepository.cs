@@ -2,6 +2,7 @@
 using System.Text.Json;
 using Windetta.Common.Authentication;
 using Windetta.Common.Types;
+using Windetta.Identity.Constants;
 
 namespace Windetta.Identity.Data.Repositories;
 

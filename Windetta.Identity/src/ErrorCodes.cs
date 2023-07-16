@@ -1,4 +1,4 @@
-﻿namespace Windetta.Identity;
+﻿namespace Windetta.Identity.Constants;
 
 public static class ErrorCodes
 {

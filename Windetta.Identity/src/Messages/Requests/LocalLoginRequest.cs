@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 using Windetta.Common.Messages;
 using Windetta.Common.Types;
+using Windetta.Identity.Constants;
 using Windetta.Identity.Domain.Entities;
 using Windetta.Identity.Messages.Responses;
 

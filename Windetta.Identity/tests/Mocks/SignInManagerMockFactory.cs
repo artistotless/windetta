@@ -12,6 +12,18 @@ internal static class SignInManagerMockFactory
         var manager = new Mock<SignInManager<TUser>>(
             userManager, mockContextAccessor.Object, mockClaimsFactory.Object, null, null, null, null);
 
+        manager.Setup(x => x.PasswordSignInAsync
+        (It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<bool>())).ReturnsAsync((string username, string password, bool ip, bool lf) =>
+            {
+                var user = userManager.FindByNameAsync(username).GetAwaiter().GetResult();
+                if (user is null)
+                    return SignInResult.Failed;
+                if (userManager.CheckPasswordAsync(user, password).GetAwaiter().GetResult())
+                    return SignInResult.Success;
+                else
+                    return SignInResult.Failed;
+            });
+
         return manager;
     }
 }

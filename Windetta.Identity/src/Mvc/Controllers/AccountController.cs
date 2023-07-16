@@ -51,7 +51,6 @@ public class AccountController : BaseController
             var localLoginResponse = await _dispatcher.HandleAsync(request);
 
             return BuildRedirectResult(localLoginResponse.Context, request.ReturnUrl);
-
         }
         catch (Exception ex)
         {
