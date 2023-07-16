@@ -7,9 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Messages\Queries\**" />
+    <Content Remove="Messages\Queries\**" />
+    <EmbeddedResource Remove="Messages\Queries\**" />
+    <None Remove="Messages\Queries\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Folder Include="Data\Migrations\IdentityServer\" />
-    <Folder Include="Messages\Queries\" />
-    <Folder Include="Messages\Events\" />
   </ItemGroup>
 
   <ItemGroup>
