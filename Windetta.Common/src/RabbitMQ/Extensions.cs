@@ -47,7 +47,7 @@ public static class Extensions
 
     private static void RegisterHandlers(ContainerBuilder builder)
     {
-        var assembly = Assembly.GetCallingAssembly();
+        var assembly = Assembly.GetEntryAssembly();
 
         builder.RegisterAssemblyTypes(assembly)
             .AsClosedTypesOf(typeof(IEventHandler<>))

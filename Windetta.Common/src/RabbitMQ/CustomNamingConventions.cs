@@ -28,6 +28,9 @@ internal sealed class CustomNamingConventions : NamingConventions
 
     private static string GetNamespace(Type type, string defaultNamespace)
     {
+        var attr = type.GetCustomAttribute(typeof(MessageNamespaceAttribute));
+        var attr2 = type.GetCustomAttribute<MessageNamespaceAttribute>();
+        ;
         var @namespace = type.GetCustomAttribute<MessageNamespaceAttribute>()?.Namespace ?? defaultNamespace;
 
         return string.IsNullOrWhiteSpace(@namespace) ? type.Name.Underscore() : $"{@namespace}";

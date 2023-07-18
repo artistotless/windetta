@@ -37,6 +37,7 @@ IdentityServerConfigurationSeeder.Seed(app);
 app.MapGet("/", () => "Windetta Identity Service").RequireAuthorization();
 app.MapGet("/ping", () => Results.Ok());
 
+
 app.UseStaticFiles();
 app.UseIdentityServer();
 app.UseHttpsRedirection();

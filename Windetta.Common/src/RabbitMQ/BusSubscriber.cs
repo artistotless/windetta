@@ -44,7 +44,7 @@ public class BusSubscriber : IBusSubscriber
         return this;
     }
 
-    public IBusSubscriber SubscribeEvent<TEvent>(string? @namespace = null, Func<TEvent, WindettaException, IRejectedEvent>? onError = null)
+    public IBusSubscriber SubscribeEvent<TEvent>(Func<TEvent, WindettaException, IRejectedEvent>? onError = null)
         where TEvent : IEvent
     {
         _busClient.SubscribeAsync<TEvent, CorrelationContext>(async (@event, correlationContext) =>
