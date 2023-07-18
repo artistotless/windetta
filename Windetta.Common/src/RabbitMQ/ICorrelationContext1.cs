@@ -14,4 +14,7 @@ public class CorrelationContext : ICorrelationContext
     public string Culture { get; }
     public int Retries { get; set; }
     public DateTime CreatedAt { get; }
+
+    public static ICorrelationContext Empty
+        => new CorrelationContext();
 }

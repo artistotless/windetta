@@ -1,4 +1,5 @@
 using Autofac.Extensions.DependencyInjection;
+using Windetta.Common.RabbitMQ;
 using Windetta.Common.Redis;
 using Windetta.Common.Types;
 using Windetta.Identity.Data.Seed;
@@ -10,18 +11,19 @@ var builder = WebApplication.CreateBuilder(args);
 IConfiguration configuration = builder.Configuration;
 IServiceCollection services = builder.Services;
 
-services.AddIdentityDbContext(configuration);
+services.AddIdentityDbContext();
 services.AddControllersWithViews();
 services.AddIdentityServer4();
 services.AddAuthorization();
 services.AddControllers();
 services.AddHttpContextAccessor();
-services.AddRedis(configuration);
-services.AddAuthenticationMethods(configuration); // Adding vk, google .. external auth providers
+services.AddRedis();
+services.AddAuthenticationMethods(); // Adding vk, google .. external auth providers
 services.ConfigureCustomViewsRouting();
 
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory(builder =>
 {
+    builder.AddRabbitMq();
     builder.ResolveDependenciesFromAssembly();
 }));
 

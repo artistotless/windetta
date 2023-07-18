@@ -4,9 +4,11 @@ using IdentityServer4.Services;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using Windetta.Common.Messages;
+using Windetta.Common.RabbitMQ;
 using Windetta.Identity.Domain.Entities;
 using Windetta.Identity.Extensions;
 using Windetta.Identity.Infrastructure.IdentityParsers;
+using Windetta.Identity.Messages.Events;
 
 namespace Windetta.Identity.Messages.Requests;
 
@@ -21,14 +23,18 @@ public class ExternalLoginHandler : IRequestHandler<ExternalLoginRequest, Author
 {
     private readonly SignInManager<User> _signinManager;
     private readonly IIdentityServerInteractionService _interaction;
+    private readonly IBusPublisher _busPublisher;
 
-    public ExternalLoginHandler(SignInManager<User> signinManager, IIdentityServerInteractionService interaction)
+    public ExternalLoginHandler(
+        SignInManager<User> signinManager,
+        IIdentityServerInteractionService interaction,
+        IBusPublisher busPublisher)
     {
         _signinManager = signinManager;
         _interaction = interaction;
+        _busPublisher = busPublisher;
     }
 
-    // TODO: Do cover by unit test
     public async Task<AuthorizationRequest> HandleAsync(ExternalLoginRequest request)
     {
         if (string.IsNullOrEmpty(request.ReturnUrl))
@@ -38,7 +44,18 @@ public class ExternalLoginHandler : IRequestHandler<ExternalLoginRequest, Author
 
         // If the user not found - create a new user with attached the external login
         if (user is null)
+        {
             user = await AutoProvisionUserAsync(request.Provider, request.Identity);
+
+            // send user created event to event bus
+            await _busPublisher.PublishAsync(new UserCreated()
+            {
+                Id = user.Id,
+                Email = user.Email,
+                Role = Roles.USER,
+                UserName = user.UserName,
+            }, CorrelationContext.Empty);
+        }
 
         await _signinManager.ExternalLoginSignInAsync
             (request.Provider, request.Identity.UniqueId, isPersistent: true);

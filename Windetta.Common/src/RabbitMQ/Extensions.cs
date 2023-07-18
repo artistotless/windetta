@@ -1,6 +1,4 @@
-﻿namespace Windetta.Common.RabbitMQ;
-
-using Autofac;
+﻿using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,13 +10,12 @@ using RawRabbit.Enrichers.MessageContext;
 using RawRabbit.Instantiation;
 using RawRabbit.Pipe;
 using RawRabbit.Pipe.Middleware;
-using System;
 using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
 using Windetta.Common.Configuration;
 using Windetta.Common.Handlers;
 using Windetta.Common.Helpers;
+
+namespace Windetta.Common.RabbitMQ;
 
 public static class Extensions
 {
@@ -26,13 +23,13 @@ public static class Extensions
         => new BusSubscriber(app);
 
     public static void AddRabbitMq(this ContainerBuilder builder)
-    {
+    { 
         RabbitMqOptions options = null;
 
         builder.Register(context =>
         {
             var configuration = context.Resolve<IConfiguration>();
-            options = configuration.GetOptions<RabbitMqOptions>("rabbitMq");
+            options = configuration.GetOptions<RabbitMqOptions>("RabbitMq");
 
             return options;
 
@@ -41,19 +38,22 @@ public static class Extensions
         builder.Register(context =>
         {
             var configuration = context.Resolve<IConfiguration>();
-            var options = configuration.GetOptions<RawRabbitConfiguration>("rabbitMq");
+            var options = configuration.GetOptions<RawRabbitConfiguration>("RabbitMq");
 
             return options;
 
         }).SingleInstance();
 
         var assembly = Assembly.GetCallingAssembly();
+
         builder.RegisterAssemblyTypes(assembly)
             .AsClosedTypesOf(typeof(IEventHandler<>))
             .InstancePerDependency();
+
         builder.RegisterAssemblyTypes(assembly)
             .AsClosedTypesOf(typeof(ICommandHandler<>))
             .InstancePerDependency();
+
         builder.RegisterType<BusPublisher>().As<IBusPublisher>()
             .InstancePerDependency();
 

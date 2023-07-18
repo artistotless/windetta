@@ -51,11 +51,13 @@ namespace Windetta.Identity.Extensions
             builder.AddDeveloperSigningCredential();
         }
 
-        public static void AddAuthenticationMethods(this IServiceCollection services, IConfiguration configuration)
+        public static void AddAuthenticationMethods(this IServiceCollection services)
         {
-            var builder = services.AddAuthentication();
+            using var provider = services.BuildServiceProvider();
 
-            builder.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+            var authBuilder = services.AddAuthentication();
+            var configuration = provider.GetRequiredService<IConfiguration>();
+            authBuilder.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
              {
                  options.Authority = "https://localhost:5001";
                  options.TokenValidationParameters = new TokenValidationParameters
@@ -64,8 +66,8 @@ namespace Windetta.Identity.Extensions
                  };
              });
 
-            builder.AddVk(configuration);
-            builder.AddGoogle(configuration);
+            authBuilder.AddVk(configuration);
+            authBuilder.AddGoogle(configuration);
         }
 
         // Add  external authentication provider 'vk.com'
@@ -97,8 +99,12 @@ namespace Windetta.Identity.Extensions
         }
 
         // Configure Db connection to storing users, roles, claims and so on.
-        public static void AddIdentityDbContext(this IServiceCollection services, IConfiguration configuration)
+        public static void AddIdentityDbContext(this IServiceCollection services)
         {
+            using var provider = services.BuildServiceProvider();
+
+            var configuration = provider.GetRequiredService<IConfiguration>();
+
             services.Configure<MysqlSettings>(configuration.GetSection("Mysql"));
 
             var settings = configuration.GetOptions<MysqlSettings>("Mysql");
