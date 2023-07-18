@@ -27,10 +27,12 @@ public static class Extensions
 
     public static void AddRabbitMq(this ContainerBuilder builder)
     {
+        RabbitMqOptions options = null;
+
         builder.Register(context =>
         {
             var configuration = context.Resolve<IConfiguration>();
-            var options = configuration.GetOptions<RabbitMqOptions>("rabbitMq");
+            options = configuration.GetOptions<RabbitMqOptions>("rabbitMq");
 
             return options;
 
@@ -55,10 +57,10 @@ public static class Extensions
         builder.RegisterType<BusPublisher>().As<IBusPublisher>()
             .InstancePerDependency();
 
-        ConfigureBus(builder);
+        ConfigureBus(builder, options!);
     }
 
-    private static void ConfigureBus(ContainerBuilder builder)
+    private static void ConfigureBus(ContainerBuilder builder, RabbitMqOptions options)
     {
         builder.RegisterRawRabbit(new()
         {
@@ -66,9 +68,8 @@ public static class Extensions
             DependencyInjection = ioc =>
             {
                 ioc.AddSingleton(options);
-                ioc.AddSingleton(configuration);
-                ioc.AddSingleton<INamingConventions>(namingConventions);
-                ioc.AddSingleton(tracer);
+                ioc.AddSingleton(options as RawRabbitConfiguration);
+                ioc.AddSingleton<INamingConventions>(new CustomNamingConventions(options.Namespace));
             },
             Plugins = p =>
             {
@@ -90,13 +91,6 @@ public static class Extensions
             QueueNamingConvention = type => GetQueueName(assemblyName, type, defaultNamespace);
             ErrorExchangeNamingConvention = () => $"{defaultNamespace}.error";
             RetryLaterExchangeConvention = span => $"{defaultNamespace}.retry";
-        }
-
-        private static string GetRoutingKeyNamespace(Type type, string defaultNamespace)
-        {
-            var @namespace = type.GetCustomAttribute<MessageNamespaceAttribute>()?.Namespace ?? defaultNamespace;
-
-            return string.IsNullOrWhiteSpace(@namespace) ? string.Empty : $"{@namespace}.";
         }
 
         private static string GetNamespace(Type type, string defaultNamespace)
