@@ -9,10 +9,21 @@ internal sealed class CustomNamingConventions : NamingConventions
     public CustomNamingConventions(string defaultNamespace)
     {
         var assemblyName = Assembly.GetEntryAssembly().GetName().Name;
+        RoutingKeyConvention = type =>
+        $"{GetRoutingKeyNamespace(type, defaultNamespace)}{type.Name.Underscore()}".ToLowerInvariant();
         ExchangeNamingConvention = type => GetNamespace(type, defaultNamespace).ToLowerInvariant();
         QueueNamingConvention = type => GetQueueName(assemblyName, type, defaultNamespace);
         ErrorExchangeNamingConvention = () => $"{defaultNamespace}.error";
         RetryLaterExchangeConvention = span => $"{defaultNamespace}.retry";
+        RetryLaterQueueNameConvetion = (exchange, span) =>
+        $"{defaultNamespace}.retry_for_{exchange.Replace(".", "_")}_in_{span.TotalMilliseconds}_ms".ToLowerInvariant();
+    }
+
+    private static string GetRoutingKeyNamespace(Type type, string defaultNamespace)
+    {
+        var @namespace = type.GetCustomAttribute<MessageNamespaceAttribute>()?.Namespace ?? defaultNamespace;
+
+        return string.IsNullOrWhiteSpace(@namespace) ? string.Empty : $"{@namespace}.";
     }
 
     private static string GetNamespace(Type type, string defaultNamespace)
