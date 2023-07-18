@@ -35,14 +35,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="IdentityServer4">
+      <HintPath>..\..\is4dlls\IdentityServer4.dll</HintPath>
+    </Reference>
     <Reference Include="IdentityServer4.EntityFramework">
-      <HintPath>..\..\iamLibs\IdentityServer4.EntityFramework\bin\Debug\net7.0\IdentityServer4.EntityFramework.dll</HintPath>
+      <HintPath>..\..\is4dlls\IdentityServer4.EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="IdentityServer4.EntityFramework.Storage">
-      <HintPath>..\..\iamLibs\IdentityServer4.EntityFramework.Storage\bin\Debug\net7.0\IdentityServer4.EntityFramework.Storage.dll</HintPath>
-    </Reference>
-    <Reference Include="IdentityServer4">
-      <HintPath>..\..\iamLibs\IdentityServer4\IdentityServer4.dll</HintPath>
+      <HintPath>..\..\is4dlls\IdentityServer4.EntityFramework.Storage.dll</HintPath>
     </Reference>
   </ItemGroup>
 

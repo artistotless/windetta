@@ -1,27 +1,23 @@
 ﻿namespace Windetta.Common.RabbitMQ;
 
-using System;
 using Autofac;
-using OpenTracing;
-using DShop.Common.Jaeger;
-using DShop.Common.Handlers;
-using DShop.Common.Messages;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using RawRabbit;
 using RawRabbit.Common;
 using RawRabbit.Configuration;
+using RawRabbit.DependencyInjection.Autofac;
 using RawRabbit.Enrichers.MessageContext;
 using RawRabbit.Instantiation;
 using RawRabbit.Pipe;
 using RawRabbit.Pipe.Middleware;
+using System;
 using System.Reflection;
 using System.Threading;
-using static System.Net.Mime.MediaTypeNames;
-using System.Diagnostics;
-using System.Reflection.Metadata;
+using System.Threading.Tasks;
 using Windetta.Common.Configuration;
+using Windetta.Common.Handlers;
 using Windetta.Common.Helpers;
 
 public static class Extensions
@@ -56,44 +52,33 @@ public static class Extensions
         builder.RegisterAssemblyTypes(assembly)
             .AsClosedTypesOf(typeof(ICommandHandler<>))
             .InstancePerDependency();
-        builder.RegisterType<Handler>().As<IHandler>()
-            .InstancePerDependency();
         builder.RegisterType<BusPublisher>().As<IBusPublisher>()
             .InstancePerDependency();
-        builder.RegisterInstance(DShopDefaultTracer.Create()).As<ITracer>().SingleInstance()
-            .PreserveExistingDefaults();
 
         ConfigureBus(builder);
     }
 
     private static void ConfigureBus(ContainerBuilder builder)
     {
-        builder.Register<IInstanceFactory>(context =>
+        builder.RegisterRawRabbit(new()
         {
-            var options = context.Resolve<RabbitMqOptions>();
-            var configuration = context.Resolve<RawRabbitConfiguration>();
-            var namingConventions = new CustomNamingConventions(options.Namespace);
-            var tracer = context.Resolve<ITracer>();
-
-            return RawRabbitFactory.CreateInstanceFactory(new RawRabbitOptions
+            ClientConfiguration = null,
+            DependencyInjection = ioc =>
             {
-                DependencyInjection = ioc =>
-                {
-                    ioc.AddSingleton(options);
-                    ioc.AddSingleton(configuration);
-                    ioc.AddSingleton<INamingConventions>(namingConventions);
-                    ioc.AddSingleton(tracer);
-                },
-                Plugins = p => p
-                    .UseAttributeRouting()
-                    .UseRetryLater()
-                    .UpdateRetryInfo()
-                    .UseMessageContext<CorrelationContext>()
-                    .UseContextForwarding()
-                    .UseJaeger(tracer)
-            });
-        }).SingleInstance();
-        builder.Register(context => context.Resolve<IInstanceFactory>().Create());
+                ioc.AddSingleton(options);
+                ioc.AddSingleton(configuration);
+                ioc.AddSingleton<INamingConventions>(namingConventions);
+                ioc.AddSingleton(tracer);
+            },
+            Plugins = p =>
+            {
+                p.UseAttributeRouting();
+                p.UseRetryLater();
+                p.UpdateRetryInfo();
+                p.UseMessageContext<CorrelationContext>();
+                p.UseContextForwarding();
+            }
+        });
     }
 
     private class CustomNamingConventions : NamingConventions
@@ -102,13 +87,9 @@ public static class Extensions
         {
             var assemblyName = Assembly.GetEntryAssembly().GetName().Name;
             ExchangeNamingConvention = type => GetNamespace(type, defaultNamespace).ToLowerInvariant();
-            RoutingKeyConvention = type =>
-                $"{GetRoutingKeyNamespace(type, defaultNamespace)}{type.Name.Underscore()}".ToLowerInvariant();
             QueueNamingConvention = type => GetQueueName(assemblyName, type, defaultNamespace);
             ErrorExchangeNamingConvention = () => $"{defaultNamespace}.error";
             RetryLaterExchangeConvention = span => $"{defaultNamespace}.retry";
-            RetryLaterQueueNameConvetion = (exchange, span) =>
-                $"{defaultNamespace}.retry_for_{exchange.Replace(".", "_")}_in_{span.TotalMilliseconds}_ms".ToLowerInvariant();
         }
 
         private static string GetRoutingKeyNamespace(Type type, string defaultNamespace)
