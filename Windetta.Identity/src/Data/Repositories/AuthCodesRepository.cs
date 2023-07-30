@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Caching.Distributed;
 using System.Text.Json;
 using Windetta.Common.Authentication;
+using Windetta.Common.Constants;
 using Windetta.Common.Types;
-using Windetta.Identity.Constants;
 
 namespace Windetta.Identity.Data.Repositories;
 
@@ -32,7 +32,7 @@ public class AuthCodesRepository : IAuthCodesRepository
         var value = await _cache.GetStringAsync(key);
 
         if (value is null)
-            throw new WindettaException(ErrorCodes.AuthCodeNotFound);
+            throw new WindettaException(Errors.Identity.AuthCodeNotFound);
 
         return JsonSerializer.Deserialize<AuthorizationCode>(value) ?? new AuthorizationCode();
     }

@@ -1,9 +1,9 @@
 ﻿using IdentityServer4.Services;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
+using Windetta.Common.Constants;
 using Windetta.Common.Messages;
 using Windetta.Common.Types;
-using Windetta.Identity.Constants;
 using Windetta.Identity.Domain.Entities;
 using Windetta.Identity.Messages.Responses;
 
@@ -43,12 +43,12 @@ public class LocalLoginHandler : IRequestHandler<LocalLoginRequest, LocalLoginRe
             request.Username, request.Password, request.RememberLogin, false);
 
         if (!signInResult.Succeeded)
-            throw new WindettaException(ErrorCodes.UserNotFound, "Username or password invalid");
+            throw new WindettaException(Errors.Identity.UserNotFound, "Username or password invalid");
 
         var user = await _signInManager.UserManager.FindByNameAsync(request.Username);
 
         if (user == null)
-            throw new WindettaException(ErrorCodes.UserNotFound, "User with username not registered");
+            throw new WindettaException(Errors.Identity.UserNotFound, "User with username not registered");
 
         return new LocalLoginResponse()
         {

@@ -1,7 +1,7 @@
 ﻿using IdentityServer4.Services;
 using Microsoft.AspNetCore.Identity;
+using Windetta.Common.Constants;
 using Windetta.Common.Types;
-using Windetta.Identity.Constants;
 using Windetta.Identity.Domain.Entities;
 using Windetta.Identity.Messages.Requests;
 using Windetta.Identity.Tests.Mocks;
@@ -58,7 +58,7 @@ public class LoginHandlerTests
         var exception = Should.Throw<WindettaException>(() => sut.HandleAsync(request).GetAwaiter().GetResult());
 
         // assert
-        exception.ErrorCode.ShouldBe(ErrorCodes.UserNotFound);
+        exception.ErrorCode.ShouldBe(Errors.Identity.UserNotFound);
     }
 
     [Fact]
@@ -78,6 +78,6 @@ public class LoginHandlerTests
         var exception = Should.Throw<WindettaException>(() => sut.HandleAsync(request).GetAwaiter().GetResult());
 
         // assert
-        exception.ErrorCode.ShouldBe(ErrorCodes.UserNotFound);
+        exception.ErrorCode.ShouldBe(Errors.Identity.UserNotFound);
     }
 }
