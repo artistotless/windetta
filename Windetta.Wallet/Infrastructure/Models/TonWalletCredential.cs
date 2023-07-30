@@ -1,4 +1,4 @@
-﻿namespace Windetta.Wallet.Services;
+﻿namespace Windetta.Wallet.Infrastructure.Models;
 
 public class TonWalletCredential
 {

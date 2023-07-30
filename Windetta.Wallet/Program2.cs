@@ -100,7 +100,6 @@ logger.LogInformation("New key: public = {PublicKey}, secret = {Secret}", key.Pu
 var ek = await tonClient.ExportKey(key);
 logger.LogInformation("Mnemonic for this key is: {Words}", string.Join(" ", ek.WordList));
 
-
 //var epk = await tonClient.ExportPemKey(key, localPass, keyPass);
 //logger.LogInformation("Same key in PEM with password:\r\n{PEM}", epk.Pem);
 
@@ -128,10 +127,10 @@ var msg = new Message(new AccountAddress(destination))
     SendMode = 1,
 };
 
+var action = new ActionMsg(new[] { msg }.ToList()) { AllowSendToUninited = true };
+
 var ast = await tonClient.GetAccountState(address.Value);
 logger.LogInformation("Acc info via GetAccountState(): balance = {Value} nanoton or {Value} TON", ast.Balance, TonUtils.Coins.FromNano(ast.Balance));
-
-var action = new ActionMsg(new[] { msg }.ToList()) { AllowSendToUninited = true };
 
 // Step 3: create query and send it
 var query = await tonClient.CreateQuery(new InputKeyRegular(inputKey), address, action, TimeSpan.FromMinutes(1), initialAccountState: initialAccountState);

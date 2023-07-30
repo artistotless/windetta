@@ -10,5 +10,7 @@ public static class Errors
     public static class Wallet
     {
         public const string InvalidFreezeAmount = "invalid_freeze_amount";
+        public const string FundsNotEnough = "funds_not_enough";
+        public const string BigFeeTransaction = "big_fee_transaction";
     }
 }

@@ -2,15 +2,15 @@
 using TonLibDotNet.Types.Wallet;
 using Windetta.Common.Handlers;
 using Windetta.Common.RabbitMQ;
+using Windetta.Wallet.Application.Services;
 using Windetta.Wallet.Domain;
 using Windetta.Wallet.Messages.Events;
-using Windetta.Wallet.Services;
 
 namespace Windetta.Wallet.Handlers.Identity;
 
 public class UserCreatedHandler : IEventHandler<UserCreated>
 {
-    private readonly IWalletService _tonClient;
+    private readonly IUserWalletService _tonClient;
     private readonly ILogger _logger;
 
     public async Task HandleAsync(UserCreated @event, ICorrelationContext context)
