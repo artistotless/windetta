@@ -4,11 +4,10 @@ using System.Reflection;
 using Windetta.Common.Configuration;
 using Windetta.Common.Constants;
 using Windetta.Common.Database;
-using Windetta.Common.Options;
 using Windetta.Common.MassTransit;
+using Windetta.Common.Options;
 using Windetta.Common.RabbitMQ;
 using Windetta.Operations.Data;
-using Windetta.Operations.Sagas;
 
 namespace Windetta.Operations.Extensions;
 
@@ -36,27 +35,25 @@ public static class DependencyResolver
         var assembly = typeof(DependencyResolver).Assembly;
         var provider = services.BuildServiceProvider();
         var configuration = provider.GetRequiredService<IConfiguration>();
-
         var rmqQtions = configuration.GetOptions<RabbitMqOptions>("RabbitMq");
 
         services.AddMassTransit(x =>
         {
-            x.AddConsumer<TestConsumer>();
-            //x.SetEntityFrameworkSagaRepositoryProvider(x =>
-            //{
-            //    x.ExistingDbContext<SagasDbContext>();
-            //});
+            x.SetEntityFrameworkSagaRepositoryProvider(x =>
+            {
+                x.ConcurrencyMode = ConcurrencyMode.Optimistic;
+                x.ExistingDbContext<SagasDbContext>();
+            });
 
-            //x.SetEndpointNameFormatter(new MyEndpointNameFormatter(Services.Operations));
+            x.SetEndpointNameFormatter(
+                new MyEndpointNameFormatter(Svc.Operations));
 
-            //x.AddSagaStateMachines(assembly);
-            //x.AddSagas(assembly);
-            //x.AddConsumers(assembly);
+            x.AddSagaStateMachines(assembly);
+            x.AddSagas(assembly);
+            x.AddConsumers(assembly);
 
             x.UsingRabbitMq((context, cfg) =>
             {
-                //cfg.MessageTopology.SetEntityNameFormatter(new MyEntityNameFormatter(Services.Operations));
-
                 cfg.Host(rmqQtions.Hostnames.First() ?? "localhost", rmqQtions.VirtualHost ?? "/", h =>
                 {
                     h.Username(rmqQtions.Username ?? "admin");

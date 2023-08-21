@@ -141,23 +141,10 @@ public static class DependencyResolver
 
         services.AddMassTransit(x =>
         {
-            //x.AddConsumer<TestConsumer>();
-            //x.SetEntityFrameworkSagaRepositoryProvider(x =>
-            //{
-            //    x.ExistingDbContext<SagasDbContext>();
-            //});
-
             x.SetEndpointNameFormatter(new MyEndpointNameFormatter(Svc.Identity));
-
-            //x.AddSagaStateMachines(assembly);
-            //x.AddSagas(assembly);
-            //x.AddConsumers(assembly);
-
-            //x.UsingInMemory((ctx, c) => c.ConfigureEndpoints(ctx));
+            x.AddConsumers(assembly);
             x.UsingRabbitMq((context, cfg) =>
             {
-                //cfg.MessageTopology.SetEntityNameFormatter(new MyEntityNameFormatter(Svc.Identity));
-
                 cfg.Host(rmqQtions.Hostnames.First() ?? "localhost", rmqQtions.VirtualHost ?? "/", h =>
                 {
                     h.Username(rmqQtions.Username ?? "admin");

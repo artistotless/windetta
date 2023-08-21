@@ -3,7 +3,7 @@ using Windetta.Contracts.Events;
 
 namespace Windetta.Identity.Messages.Events;
 
-[ConfigureConsumeTopology(false)]
+//[ConfigureConsumeTopology(false)]
 public class UserCreated : IUserCreated
 {
     public Guid Id { get; set; }

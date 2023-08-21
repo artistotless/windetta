@@ -1,6 +1,4 @@
-﻿using MassTransit;
-
-namespace Windetta.Contracts.Events;
+﻿namespace Windetta.Contracts.Events;
 
 public interface IUserCreated
 {

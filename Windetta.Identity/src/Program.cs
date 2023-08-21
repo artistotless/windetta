@@ -11,7 +11,6 @@ IConfiguration configuration = builder.Configuration;
 IServiceCollection services = builder.Services;
 
 services.ConfigureMassTransit();
-
 services.AddIdentityDbContext();
 services.AddControllersWithViews();
 services.AddIdentityServer4();
@@ -24,7 +23,6 @@ services.ConfigureCustomViewsRouting();
 
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory(builder =>
 {
-    //builder.AddRabbitMq();
     builder.ResolveDependenciesFromAssembly();
 }));
 

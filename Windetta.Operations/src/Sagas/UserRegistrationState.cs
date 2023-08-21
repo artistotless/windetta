@@ -1,5 +1,5 @@
 ﻿using MassTransit;
-using Windetta.Operations.Messages.Events;
+using Windetta.Contracts.Events;
 
 namespace Windetta.Operations.Sagas;
 
@@ -32,5 +32,5 @@ public class UserRegistrationStateMachine : MassTransitStateMachine<UserRegistra
     public State Registered { get; }
     public State WalletAttached { get; }
 
-    public Event<UserCreated> UserCreated { get; }
+    public Event<IUserCreated> UserCreated { get; }
 }
