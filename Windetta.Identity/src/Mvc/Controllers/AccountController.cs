@@ -1,26 +1,48 @@
 ﻿using IdentityServer4.Models;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Windetta.Contracts.Events;
 using Windetta.Identity.Domain.Entities;
 using Windetta.Identity.Extensions;
 using Windetta.Identity.Infrastructure.Exceptions;
+using Windetta.Identity.Messages.Events;
 using Windetta.Identity.Messages.Requests;
 using Windetta.Identity.Models;
 using Windetta.Identity.Services;
 
 namespace Windetta.Identity.Controllers;
 
+
 [Route("[controller]")]
 public class AccountController : BaseController
 {
     private readonly IRequestDispatcher _dispatcher;
     private readonly UserManager<User> _userManager;
+    private readonly IPublishEndpoint _bus;
+    private readonly IBus _bus2;
 
-    public AccountController(IRequestDispatcher dispatcher, UserManager<User> userManager)
+
+    public AccountController(IRequestDispatcher dispatcher, UserManager<User> userManager, IPublishEndpoint bus, IBus bus2)
     {
         _dispatcher = dispatcher;
         _userManager = userManager;
+        _bus = bus;
+        _bus2 = bus2;
+    }
+
+    [HttpGet]
+    [Route("event")]
+    public async Task<IActionResult> Event()
+    {
+        return NoContent(async () => await _bus2.Publish<UserCreated>(new
+        {
+            Email = "test@email.com",
+            Id = Guid.NewGuid(),
+            Role = "user",
+            UserName = "userName",
+        }));
     }
 
     /// <summary>

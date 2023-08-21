@@ -1,6 +1,7 @@
 using IdentityModel;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
+using MassTransit;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using Windetta.Common.Messages;
@@ -23,16 +24,17 @@ public class ExternalLoginHandler : IRequestHandler<ExternalLoginRequest, Author
 {
     private readonly SignInManager<User> _signinManager;
     private readonly IIdentityServerInteractionService _interaction;
-    private readonly IBusPublisher _busPublisher;
+    private readonly IBus _bus;
+    //private readonly IBusPublisher _busPublisher;
 
     public ExternalLoginHandler(
         SignInManager<User> signinManager,
         IIdentityServerInteractionService interaction,
-        IBusPublisher busPublisher)
+        IBus bus)
     {
         _signinManager = signinManager;
         _interaction = interaction;
-        _busPublisher = busPublisher;
+        _bus = bus;
     }
 
     public async Task<AuthorizationRequest> HandleAsync(ExternalLoginRequest request)
@@ -46,21 +48,20 @@ public class ExternalLoginHandler : IRequestHandler<ExternalLoginRequest, Author
         if (user is null)
         {
             user = await AutoProvisionUserAsync(request.Provider, request.Identity);
-
-            // send user created event to event bus
-            await _busPublisher.PublishAsync(new UserCreated()
-            {
-                Id = user.Id,
-                Email = user.Email,
-                Role = Roles.USER,
-                UserName = user.UserName,
-            }, CorrelationContext.Empty);
         }
 
         await _signinManager.ExternalLoginSignInAsync
             (request.Provider, request.Identity.UniqueId, isPersistent: true);
 
         var context = await _interaction.GetAuthorizationContextAsync(request.ReturnUrl);
+
+        await _bus.Publish<UserCreated>(new()
+        {
+            Id = user.Id,
+            Email = user.Email,
+            Role = Roles.USER,
+            UserName = user.UserName,
+        });
 
         return context;
     }

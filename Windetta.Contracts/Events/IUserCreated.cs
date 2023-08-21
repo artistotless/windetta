@@ -1,10 +1,8 @@
 ﻿using MassTransit;
-using Windetta.Contracts.Events;
 
-namespace Windetta.Identity.Messages.Events;
+namespace Windetta.Contracts.Events;
 
-[ConfigureConsumeTopology(false)]
-public class UserCreated : IUserCreated
+public interface IUserCreated
 {
     public Guid Id { get; set; }
     public string UserName { get; set; }

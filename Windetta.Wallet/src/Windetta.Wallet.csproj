@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Windetta.Common\src\Windetta.Common.csproj" />
+    <ProjectReference Include="..\..\Windetta.Common\src\Windetta.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,5 +1,4 @@
 using Autofac.Extensions.DependencyInjection;
-using Windetta.Common.RabbitMQ;
 using Windetta.Common.Redis;
 using Windetta.Common.Types;
 using Windetta.Identity.Data.Seed;
@@ -10,6 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 IConfiguration configuration = builder.Configuration;
 IServiceCollection services = builder.Services;
+
+services.ConfigureMassTransit();
 
 services.AddIdentityDbContext();
 services.AddControllersWithViews();
@@ -23,7 +24,7 @@ services.ConfigureCustomViewsRouting();
 
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory(builder =>
 {
-    builder.AddRabbitMq();
+    //builder.AddRabbitMq();
     builder.ResolveDependenciesFromAssembly();
 }));
 

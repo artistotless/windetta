@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
+
 namespace Windetta.Common.Configuration;
 
 public static class Extensions

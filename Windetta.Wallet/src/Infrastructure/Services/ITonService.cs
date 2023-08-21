@@ -1,8 +1,9 @@
-﻿using Windetta.Wallet.Infrastructure.Models;
+﻿using Windetta.Common.Types;
+using Windetta.Wallet.Infrastructure.Models;
 
 namespace Windetta.Wallet.Infrastructure.Services;
 
-public interface ITonService
+public interface ITonService : IScopedService
 {
     Task<TonWallet> GenerateWallet();
     Task<long> GetBalance(string address);

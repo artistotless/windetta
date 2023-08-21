@@ -1,9 +1,9 @@
 ﻿using IdentityModel;
+using MassTransit;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using Windetta.Common.Messages;
-using Windetta.Common.RabbitMQ;
 using Windetta.Identity.Domain.Entities;
 using Windetta.Identity.Extensions;
 using Windetta.Identity.Messages.Events;
@@ -28,12 +28,13 @@ public class LocalRegisterRequest : IRequest
 public class LocalRegisterHandler : IRequestHandler<LocalRegisterRequest>
 {
     private readonly UserManager<User> _userManager;
-    private readonly IBusPublisher _busPublisher;
+    private readonly IBus _bus;
+    //private readonly IBusPublisher _busPublisher;
 
-    public LocalRegisterHandler(UserManager<User> userManager, IBusPublisher busPublisher)
+    public LocalRegisterHandler(UserManager<User> userManager, IBus bus)
     {
         _userManager = userManager;
-        _busPublisher = busPublisher;
+        _bus = bus;
     }
 
     public async Task HandleAsync(LocalRegisterRequest request)
@@ -62,14 +63,22 @@ public class LocalRegisterHandler : IRequestHandler<LocalRegisterRequest>
         (await _userManager.AddClaimsAsync(user, claims))
             .HandleBadResult();
 
-        // send user created event to event bus
-        await _busPublisher.PublishAsync(new UserCreated()
+        await _bus.Publish<UserCreated>(new()
         {
             Id = user.Id,
             Email = user.Email,
             Role = Roles.USER,
             UserName = user.UserName,
-        }, CorrelationContext.Empty);
+        });
+
+        //// send user created event to event bus
+        //await _busPublisher.PublishAsync(new UserCreated()
+        //{
+        //    Id = user.Id,
+        //    Email = user.Email,
+        //    Role = Roles.USER,
+        //    UserName = user.UserName,
+        //}, CorrelationContext.Empty);
     }
 
     private static void Validate(LocalRegisterRequest request)

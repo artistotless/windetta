@@ -15,6 +15,12 @@ public class TonService : ITonService
     private readonly ITonClient _tonClient;
     private readonly ILogger _logger;
 
+    public TonService(ITonClient tonClient, ILogger logger)
+    {
+        _tonClient = tonClient;
+        _logger = logger;
+    }
+
     public async Task<TonWallet> GenerateWallet()
     {
         await InitTonClient();
@@ -122,7 +128,6 @@ public class TonService : ITonService
             TotalFee = sumFee,
         };
     }
-
 
     private async Task InitTonClient()
     {

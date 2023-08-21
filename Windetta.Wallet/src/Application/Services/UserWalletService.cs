@@ -1,18 +1,25 @@
-﻿using TonLibDotNet;
-using Windetta.Wallet.Application.Dto;
-using Windetta.Wallet.Domain;
+﻿using Windetta.Wallet.Application.Dto;
+using Windetta.Wallet.Infrastructure.Models;
+using Windetta.Wallet.Infrastructure.Services;
 
 namespace Windetta.Wallet.Application.Services;
 
 public class UserWalletService : IUserWalletService
 {
+    private readonly ITonService _tonService;
     private readonly ILogger _logger;
     //private readonly IWalletsRepository _rep;
     //private readonly IWalletCredentialRepository _rep;
 
-    public UserWalletService(ITonClient tonClient)
+    public UserWalletService(ITonService tonService, ILogger logger)
     {
-        _tonClient = tonClient;
+        _tonService = tonService;
+        _logger = logger;
+    }
+
+    public Task CreateWallet(Guid userId, TonWallet wallet)
+    {
+        throw new NotImplementedException();
     }
 
     public Task<WalletBalance> GetBalance(Guid userId)
