@@ -1,28 +1,33 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Windetta.Wallet.Application.Services;
 
 namespace Windetta.Wallet.Controllers;
 
 [Route("[controller]")]
 public class WalletController : Controller
 {
-    [HttpGet]
-    [Route("balance")]
-    public IActionResult GetBalance()
+    private readonly IUserWalletService _walletService;
+
+    public WalletController(IUserWalletService walletService)
     {
-        return View();
+        _walletService = walletService;
     }
 
     [HttpGet]
-    [Route("deposit")]
-    public IActionResult GetDepositAddress()
+    [Route("{userId:guid}/balance")]
+    public async Task<IActionResult> GetBalance(Guid userId)
     {
-        return View();
+        var info = await _walletService.GetWalletInfoAsync(userId);
+
+        return View(info.Balance);
     }
 
-    [HttpPost]
-    [Route("withdraw")]
-    public IActionResult Withdraw()
+    [HttpGet]
+    [Route("{userId:guid}/deposit")]
+    public async Task<IActionResult> GetDepositAddress(Guid userId)
     {
-        return View();
+        var info = await _walletService.GetWalletInfoAsync(userId);
+
+        return View(info.Address);
     }
 }

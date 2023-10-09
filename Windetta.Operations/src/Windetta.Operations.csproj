@@ -16,16 +16,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Windetta.Common\src\Windetta.Common.csproj" />
+    <ProjectReference Include="..\..\Windetta.Contracts\Windetta.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Consumers\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Windetta.Contracts">
-      <HintPath>..\..\Windetta.Contracts\bin\Debug\net7.0\Windetta.Contracts.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>

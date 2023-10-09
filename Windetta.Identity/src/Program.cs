@@ -1,4 +1,7 @@
 using Autofac.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using System.Reflection;
+using Windetta.Common.Database;
 using Windetta.Common.Redis;
 using Windetta.Common.Types;
 using Windetta.Identity.Data.Seed;
@@ -11,7 +14,8 @@ IConfiguration configuration = builder.Configuration;
 IServiceCollection services = builder.Services;
 
 services.ConfigureMassTransit();
-services.AddIdentityDbContext();
+services.AddMysqlDbContext<IdentityDbContext>(Assembly.GetExecutingAssembly());
+services.AddIdentityStore();
 services.AddControllersWithViews();
 services.AddIdentityServer4();
 services.AddAuthorization();

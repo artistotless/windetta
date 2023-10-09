@@ -29,7 +29,6 @@ public class LocalRegisterHandler : IRequestHandler<LocalRegisterRequest>
 {
     private readonly UserManager<User> _userManager;
     private readonly IBus _bus;
-    //private readonly IBusPublisher _busPublisher;
 
     public LocalRegisterHandler(UserManager<User> userManager, IBus bus)
     {

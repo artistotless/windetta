@@ -1,4 +1,10 @@
-﻿using Windetta.Wallet.Application.Dto;
+﻿using Microsoft.EntityFrameworkCore;
+using Windetta.Common.Constants;
+using Windetta.Common.Types;
+using Windetta.Wallet.Application.Dto;
+using Windetta.Wallet.Data;
+using Windetta.Wallet.Data.Specifications;
+using Windetta.Wallet.Domain;
 using Windetta.Wallet.Infrastructure.Models;
 using Windetta.Wallet.Infrastructure.Services;
 
@@ -6,39 +12,90 @@ namespace Windetta.Wallet.Application.Services;
 
 public class UserWalletService : IUserWalletService
 {
+    private readonly WalletDbContext _ctx;
     private readonly ITonService _tonService;
-    private readonly ILogger _logger;
-    //private readonly IWalletsRepository _rep;
-    //private readonly IWalletCredentialRepository _rep;
 
-    public UserWalletService(ITonService tonService, ILogger logger)
+    public UserWalletService(WalletDbContext ctx, ITonService tonService)
     {
+        _ctx = ctx;
         _tonService = tonService;
-        _logger = logger;
     }
 
-    public Task CreateWallet(Guid userId, TonWallet wallet)
+    public async Task CreateWalletAsync(Guid userId)
     {
-        throw new NotImplementedException();
+        var walletData = await _tonService.GenerateWalletData();
+
+        var keySet = new WalletKeysSet()
+        {
+            PrivateKey = walletData.Credential.SecretKey,
+            PublicKey = walletData.Credential.PublicKey
+        };
+
+        _ctx.Wallets.Add(new UserWallet()
+        {
+            Address = walletData.Address,
+            UserId = userId,
+            WalletKeys = keySet
+        });
+
+        await _ctx.SaveChangesAsync();
     }
 
-    public Task<WalletBalance> GetBalance(Guid userId)
+    public async Task<WalletInfoDto> GetWalletInfoAsync(Guid userId)
     {
-        throw new NotImplementedException();
+        var wallet = await _ctx.Wallets.Where(new WalletByUserIdSpec(userId))
+              .Select(x => new { x.HeldBalance, x.Address })
+              .FirstOrDefaultAsync();
+
+        if (wallet is null)
+            throw new WindettaException(Errors.Wallet.NotFound);
+
+        var nanotons = await _tonService.GetBalance(wallet.Address);
+        var balance = new WalletBalanceDto(nanotons, wallet.HeldBalance);
+
+        return new WalletInfoDto(balance, wallet.Address);
     }
 
-    public Task<string> GetDepositAddress(Guid userId)
+    public async Task HoldBalanceAsync(Guid userId, int nanotons)
     {
-        throw new NotImplementedException();
+        var wallet = await _ctx.Wallets
+            .FirstOrDefaultAsync(new WalletByUserIdSpec(userId));
+
+        if (wallet is null)
+            throw new WindettaException(Errors.Wallet.NotFound);
+
+        wallet.HoldBalance(nanotons);
+
+        await _ctx.SaveChangesAsync();
     }
 
-    public Task HoldBalance(Guid userId, int nanotonAmount)
+    public async Task TransferAsync(Guid userId, long nanotons, TonAddress destination)
     {
-        throw new NotImplementedException();
+        var wallet = await _ctx.Wallets.Include(x => x.WalletKeys)
+           .FirstOrDefaultAsync(new WalletByUserIdSpec(userId));
+
+        if (wallet is null)
+            throw new WindettaException(Errors.Wallet.NotFound);
+
+        var credential = new TonWalletCredential()
+        {
+            PublicKey = wallet.WalletKeys.PublicKey,
+            SecretKey = wallet.WalletKeys.PrivateKey
+        };
+
+        await _tonService.TransferTon(credential, destination, nanotons);
     }
 
-    public Task UnHoldBalance(Guid userId)
+    public async Task UnHoldBalanceAsync(Guid userId)
     {
-        throw new NotImplementedException();
+        var wallet = await _ctx.Wallets
+           .FirstOrDefaultAsync(new WalletByUserIdSpec(userId));
+
+        if (wallet is null)
+            throw new WindettaException(Errors.Wallet.NotFound);
+
+        wallet.UnHoldBalance();
+
+        await _ctx.SaveChangesAsync();
     }
 }

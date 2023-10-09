@@ -15,13 +15,13 @@ public class TonService : ITonService
     private readonly ITonClient _tonClient;
     private readonly ILogger _logger;
 
-    public TonService(ITonClient tonClient, ILogger logger)
+    public TonService(ITonClient tonClient, ILogger<TonService> logger)
     {
         _tonClient = tonClient;
         _logger = logger;
     }
 
-    public async Task<TonWallet> GenerateWallet()
+    public async Task<TonWallet> GenerateWalletData()
     {
         await InitTonClient();
 
@@ -47,7 +47,7 @@ public class TonService : ITonService
 
         var tonWallet = new TonWallet()
         {
-            Address = address.Value,
+            Address = new(address.Value),
             Credential = keys,
         };
 
@@ -98,7 +98,7 @@ public class TonService : ITonService
     // It takes the sender's wallet credentials, the recipient's address ('to'), and the amount in nanotons to transfer.
     // The method returns a TransferInfo object with details about the transfer, including the actual amount transferred, the recipient address, and the total transaction fees.
     /// </summary>
-    public async Task<TransferInfo> TransferTon(TonWalletCredential from, string to, long nanotonAmount)
+    public async Task<TransferResult> TransferTon(TonWalletCredential from, string to, long nanotonAmount)
     {
         // Estimate the transaction fees for the transfer using the provided sender's wallet credentials, recipient address, and amount.
         var sumFee = await EstimateFees(from, to, nanotonAmount);
@@ -121,7 +121,7 @@ public class TonService : ITonService
 
         // Create a TransferInfo object to store details about the transfer.
         // This includes the actual amount transferred ('amount'), the recipient address ('to'), and the total transaction fees ('sumFee').
-        return new TransferInfo()
+        return new TransferResult()
         {
             Amount = amount,
             Destination = to,
@@ -149,7 +149,7 @@ public class TonService : ITonService
         var address = await _tonClient.GetAccountAddress(initialAccountState, 0, 0);
         var msg = new Message(new AccountAddress(to))
         {
-            Data = new DataText(Data.Int256_AllZeroes),
+            Data = new DataText(DataText.Int256_AllZeroes),
             Amount = nanotonAmount,
             SendMode = 1,
         };

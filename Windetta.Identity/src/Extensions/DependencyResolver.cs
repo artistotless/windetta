@@ -104,20 +104,8 @@ public static class DependencyResolver
     }
 
     // Configure Db connection to storing users, roles, claims and so on.
-    public static void AddIdentityDbContext(this IServiceCollection services)
+    public static void AddIdentityStore(this IServiceCollection services)
     {
-        using var provider = services.BuildServiceProvider();
-
-        var configuration = provider.GetRequiredService<IConfiguration>();
-
-        services.Configure<MysqlSettings>(configuration.GetSection("Mysql"));
-
-        var settings = configuration.GetOptions<MysqlSettings>("Mysql");
-        var connString = settings.GetConnectionString();
-
-        services.AddDbContext<IdentityDbContext>(options => options.UseMySql(connString, new MySqlServerVersion(settings.Version),
-             b => b.MigrationsAssembly(Assembly.GetExecutingAssembly().FullName)));
-
         services.AddIdentity<User, Role>(o =>
         {
             o.User.RequireUniqueEmail = true;

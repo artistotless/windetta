@@ -1,6 +1,6 @@
 ﻿namespace Windetta.Wallet.Infrastructure.Models;
 
-public class TransferInfo
+public class TransferResult
 {
     public long Amount { get; set; }
     public string Destination { get; set; }

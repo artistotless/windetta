@@ -21,7 +21,7 @@ public class RegisterHandlerTests
     public void HandleAsync_CreatesNewUser()
     {
         // arrange
-        var sut = new LocalRegisterHandler(_userManagerMock.Object);
+        var sut = new LocalRegisterHandler(_userManagerMock.Object, null);
         var request = new LocalRegisterRequest()
         {
             Email = "unique-email@gmai.com",
@@ -43,7 +43,7 @@ public class RegisterHandlerTests
         string email, string userName, string expectedErrorMessage)
     {
         // arrange
-        var sut = new LocalRegisterHandler(_userManagerMock.Object);
+        var sut = new LocalRegisterHandler(_userManagerMock.Object, null);
         var request = new LocalRegisterRequest()
         {
             Email = email,
@@ -75,7 +75,7 @@ public class RegisterHandlerTests
         };
 
         // act 
-        var sut = new LocalRegisterHandler(null);
+        var sut = new LocalRegisterHandler(null, null);
         var exception = Should.Throw<ArgumentNullException>(
             () => sut.HandleAsync(request).GetAwaiter().GetResult());
 

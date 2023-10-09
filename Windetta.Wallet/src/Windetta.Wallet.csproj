@@ -9,6 +9,12 @@
   <ItemGroup>
     <PackageReference Include="Autofac" Version="7.0.1" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageReference Include="LinqSpecs" Version="3.2.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="7.0.0" />
     <PackageReference Include="TonLib.Net" Version="0.19.0" />
     <PackageReference Include="TonSdk.Client" Version="0.2.2" />
     <PackageReference Include="TonSdk.Contracts" Version="0.2.3" />
@@ -16,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Windetta.Common\src\Windetta.Common.csproj" />
+    <ProjectReference Include="..\..\Windetta.Contracts\Windetta.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -6,13 +6,12 @@ using Windetta.Operations.Sagas;
 
 namespace Windetta.Operations.Data;
 
-public class UserRegistrationMap : SagaClassMap<UserRegistrationState>
+public class UserRegistrationMap : SagaClassMap<NewUserFlow>
 {
-    protected override void Configure(EntityTypeBuilder<UserRegistrationState> entity, ModelBuilder model)
+    protected override void Configure(EntityTypeBuilder<NewUserFlow> entity, ModelBuilder model)
     {
         entity.Property(x => x.CurrentState).HasMaxLength(64);
         entity.Property(x => x.UserId);
-        entity.Property(x => x.WalletId);
         entity.HasIndex(x => x.CorrelationId);
     }
 }

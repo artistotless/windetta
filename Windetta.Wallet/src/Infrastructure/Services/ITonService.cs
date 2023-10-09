@@ -5,7 +5,7 @@ namespace Windetta.Wallet.Infrastructure.Services;
 
 public interface ITonService : IScopedService
 {
-    Task<TonWallet> GenerateWallet();
+    Task<TonWallet> GenerateWalletData();
     Task<long> GetBalance(string address);
 
     /// <summary>
@@ -13,7 +13,7 @@ public interface ITonService : IScopedService
     /// </summary>
     /// <param name="from">Source wallet credential</param>
     /// <param name="to">Destination TON address</param>
-    /// <param name="nanotonAmount">amount of nanotons</param>
-    Task<TransferInfo> TransferTon(TonWalletCredential from, string to, long nanotonAmount);
-    Task<long> EstimateFees(TonWalletCredential from, string to, long nanotonAmount);
+    /// <param name="nanotons">amount of nanotons</param>
+    Task<TransferResult> TransferTon(TonWalletCredential from, string to, long nanotons);
+    Task<long> EstimateFees(TonWalletCredential from, string to, long nanotons);
 }

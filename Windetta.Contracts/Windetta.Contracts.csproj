@@ -7,12 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Commands\" />
     <Folder Include="Queries\" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="MassTransit" Version="8.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Windetta.Common\src\Windetta.Common.csproj" />
   </ItemGroup>
 
 </Project>

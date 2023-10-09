@@ -36,7 +36,7 @@ public class AccountController : BaseController
     [Route("event")]
     public async Task<IActionResult> Event()
     {
-        return NoContent(async () => await _bus.Publish<IUserCreated>(new
+        return NoContent(async () => await _bus.Publish<UserCreated>(new
         {
             Email = "test@email.com",
             Id = Guid.NewGuid(),
