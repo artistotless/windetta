@@ -11,13 +11,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Windetta.Identity", "Windet
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{D0CB951F-ACE6-4DFE-8916-F4A778AD68E8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Windetta.Identity.Tests", "Windetta.Identity\tests\Windetta.Identity.Tests.csproj", "{17D21359-8506-4066-A89E-52A8B6F133CB}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Windetta.Wallet", "Windetta.Wallet\src\Windetta.Wallet.csproj", "{4DEC793F-BCFF-4ADB-A99E-56E8EECDB4E5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Windetta.Operations", "Windetta.Operations\src\Windetta.Operations.csproj", "{1BA77C48-C891-4DC4-B376-93CA78005491}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Windetta.Contracts", "Windetta.Contracts\Windetta.Contracts.csproj", "{DC0120B4-526D-4FDA-B70F-BAF403B670FE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Windetta.Contracts", "Windetta.Contracts\Windetta.Contracts.csproj", "{DC0120B4-526D-4FDA-B70F-BAF403B670FE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Windetta.WalletTests", "Windetta.Wallet\tests\Windetta.WalletTests.csproj", "{9F5269FF-7895-4EAD-991E-7237142E0313}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Windetta.IdentityTests", "Windetta.Identity\tests\Windetta.IdentityTests.csproj", "{400CE1BF-3E97-43EA-A257-6169455A23FF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,10 +39,6 @@ Global
 		{8B8FDD72-D8DC-4611-8A32-5E209EC95F9F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8B8FDD72-D8DC-4611-8A32-5E209EC95F9F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8B8FDD72-D8DC-4611-8A32-5E209EC95F9F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{17D21359-8506-4066-A89E-52A8B6F133CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{17D21359-8506-4066-A89E-52A8B6F133CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{17D21359-8506-4066-A89E-52A8B6F133CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{17D21359-8506-4066-A89E-52A8B6F133CB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4DEC793F-BCFF-4ADB-A99E-56E8EECDB4E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4DEC793F-BCFF-4ADB-A99E-56E8EECDB4E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4DEC793F-BCFF-4ADB-A99E-56E8EECDB4E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -53,12 +51,21 @@ Global
 		{DC0120B4-526D-4FDA-B70F-BAF403B670FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC0120B4-526D-4FDA-B70F-BAF403B670FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DC0120B4-526D-4FDA-B70F-BAF403B670FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9F5269FF-7895-4EAD-991E-7237142E0313}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9F5269FF-7895-4EAD-991E-7237142E0313}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9F5269FF-7895-4EAD-991E-7237142E0313}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9F5269FF-7895-4EAD-991E-7237142E0313}.Release|Any CPU.Build.0 = Release|Any CPU
+		{400CE1BF-3E97-43EA-A257-6169455A23FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{400CE1BF-3E97-43EA-A257-6169455A23FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{400CE1BF-3E97-43EA-A257-6169455A23FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{400CE1BF-3E97-43EA-A257-6169455A23FF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{17D21359-8506-4066-A89E-52A8B6F133CB} = {D0CB951F-ACE6-4DFE-8916-F4A778AD68E8}
+		{9F5269FF-7895-4EAD-991E-7237142E0313} = {D0CB951F-ACE6-4DFE-8916-F4A778AD68E8}
+		{400CE1BF-3E97-43EA-A257-6169455A23FF} = {D0CB951F-ACE6-4DFE-8916-F4A778AD68E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8236D9C0-4521-4D71-A1C3-30D6E29ED273}

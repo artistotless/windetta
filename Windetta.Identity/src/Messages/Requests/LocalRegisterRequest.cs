@@ -12,6 +12,8 @@ namespace Windetta.Identity.Messages.Requests;
 
 public class LocalRegisterRequest : IRequest
 {
+    public Guid? Id { get; set; }
+
     [EmailAddress]
     [Required]
     public string Email { get; set; }
@@ -47,6 +49,8 @@ public class LocalRegisterHandler : IRequestHandler<LocalRegisterRequest>
             DisplayName = request.UserName
         };
 
+        user.Id = request.Id ?? user.Id;
+
         (await _userManager.CreateAsync(user, request.Password))
             .HandleBadResult();
 
@@ -69,15 +73,6 @@ public class LocalRegisterHandler : IRequestHandler<LocalRegisterRequest>
             Role = Roles.USER,
             UserName = user.UserName,
         });
-
-        //// send user created event to event bus
-        //await _busPublisher.PublishAsync(new UserCreated()
-        //{
-        //    Id = user.Id,
-        //    Email = user.Email,
-        //    Role = Roles.USER,
-        //    UserName = user.UserName,
-        //}, CorrelationContext.Empty);
     }
 
     private static void Validate(LocalRegisterRequest request)

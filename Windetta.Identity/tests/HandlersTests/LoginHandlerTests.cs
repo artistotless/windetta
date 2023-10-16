@@ -1,10 +1,12 @@
 ﻿using IdentityServer4.Services;
+using MassTransit;
 using Microsoft.AspNetCore.Identity;
 using Windetta.Common.Constants;
 using Windetta.Common.Types;
 using Windetta.Identity.Domain.Entities;
 using Windetta.Identity.Messages.Requests;
 using Windetta.Identity.Tests.Mocks;
+using Windetta.IdentityTests.Mocks;
 using Windetta.Tests.Identity.Mocks;
 
 namespace Windetta.Tests.Identity.HandlersTests;
@@ -13,6 +15,7 @@ public class LoginHandlerTests
 {
     private readonly UserStore _userStore = new();
     private readonly Mock<UserManager<User>> _userManagerMock;
+
 
     public LoginHandlerTests()
     {

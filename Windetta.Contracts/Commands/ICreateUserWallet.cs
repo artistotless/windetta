@@ -2,5 +2,5 @@
 
 public interface ICreateUserWallet
 {
-    public Guid UserId { get; init; }
+    public Guid UserId { get; set; }
 }

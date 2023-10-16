@@ -2,6 +2,6 @@
 
 public interface INotifyEmailConfirmation
 {
-    public Guid UserId { get; init; }
-    public string Email { get; init; }
+    public Guid UserId { get; set; }
+    public string Email { get; set; }
 }

@@ -4,7 +4,7 @@ using Windetta.Wallet.Application.Services;
 namespace Windetta.Wallet.Controllers;
 
 [Route("[controller]")]
-public class WalletController : Controller
+public class WalletController : ControllerBase
 {
     private readonly IUserWalletService _walletService;
 
@@ -19,7 +19,7 @@ public class WalletController : Controller
     {
         var info = await _walletService.GetWalletInfoAsync(userId);
 
-        return View(info.Balance);
+        return Ok(info.Balance);
     }
 
     [HttpGet]
@@ -28,6 +28,6 @@ public class WalletController : Controller
     {
         var info = await _walletService.GetWalletInfoAsync(userId);
 
-        return View(info.Address);
+        return Ok(info.Address);
     }
 }

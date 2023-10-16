@@ -1,4 +1,6 @@
-﻿namespace Windetta.Wallet.Application.Dto;
+﻿using Windetta.Wallet.Domain;
+
+namespace Windetta.Wallet.Application.Dto;
 
 public class WalletInfoDto
 {

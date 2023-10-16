@@ -21,24 +21,29 @@ public class UserWalletService : IUserWalletService
         _tonService = tonService;
     }
 
-    public async Task CreateWalletAsync(Guid userId)
+    public async Task<WalletInfoDto> CreateWalletAsync(Guid userId)
     {
         var walletData = await _tonService.GenerateWalletData();
 
         var keySet = new WalletKeysSet()
         {
-            PrivateKey = walletData.Credential.SecretKey,
-            PublicKey = walletData.Credential.PublicKey
+            PrivateKey = walletData.Credential.PrivateKey,
+            PublicKey = walletData.Credential.PublicKey,
+            UserId = userId
         };
 
-        _ctx.Wallets.Add(new UserWallet()
+        var userWallet = new UserWallet()
         {
             Address = walletData.Address,
             UserId = userId,
             WalletKeys = keySet
-        });
+        };
+
+        _ctx.Wallets.Add(userWallet);
 
         await _ctx.SaveChangesAsync();
+
+        return new WalletInfoDto(new(0, 0), userWallet.Address);
     }
 
     public async Task<WalletInfoDto> GetWalletInfoAsync(Guid userId)
@@ -80,10 +85,27 @@ public class UserWalletService : IUserWalletService
         var credential = new TonWalletCredential()
         {
             PublicKey = wallet.WalletKeys.PublicKey,
-            SecretKey = wallet.WalletKeys.PrivateKey
+            PrivateKey = wallet.WalletKeys.PrivateKey
         };
 
         await _tonService.TransferTon(credential, destination, nanotons);
+    }
+
+    public async Task<TonWalletCredential> GetSecretKeyAsync(Guid userId)
+    {
+        var wallet = await _ctx.Wallets.Include(x => x.WalletKeys)
+           .FirstOrDefaultAsync(new WalletByUserIdSpec(userId));
+
+        if (wallet is null)
+            throw new WindettaException(Errors.Wallet.NotFound);
+
+        var credential = new TonWalletCredential()
+        {
+            PublicKey = wallet.WalletKeys.PublicKey,
+            PrivateKey = wallet.WalletKeys.PrivateKey
+        };
+
+        return credential;
     }
 
     public async Task UnHoldBalanceAsync(Guid userId)

@@ -45,7 +45,10 @@ public static class Extensions
 
     private static void AddToContainer(ContainerBuilder builder, Type? lifetimeType, Type implementationType, Type serviceType)
     {
-        var registered = builder.RegisterType(implementationType).As(serviceType);
+        var registered = builder
+            .RegisterType(implementationType)
+            .IfNotRegistered(serviceType)
+            .As(serviceType);
 
         // pattern matching
         Action serviceLifeTimeApply = lifetimeType switch

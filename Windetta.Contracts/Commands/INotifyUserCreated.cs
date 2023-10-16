@@ -2,7 +2,7 @@
 
 public interface INotifyUserCreated
 {
-    public Guid UserId { get; init; }
-    public string Email { get; init; }
-    public DateTime TimeStamp { get; init; }
+    public Guid UserId { get; set; }
+    public string Email { get; set; }
+    public DateTime TimeStamp { get; set; }
 }

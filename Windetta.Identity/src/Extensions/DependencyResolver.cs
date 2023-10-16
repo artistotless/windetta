@@ -118,29 +118,4 @@ public static class DependencyResolver
             .AddEntityFrameworkStores<IdentityDbContext>()
             .AddDefaultTokenProviders();
     }
-
-    public static void ConfigureMassTransit(this IServiceCollection services)
-    {
-        var assembly = typeof(DependencyResolver).Assembly;
-        var provider = services.BuildServiceProvider();
-        var configuration = provider.GetRequiredService<IConfiguration>();
-
-        var rmqQtions = configuration.GetOptions<RabbitMqOptions>("RabbitMq");
-
-        services.AddMassTransit(x =>
-        {
-            x.SetEndpointNameFormatter(new MyEndpointNameFormatter(Svc.Identity));
-            x.AddConsumers(assembly);
-            x.UsingRabbitMq((context, cfg) =>
-            {
-                cfg.Host(rmqQtions.Hostnames.First() ?? "localhost", rmqQtions.VirtualHost ?? "/", h =>
-                {
-                    h.Username(rmqQtions.Username ?? "admin");
-                    h.Password(rmqQtions.Password ?? "admin");
-                });
-
-                cfg.ConfigureEndpoints(context);
-            });
-        });
-    }
 }

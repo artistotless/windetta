@@ -25,7 +25,6 @@ public class ExternalLoginHandler : IRequestHandler<ExternalLoginRequest, Author
     private readonly SignInManager<User> _signinManager;
     private readonly IIdentityServerInteractionService _interaction;
     private readonly IBus _bus;
-    //private readonly IBusPublisher _busPublisher;
 
     public ExternalLoginHandler(
         SignInManager<User> signinManager,

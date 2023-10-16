@@ -5,7 +5,7 @@ namespace Windetta.Wallet.Infrastructure.Services;
 
 public interface ITonService : IScopedService
 {
-    Task<TonWallet> GenerateWalletData();
+    ValueTask<TonWallet> GenerateWalletData();
     Task<long> GetBalance(string address);
 
     /// <summary>

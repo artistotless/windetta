@@ -1,7 +1,9 @@
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using System.Reflection;
+using Windetta.Common.Constants;
 using Windetta.Common.Database;
+using Windetta.Common.MassTransit;
 using Windetta.Common.Redis;
 using Windetta.Common.Types;
 using Windetta.Identity.Data.Seed;
@@ -12,8 +14,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 IConfiguration configuration = builder.Configuration;
 IServiceCollection services = builder.Services;
+var assemby = Assembly.GetExecutingAssembly();
 
-services.ConfigureMassTransit();
+services.AddMassTransit(assemby, Svc.Identity);
 services.AddMysqlDbContext<IdentityDbContext>(Assembly.GetExecutingAssembly());
 services.AddIdentityStore();
 services.AddControllersWithViews();
@@ -30,8 +33,6 @@ builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory(builder
     builder.ResolveDependenciesFromAssembly();
 }));
 
-// ---------------------
-
 var app = builder.Build();
 
 IdentitySeeder.Seed(app);
@@ -39,7 +40,6 @@ IdentityServerConfigurationSeeder.Seed(app);
 
 app.MapGet("/", () => "Windetta Identity Service").RequireAuthorization();
 app.MapGet("/ping", () => Results.Ok());
-
 
 app.UseStaticFiles();
 app.UseIdentityServer();

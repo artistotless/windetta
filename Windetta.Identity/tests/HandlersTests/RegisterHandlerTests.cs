@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using MassTransit;
+using Microsoft.AspNetCore.Identity;
 using Windetta.Identity.Domain.Entities;
 using Windetta.Identity.Infrastructure.Exceptions;
+using Windetta.Identity.Messages.Events;
 using Windetta.Identity.Messages.Requests;
 using Windetta.Identity.Tests.Mocks;
+using Windetta.IdentityTests.Mocks;
 using Windetta.Tests.Identity.Mocks;
 
 namespace Windetta.Tests.Identity.HandlersTests;
@@ -11,17 +14,19 @@ public class RegisterHandlerTests
 {
     private readonly UserStore _userStore = new();
     private readonly Mock<UserManager<User>> _userManagerMock;
+    private readonly Mock<IBus> _busMock;
 
     public RegisterHandlerTests()
     {
         _userManagerMock = UserManagerMockFactory.Create(_userStore.GetUsers());
+        _busMock = BusMockFactory.Create();
     }
 
     [Fact]
     public void HandleAsync_CreatesNewUser()
     {
         // arrange
-        var sut = new LocalRegisterHandler(_userManagerMock.Object, null);
+        var sut = new LocalRegisterHandler(_userManagerMock.Object, _busMock.Object);
         var request = new LocalRegisterRequest()
         {
             Email = "unique-email@gmai.com",
@@ -34,6 +39,8 @@ public class RegisterHandlerTests
 
         // assert
         _userStore.DeltaUsersCount.ShouldBe(1);
+        _busMock.Verify(x => x.Publish<UserCreated>(
+            It.IsAny<UserCreated>(), CancellationToken.None), Times.Once);
     }
 
     [Theory]

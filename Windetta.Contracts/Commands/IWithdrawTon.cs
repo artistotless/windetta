@@ -4,7 +4,7 @@ namespace Windetta.Contracts.Commands;
 
 public interface IWithdrawTon
 {
-    public Guid UserId { get; init; }
-    public TonAddress Destination { get; init; }
-    public long Nanotons { get; init; }
+    public Guid UserId { get; set; }
+    public TonAddress Destination { get; set; }
+    public long Nanotons { get; set; }
 }

@@ -7,7 +7,7 @@ public class WalletBalanceDto
 
     public WalletBalanceDto(long total, long held)
     {
-        Total = total;
+        Total = total < 0 ? 0 : total;
         Held = held;
     }
 }

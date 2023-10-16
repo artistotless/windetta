@@ -15,9 +15,9 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="7.0.0" />
-    <PackageReference Include="TonLib.Net" Version="0.19.0" />
-    <PackageReference Include="TonSdk.Client" Version="0.2.2" />
+    <PackageReference Include="TonSdk.Client" Version="0.2.3" />
     <PackageReference Include="TonSdk.Contracts" Version="0.2.3" />
+    <PackageReference Include="TonSdk.Core" Version="0.2.4" />
   </ItemGroup>
 
   <ItemGroup>
@@ -26,9 +26,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="libcrypto-1_1-x64.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="tonlibjson.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
