@@ -4,11 +4,11 @@ using Windetta.Wallet.Application.Services;
 namespace Windetta.Wallet.Controllers;
 
 [Route("[controller]")]
-public class WalletController : ControllerBase
+public class WalletsController : ControllerBase
 {
     private readonly IUserWalletService _walletService;
 
-    public WalletController(IUserWalletService walletService)
+    public WalletsController(IUserWalletService walletService)
     {
         _walletService = walletService;
     }

@@ -12,21 +12,22 @@ namespace Windetta.Tests.Identity.HandlersTests;
 
 public class ExternalLoginHandlerTests
 {
-    private readonly UserStore _userStore = new();
+    private readonly UserStore _userStore;
     private readonly Mock<UserManager<User>> _userManagerMock;
     private readonly Mock<IBus> _busMock;
 
     public ExternalLoginHandlerTests()
     {
+        _userStore = new();
         _userManagerMock = UserManagerMockFactory.Create(_userStore.GetUsers());
-        _busMock = BusMockFactory.Create();
+        _busMock = new BusMock();
     }
 
     [Fact]
-    public void HandleAsync_ReturnCorrectRedirectUrlIfPassNull()
+    public void ShouldReturnCorrectRedirectUrlIfPassNull()
     {
         // arrange
-        var signInManagerMock = SignInManagerMockFactory.Create(_userManagerMock.Object);
+        var signInManagerMock = SignInManagerMock.Create(_userManagerMock.Object);
         var is4InteractionMock = Mock.Of<IIdentityServerInteractionService>();
         var sut = new ExternalLoginHandler(
             signInManagerMock.Object, is4InteractionMock, _busMock.Object);
@@ -43,10 +44,10 @@ public class ExternalLoginHandlerTests
     }
 
     [Fact]
-    public void HandleAsync_ShouldPublishUserCreatedEvent()
+    public void ShouldPublishUserCreatedEvent()
     {
         // arrange
-        var signInManagerMock = SignInManagerMockFactory.Create(_userManagerMock.Object);
+        var signInManagerMock = SignInManagerMock.Create(_userManagerMock.Object);
         var is4InteractionMock = Mock.Of<IIdentityServerInteractionService>();
         var sut = new ExternalLoginHandler(
             signInManagerMock.Object, is4InteractionMock, _busMock.Object);
@@ -64,10 +65,10 @@ public class ExternalLoginHandlerTests
     }
 
     [Fact]
-    public void HandleAsync_ShouldCreateNewUserIfUserNotFound()
+    public void ShouldCreateNewUserIfUserNotFound()
     {
         // arrange
-        var signInManagerMock = SignInManagerMockFactory.Create(_userManagerMock.Object);
+        var signInManagerMock = SignInManagerMock.Create(_userManagerMock.Object);
         var is4InteractionMock = Mock.Of<IIdentityServerInteractionService>();
         var sut = new ExternalLoginHandler(
             signInManagerMock.Object, is4InteractionMock, _busMock.Object);
@@ -88,10 +89,10 @@ public class ExternalLoginHandlerTests
     }
 
     [Fact]
-    public void HandleAsync_ShouldCall_ExternalLoginSignInAsync()
+    public void ShouldCall_ExternalLoginSignInAsync()
     {
         // arrange
-        var signInManagerMock = SignInManagerMockFactory.Create(_userManagerMock.Object);
+        var signInManagerMock = SignInManagerMock.Create(_userManagerMock.Object);
         var is4InteractionMock = Mock.Of<IIdentityServerInteractionService>();
         var sut = new ExternalLoginHandler(
             signInManagerMock.Object, is4InteractionMock, _busMock.Object);

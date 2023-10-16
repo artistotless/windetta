@@ -1,5 +1,4 @@
-﻿using Autofac.Core;
-using MassTransit;
+﻿using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using Windetta.Common.Types;
 using Windetta.Contracts.Commands;
@@ -27,11 +26,15 @@ public class TestController : ControllerBase
     [Route("create")]
     public async Task<IActionResult> Create()
     {
+        await _bus.Publish<ICreateUserWallet>(new
+        {
+            UserId = Guid.NewGuid()
+        });
+
         var walletData = await _service.GenerateWalletData();
 
         return Ok(walletData);
     }
-
 
     [HttpGet]
     [Route("get/{userId:guid}")]

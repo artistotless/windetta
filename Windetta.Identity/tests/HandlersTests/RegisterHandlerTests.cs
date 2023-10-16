@@ -19,11 +19,11 @@ public class RegisterHandlerTests
     public RegisterHandlerTests()
     {
         _userManagerMock = UserManagerMockFactory.Create(_userStore.GetUsers());
-        _busMock = BusMockFactory.Create();
+        _busMock = new BusMock().Mock;
     }
 
     [Fact]
-    public void HandleAsync_CreatesNewUser()
+    public void Handle_CreatesNewUser()
     {
         // arrange
         var sut = new LocalRegisterHandler(_userManagerMock.Object, _busMock.Object);
@@ -46,7 +46,7 @@ public class RegisterHandlerTests
     [Theory]
     [InlineData("user1gmail.com", "unique-username", "DuplicateEmail")]
     [InlineData("unique-email@gmail.com", "user1", "DuplicateUserName")]
-    public void HandleAsync_CreatesNewUserFail_CredentialsAlreadyTaken(
+    public void Handle_CreatesNewUserFail_CredentialsAlreadyTaken(
         string email, string userName, string expectedErrorMessage)
     {
         // arrange
@@ -70,7 +70,7 @@ public class RegisterHandlerTests
     [InlineData(null, "NotNullUserName", "NotNullPassword")]
     [InlineData("NotNullEmail", null, "NotNullPassword")]
     [InlineData("NotNullEmail", "NotNullUserName", null)]
-    public void HandleAsync_ThrowArgumentNullExceptionIfArgumentsNull(
+    public void ShouldThrowArgumentNullExceptionIfArgumentsNull(
         string email, string userName, string password)
     {
         // arrange

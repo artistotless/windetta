@@ -19,14 +19,16 @@ namespace Windetta.Wallet.Consumers
 
         public async Task Consume(ConsumeContext<ICreateUserWallet> context)
         {
-            var wallet = await _walletService.CreateWalletAsync(context.Message.UserId);
+            //var wallet = await _walletService.CreateWalletAsync(context.Message.UserId);
 
-            await _bus.Publish<IUserWalletCreated>(new
-            {
-                UserId = context.Message.UserId,
-                Addres = new TonAddress(wallet.Address),
-                TimeStamp = DateTime.UtcNow,
-            });
+            //await _bus.Publish<IUserWalletCreated>(new
+            //{
+            //    UserId = context.Message.UserId,
+            //    Address = new TonAddress(wallet.Address),
+            //    TimeStamp = DateTime.UtcNow,
+            //});
+
+            await Task.CompletedTask;
         }
     }
 }

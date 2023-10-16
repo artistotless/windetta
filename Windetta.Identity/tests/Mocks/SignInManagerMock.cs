@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Windetta.Tests.Identity.Mocks;
 
-internal static class SignInManagerMockFactory
+internal static class SignInManagerMock
 {
     public static Mock<SignInManager<TUser>> Create<TUser>(UserManager<TUser> userManager) where TUser : IdentityUser<Guid>
     {

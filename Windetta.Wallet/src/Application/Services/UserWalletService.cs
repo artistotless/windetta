@@ -61,7 +61,7 @@ public class UserWalletService : IUserWalletService
         return new WalletInfoDto(balance, wallet.Address);
     }
 
-    public async Task HoldBalanceAsync(Guid userId, int nanotons)
+    public async Task HoldBalanceAsync(Guid userId, long nanotons)
     {
         var wallet = await _ctx.Wallets
             .FirstOrDefaultAsync(new WalletByUserIdSpec(userId));

@@ -17,6 +17,10 @@ public struct TonAddress
 
         Value = address;
     }
+
+    public static TonAddress Parse(string address)
+        => new TonAddress(address);
+
     public override string ToString() => Value;
 
     public static implicit operator string(TonAddress address) => address.Value;

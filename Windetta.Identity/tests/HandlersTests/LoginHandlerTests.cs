@@ -1,12 +1,10 @@
 ﻿using IdentityServer4.Services;
-using MassTransit;
 using Microsoft.AspNetCore.Identity;
 using Windetta.Common.Constants;
 using Windetta.Common.Types;
 using Windetta.Identity.Domain.Entities;
 using Windetta.Identity.Messages.Requests;
 using Windetta.Identity.Tests.Mocks;
-using Windetta.IdentityTests.Mocks;
 using Windetta.Tests.Identity.Mocks;
 
 namespace Windetta.Tests.Identity.HandlersTests;
@@ -23,10 +21,10 @@ public class LoginHandlerTests
     }
 
     [Fact]
-    public void HandleAsync_ReturnCorrectResponse()
+    public void ShouldReturnCorrectResponse()
     {
         // arrange
-        var signInManagerMock = SignInManagerMockFactory.Create(_userManagerMock.Object);
+        var signInManagerMock = SignInManagerMock.Create(_userManagerMock.Object);
         var is4InteractionMock = Mock.Of<IIdentityServerInteractionService>();
         var sut = new LocalLoginHandler(signInManagerMock.Object, is4InteractionMock);
         var request = new LocalLoginRequest()
@@ -45,10 +43,10 @@ public class LoginHandlerTests
     }
 
     [Fact]
-    public void HandleAsync_ShouldThrowExceptionIfUserNotFound()
+    public void ShouldThrowExceptionIfUserNotFound()
     {
         // arrange
-        var signInManagerMock = SignInManagerMockFactory.Create(_userManagerMock.Object);
+        var signInManagerMock = SignInManagerMock.Create(_userManagerMock.Object);
         var is4InteractionMock = Mock.Of<IIdentityServerInteractionService>();
         var sut = new LocalLoginHandler(signInManagerMock.Object, is4InteractionMock);
         var request = new LocalLoginRequest()
@@ -65,10 +63,10 @@ public class LoginHandlerTests
     }
 
     [Fact]
-    public void HandleAsync_ShouldThrowExceptionIfPasswordDoesNotMatch()
+    public void ShouldThrowExceptionIfPasswordDoesNotMatch()
     {
         // arrange
-        var signInManagerMock = SignInManagerMockFactory.Create(_userManagerMock.Object);
+        var signInManagerMock = SignInManagerMock.Create(_userManagerMock.Object);
         var is4InteractionMock = Mock.Of<IIdentityServerInteractionService>();
         var sut = new LocalLoginHandler(signInManagerMock.Object, is4InteractionMock);
         var request = new LocalLoginRequest()
