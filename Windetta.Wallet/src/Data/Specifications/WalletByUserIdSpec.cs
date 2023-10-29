@@ -4,15 +4,15 @@ using Windetta.Wallet.Domain;
 
 namespace Windetta.Wallet.Data.Specifications;
 
-public class WalletByUserIdSpec : Specification<UserWallet>
+public class TxnByIdSpec : Specification<Transaction>
 {
-    private readonly Guid _userId;
+    private readonly string _id;
 
-    public WalletByUserIdSpec(Guid userId)
+    public TxnByIdSpec(string id)
     {
-        _userId = userId;
+        _id = id;
     }
 
-    public override Expression<Func<UserWallet, bool>> ToExpression()
-        => x => x.UserId == _userId;
+    public override Expression<Func<Transaction, bool>> ToExpression()
+        => x => x.Id == _id;
 }

@@ -29,7 +29,7 @@ public class ConsumersTests : IClassFixture<HarnessFixture>
         });
         // assert
         (await _harness.Published.Any<ICreateUserWallet>()).ShouldBeTrue();
-        var consumerHarness = _harness.GetConsumerHarness<CreationConsumer>();
+        var consumerHarness = _harness.GetConsumerHarness<CreateConsumer>();
         (await consumerHarness.Consumed.Any<ICreateUserWallet>(
         x => x.Context.Message.UserId == userId)).ShouldBeTrue();
     }

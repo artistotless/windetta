@@ -5,9 +5,10 @@ namespace Windetta.Wallet.Application.Services;
 
 public interface IUserWalletService : IScopedService
 {
-    Task<WalletInfoDto> GetWalletInfoAsync(Guid userId);
     Task HoldBalanceAsync(Guid userId, long nanotons);
     Task UnHoldBalanceAsync(Guid userId);
     Task<WalletInfoDto> CreateWalletAsync(Guid userId);
-    Task TransferAsync(Guid userId, long nanotons, TonAddress destinationAddress);
+    Task TransferAsync(Guid userId, long nanotons, Guid destinationUser);
+    Task WithdrawAsync(Guid userId, long nanotons, TonAddress destinationAddress);
+    Task IncreaseBalance(Guid userId, long nanotons,string txnId);
 }

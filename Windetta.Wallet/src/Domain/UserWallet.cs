@@ -1,13 +1,15 @@
-﻿using Windetta.Common.Types;
-
-namespace Windetta.Wallet.Domain;
+﻿namespace Windetta.Wallet.Domain;
 
 public class UserWallet
 {
     public Guid UserId { get; init; }
+    public long Balance { get; private set; }
     public long HeldBalance { get; private set; } = 0; // nanoton
-    public TonAddress Address { get; init; }
-    public WalletKeysSet WalletKeys { get; init; }
+
+    public void IncreaseBalance(long nanotons)
+    {
+        Balance += nanotons;
+    }
 
     public void HoldBalance(long nanotons)
     {

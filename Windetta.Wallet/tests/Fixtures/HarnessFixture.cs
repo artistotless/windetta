@@ -19,7 +19,7 @@ public class HarnessFixture
         .AddMassTransitTestHarness(cfg =>
         {
             cfg.SetEndpointNameFormatter(new MyEndpointNameFormatter(Svc.Wallet));
-            cfg.AddConsumers(typeof(CreationConsumer).Assembly);
+            cfg.AddConsumers(typeof(CreateConsumer).Assembly);
 
         }).BuildServiceProvider(true);
 
