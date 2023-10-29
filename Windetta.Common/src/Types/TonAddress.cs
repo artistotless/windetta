@@ -12,9 +12,6 @@ public struct TonAddress
         if (address.Length != 48)
             throw new ArgumentException(nameof(address));
 
-        if (!address.StartsWith("EQ") && !address.StartsWith("UQ"))
-            throw new ArgumentException(nameof(address));
-
         Value = address;
     }
 

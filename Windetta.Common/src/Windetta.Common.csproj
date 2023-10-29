@@ -39,4 +39,13 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.31.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="TonSdk.Contracts">
+      <HintPath>..\..\..\TonSdk.Net-fork\TonSdk.NET\TonSdk.Contracts\src\bin\Debug\net7.0\TonSdk.Contracts.dll</HintPath>
+    </Reference>
+    <Reference Include="TonSdk.Core">
+      <HintPath>..\..\..\TonSdk.Net-fork\TonSdk.NET\TonSdk.Core\src\bin\Debug\net7.0\TonSdk.Core.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
