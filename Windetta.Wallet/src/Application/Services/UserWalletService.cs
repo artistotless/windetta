@@ -16,6 +16,10 @@ public class UserWalletService : IUserWalletService
     {
         _ctx = ctx;
     }
+    public Task<WalletBalanceDto> GetBalance(Guid userId)
+    {
+        throw new NotImplementedException();
+    }
 
     public async Task<WalletInfoDto> CreateWalletAsync(Guid userId)
     {

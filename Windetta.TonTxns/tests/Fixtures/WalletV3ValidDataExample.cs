@@ -1,4 +1,4 @@
-﻿namespace Windetta.WalletTests.Fixtures;
+﻿namespace Windetta.TonTxnsTests.Fixtures;
 
 public static class WalletV3ValidDataExample
 {

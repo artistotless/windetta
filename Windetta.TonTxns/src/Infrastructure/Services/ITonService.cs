@@ -1,11 +1,10 @@
 ﻿using Windetta.Common.Types;
-using Windetta.Wallet.Infrastructure.Models;
+using Windetta.TonTxns.Infrastructure.Models;
 
-namespace Windetta.Wallet.Infrastructure.Services;
+namespace Windetta.TonTxns.Infrastructure.Services;
 
 public interface ITonService : IScopedService
 {
-    ValueTask<TonWallet> GenerateWalletData();
     Task<long> GetBalance(string address);
 
     /// <summary>
@@ -15,5 +14,4 @@ public interface ITonService : IScopedService
     /// <param name="to">Destination TON address</param>
     /// <param name="nanotons">amount of nanotons</param>
     Task<TransferResult> TransferTon(TonWalletCredential from, string to, long nanotons);
-    Task<long> EstimateFees(TonWalletCredential from, string to, long nanotons);
 }

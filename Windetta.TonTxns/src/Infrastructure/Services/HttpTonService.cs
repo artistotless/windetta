@@ -4,12 +4,9 @@ using TonSdk.Contracts.Wallet;
 using TonSdk.Core;
 using TonSdk.Core.Block;
 using TonSdk.Core.Boc;
-using TonSdk.Core.Crypto;
-using Windetta.Common.Types;
-using Windetta.Wallet.Extensions;
-using Windetta.Wallet.Infrastructure.Models;
+using Windetta.TonTxns.Infrastructure.Models;
 
-namespace Windetta.Wallet.Infrastructure.Services;
+namespace Windetta.TonTxns.Infrastructure.Services;
 
 public class HttpTonService : ITonService
 {
@@ -18,38 +15,6 @@ public class HttpTonService : ITonService
     public HttpTonService(IOptions<TonClientParameters> parameters)
     {
         _client = new TonClient(parameters.Value);
-    }
-
-    public ValueTask<TonWallet> GenerateWalletData()
-    {
-        Mnemonic mnemonic = new Mnemonic();
-        // Create a new preprocessed wallet using the public key from the generated mnemonic
-
-        WalletV3 wallet = new WalletV3(new WalletV3Options
-        {
-            PublicKey = mnemonic.Keys.PublicKey!
-        });
-
-        // Convert the address to a non-bounceable format
-        string nonBounceableAddress = wallet.Address.ToString(
-            AddressType.Base64, new AddressStringifyOptions(false, false, true));
-
-        (string publicKey, string privateKey) = mnemonic.GetKeysPair();
-
-        return ValueTask.FromResult(new TonWallet()
-        {
-            Address = new TonAddress(nonBounceableAddress),
-            Credential = new TonWalletCredential()
-            {
-                PublicKey = publicKey,
-                PrivateKey = privateKey,
-            },
-        });
-    }
-
-    public Task<long> EstimateFees(TonWalletCredential from, string to, long nanotons)
-    {
-        throw new NotImplementedException();
     }
 
     public async Task<long> GetBalance(string address)
@@ -103,7 +68,12 @@ public class HttpTonService : ITonService
                 .StoreString(string.Empty)
                 .Build(),
             }),
-            Mode = 1
+            Mode = 64
         };
+    }
+
+    Task<TransferResult> ITonService.TransferTon(TonWalletCredential from, string to, long nanotons)
+    {
+        throw new NotImplementedException();
     }
 }

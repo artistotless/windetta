@@ -1,4 +1,4 @@
-﻿namespace Windetta.Wallet.Infrastructure.Models;
+﻿namespace Windetta.TonTxns.Infrastructure.Models;
 
 public class TransferResult
 {

@@ -3,7 +3,6 @@ using Shouldly;
 using Windetta.Common.Types;
 using Windetta.Contracts.Commands;
 using Windetta.Wallet.Consumers;
-using Windetta.WalletTests.Fixtures;
 
 namespace Windetta.WalletTests.ConsumersTests;
 

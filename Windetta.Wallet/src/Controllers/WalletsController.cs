@@ -7,27 +7,29 @@ namespace Windetta.Wallet.Controllers;
 public class WalletsController : ControllerBase
 {
     private readonly IUserWalletService _walletService;
+    private readonly IDepositAddressSource _addressSource;
 
-    public WalletsController(IUserWalletService walletService)
+    public WalletsController(IUserWalletService walletService, IDepositAddressSource addressSource)
     {
         _walletService = walletService;
+        _addressSource = addressSource;
     }
 
     [HttpGet]
     [Route("{userId:guid}/balance")]
     public async Task<IActionResult> GetBalance(Guid userId)
     {
-        var info = await _walletService.GetWalletInfoAsync(userId);
+        var balance = await _walletService.GetBalance(userId);
 
-        return Ok(info.Balance);
+        return Ok(balance);
     }
 
     [HttpGet]
     [Route("{userId:guid}/deposit")]
     public async Task<IActionResult> GetDepositAddress(Guid userId)
     {
-        var info = await _walletService.GetWalletInfoAsync(userId);
+        var address = await _addressSource.GetAddressAsync();
 
-        return Ok(info.Address);
+        return Ok(address);
     }
 }

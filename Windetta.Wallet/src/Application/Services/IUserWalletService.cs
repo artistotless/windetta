@@ -11,4 +11,5 @@ public interface IUserWalletService : IScopedService
     Task TransferAsync(Guid userId, long nanotons, Guid destinationUser);
     Task WithdrawAsync(Guid userId, long nanotons, TonAddress destinationAddress);
     Task IncreaseBalance(Guid userId, long nanotons,string txnId);
+    Task<WalletBalanceDto> GetBalance(Guid userId);
 }

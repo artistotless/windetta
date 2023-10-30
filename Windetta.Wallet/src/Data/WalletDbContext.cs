@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Windetta.Common.Helpers;
-using Windetta.Common.Types;
 using Windetta.Wallet.Domain;
 
 namespace Windetta.Wallet.Data;
@@ -20,5 +18,36 @@ public sealed class WalletDbContext : DbContext
 
         modelBuilder.Entity<UserWallet>()
             .HasKey(x => x.UserId);
+
+        modelBuilder.Entity<UserWallet>()
+          .Property(x => x.UserId)
+          .HasColumnType("CHAR(36)");
+
+        modelBuilder.Entity<UserWallet>()
+          .Property(x => x.HeldBalance)
+          .HasColumnType("BIGINT");
+
+        modelBuilder.Entity<UserWallet>()
+          .Property(x => x.Balance)
+          .HasColumnType("BIGINT");
+
+        modelBuilder.Entity<Transaction>()
+            .HasKey(x => x.Id);
+
+        modelBuilder.Entity<Transaction>()
+            .Property(x => x.Id)
+            .HasColumnType("VARCHAR(40)");
+
+        modelBuilder.Entity<Transaction>()
+          .Property(x => x.TimeStamp)
+          .HasColumnType("DATETIME(6)");
+
+        modelBuilder.Entity<Transaction>()
+          .Property(x => x.Nanotons)
+          .HasColumnType("BIGINT");
+
+        modelBuilder.Entity<Transaction>()
+         .Property(x => x.Type)
+         .HasColumnType("TINYINT");
     }
 }
