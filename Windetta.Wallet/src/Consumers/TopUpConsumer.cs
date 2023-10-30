@@ -1,5 +1,6 @@
 ﻿using MassTransit;
 using Windetta.Contracts.Events;
+using Windetta.Wallet.Application.Dto;
 using Windetta.Wallet.Application.Services;
 
 namespace Windetta.Wallet.Consumers
@@ -17,9 +18,11 @@ namespace Windetta.Wallet.Consumers
         {
             var userId = context.Message.UserId;
             var nanotons = context.Message.Nanotons;
-            var transactionId = context.Message.TxnId;
 
-            await _walletService.IncreaseBalance(userId, nanotons, transactionId);
+            await _walletService.TopUpBalance(new TopUpArgument(userId, nanotons)
+            {
+                OperationId = context.Message.CorrelationId,
+            });
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Data;
 using Windetta.Common.Constants;
 using Windetta.Common.Types;
 using Windetta.Wallet.Application.Dto;
@@ -54,37 +55,84 @@ public class UserWalletService : IUserWalletService
         await _ctx.SaveChangesAsync();
     }
 
-    public async Task IncreaseBalance(Guid userId, long nanotons, string txnId)
+    public async Task TopUpBalance(TopUpArgument arg)
     {
         if ((await _ctx.Transactions
-            .FindAsync(new TxnByIdSpec(txnId))) is not null) return;
+            .FindAsync(new TxnByIdSpec(arg.OperationId))) is not null) return;
 
         var wallet = await _ctx.Wallets
-           .FindAsync(new WalletByUserIdSpec(userId));
+           .FindAsync(new WalletByUserIdSpec(arg.userId));
 
         if (wallet is null)
             throw new WindettaException(Errors.Wallet.NotFound);
 
-        wallet.IncreaseBalance(nanotons);
+        using var transaction = _ctx.Database
+            .BeginTransaction(IsolationLevel.Serializable);
 
-        _ctx.Transactions.Add(new()
+        try
         {
-            Id = txnId,
-            Nanotons = nanotons,
-            TimeStamp = DateTime.UtcNow,
-            Type = TransactionType.TopUp,
-            UserId = userId
-        });
+            wallet.IncreaseBalance(arg.nanotons);
 
-        await _ctx.SaveChangesAsync();
+            _ctx.Transactions.Add(new()
+            {
+                Id = arg.OperationId,
+                Nanotons = arg.nanotons,
+                TimeStamp = DateTime.UtcNow,
+                Type = TransactionType.TopUp,
+                UserId = arg.userId
+            });
+
+            await _ctx.SaveChangesAsync();
+
+            transaction.Commit();
+        }
+        catch
+        {
+            transaction.Rollback();
+        }
     }
 
-    public Task TransferAsync(Guid userId, long nanotons, Guid destinationUser)
+    public async Task TransferAsync(TransferArgument arg)
     {
-        throw new NotImplementedException();
+        if ((await _ctx.Transactions
+            .FindAsync(new TxnByIdSpec(arg.OperationId))) is not null) return;
+
+        var user1Wallet = await _ctx.Wallets
+            .FindAsync(new WalletByUserIdSpec(arg.userId));
+
+        var user2Wallet = await _ctx.Wallets
+            .FindAsync(new WalletByUserIdSpec(arg.destinationUser));
+
+        if (user1Wallet is null || user2Wallet is null)
+            throw new WindettaException(Errors.Wallet.NotFound);
+
+        using var transaction = _ctx.Database
+            .BeginTransaction(IsolationLevel.Serializable);
+
+        try
+        {
+            user1Wallet.TransferToWallet(user2Wallet, arg.nanotons);
+
+            _ctx.Transactions.Add(new()
+            {
+                Id = arg.OperationId,
+                Nanotons = arg.nanotons,
+                TimeStamp = DateTime.UtcNow,
+                Type = TransactionType.Transfer,
+                UserId = arg.userId
+            });
+
+            await _ctx.SaveChangesAsync();
+
+            transaction.Commit();
+        }
+        catch
+        {
+            transaction.Rollback();
+        }
     }
 
-    public Task WithdrawAsync(Guid userId, long nanotons, TonAddress destinationAddress)
+    public Task WithdrawAsync(WithdrawArgument arg)
     {
         throw new NotImplementedException();
     }

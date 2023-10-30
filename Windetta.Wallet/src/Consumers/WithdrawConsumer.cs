@@ -19,6 +19,9 @@ public class WithdrawConsumer : IConsumer<IWithdrawTon>
         var nanotons = context.Message.Nanotons;
         var destination = context.Message.Destination;
 
-        await _walletService.WithdrawAsync(userId, nanotons, destination);
+        await _walletService.WithdrawAsync(new(userId, nanotons, destination)
+        {
+            OperationId = context.Message.CorrelationId
+        });
     }
 }

@@ -1,6 +1,8 @@
-﻿namespace Windetta.Contracts.Commands;
+﻿using MassTransit;
 
-public interface ITransferTon
+namespace Windetta.Contracts.Commands;
+
+public interface ITransferTon : CorrelatedBy<Guid>
 {
     public Guid InitiatorUserId { get; set; }
     public Guid DestinationUserId { get; set; }

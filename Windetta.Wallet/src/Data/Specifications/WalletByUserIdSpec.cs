@@ -6,9 +6,9 @@ namespace Windetta.Wallet.Data.Specifications;
 
 public class TxnByIdSpec : Specification<Transaction>
 {
-    private readonly string _id;
+    private readonly Guid _id;
 
-    public TxnByIdSpec(string id)
+    public TxnByIdSpec(Guid id)
     {
         _id = id;
     }

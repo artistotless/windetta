@@ -1,8 +1,9 @@
-﻿namespace Windetta.Contracts.Events;
+﻿using MassTransit;
 
-public interface IFundsAdded
+namespace Windetta.Contracts.Events;
+
+public interface IFundsAdded : CorrelatedBy<Guid>
 {
-    public string TxnId { get; set; }
     public Guid UserId { get; set; }
     public long Nanotons { get; set; }
 }

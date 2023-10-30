@@ -19,6 +19,9 @@ public class TransferConsumer : IConsumer<ITransferTon>
         var nanotons = context.Message.Nanotons;
         var destination = context.Message.DestinationUserId;
 
-        await _walletService.TransferAsync(userId, nanotons, destination);
+        await _walletService.TransferAsync(new(userId, nanotons, destination)
+        {
+            OperationId = context.Message.CorrelationId
+        });
     }
 }

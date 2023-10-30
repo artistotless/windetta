@@ -10,7 +10,7 @@ public enum TransactionType
 public class Transaction
 {
     public Guid UserId { get; set; }
-    public string Id { get; init; }
+    public Guid Id { get; init; }
     public DateTime TimeStamp { get; set; }
     public TransactionType Type { get; set; }
     public long Nanotons { get; set; }
