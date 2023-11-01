@@ -1,4 +1,6 @@
 ﻿using MassTransit;
+using Windetta.Common.Constants;
+using Windetta.Common.MassTransit;
 using Windetta.Common.Types;
 using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
@@ -10,15 +12,15 @@ public class TonWithdrawFlow : SagaStateMachineInstance
     public Guid UserId { get; set; }
     public long Nanotons { get; set; }
     public TonAddress Destination { get; set; }
-    public int CurrentState { get; set; }
+    public string CurrentState { get; set; }
     public Guid CorrelationId { get; set; }
     public string? FailReason { get; set; }
     public Guid? ExpirationTokenId { get; set; }
 }
 
-public class BalanceWithdrawFlowStateMachine : MassTransitStateMachine<TonWithdrawFlow>
+public class TonWithdrawFlowStateMachine : MassTransitStateMachine<TonWithdrawFlow>
 {
-    public BalanceWithdrawFlowStateMachine()
+    public TonWithdrawFlowStateMachine()
     {
         Event(() => WithdrawRequested, x => x.CorrelateById(ctx => ctx.Message.CorrelationId));
         Event(() => BalanceDeducted, x => x.CorrelateById(ctx => ctx.Message.CorrelationId));
@@ -32,9 +34,10 @@ public class BalanceWithdrawFlowStateMachine : MassTransitStateMachine<TonWithdr
 
         Initially(
             When(WithdrawRequested)
-                .InitSaga()
+                .CopyDataToInstance()
+                .TransitionTo(AwaitingDeduction)
                 .DeductFromBalance()
-                .TransitionTo(AwaitingDeduction));
+                );
 
         During(AwaitingDeduction,
             When(BalanceDeducted)
@@ -82,8 +85,8 @@ public class BalanceWithdrawFlowStateMachine : MassTransitStateMachine<TonWithdr
 
 public static class BalanceWithdrawFlowStateMachineExtensions
 {
-    public static EventActivityBinder<TonWithdrawFlow, IWithdrawTonRequested> InitSaga(
-   this EventActivityBinder<TonWithdrawFlow, IWithdrawTonRequested> binder)
+    public static EventActivityBinder<TonWithdrawFlow, IWithdrawTonRequested> CopyDataToInstance(
+        this EventActivityBinder<TonWithdrawFlow, IWithdrawTonRequested> binder)
     {
         return binder.Then(ctx =>
         {
@@ -94,15 +97,24 @@ public static class BalanceWithdrawFlowStateMachineExtensions
         });
     }
 
-    public static EventActivityBinder<TonWithdrawFlow, T> DeductFromBalance<T>(
-       this EventActivityBinder<TonWithdrawFlow, T> binder) where T : class
+    public static EventActivityBinder<TonWithdrawFlow, IWithdrawTonRequested> DeductFromBalance(
+        this EventActivityBinder<TonWithdrawFlow, IWithdrawTonRequested> binder)
     {
-        return binder.SendAsync(context => context.Init<IDeductBalance>(new
+        var address = new MyEndpointNameFormatter(Svc.Wallet).CommandUri<IDeductBalance>();
+
+        return binder.SendAsync(new Uri($"queue:{address}"), ctx => ctx.Init<IDeductBalance>(new
         {
-            CorrelationId = context.Saga.CorrelationId,
-            UserId = context.Saga.UserId,
-            Amount = context.Saga.Nanotons,
+            Amount = ctx.Message.Nanotons,
+            CorrelationId = ctx.Message.CorrelationId,
+            UserId = ctx.Message.UserId,
         }));
+
+        //return binder.PublishAsync(context => context.Init<IDeductBalance>(new
+        //{
+        //    Amount = context.Message.Nanotons,
+        //    CorrelationId = context.Message.CorrelationId,
+        //    UserId = context.Message.UserId,
+        //}));
     }
 
     public static EventActivityBinder<TonWithdrawFlow, T> UnDeductFromBalance<T>(
@@ -125,5 +137,21 @@ public static class BalanceWithdrawFlowStateMachineExtensions
             Destination = new TonAddress(context.Saga.Destination),
             Nanotons = context.Saga.Nanotons,
         }));
+    }
+}
+
+public class SomeConsumer : IConsumer<IDeductBalance>
+{
+    public Task Consume(ConsumeContext<IDeductBalance> context)
+    {
+        throw new NotImplementedException();
+    }
+}
+
+public class SomeBatchConsumer : IConsumer<Batch<ITransferTon>>
+{
+    public Task Consume(ConsumeContext<Batch<ITransferTon>> context)
+    {
+        throw new NotImplementedException();
     }
 }

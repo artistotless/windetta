@@ -18,7 +18,7 @@ public class TransferConsumerTests : IClassFixture<HarnessFixture>
     }
 
     [Fact]
-    public async Task ShouldRecievesFewMessagesAtaTime()
+    public async Task ShouldConsumeManyMessagesAtaTime()
     {
         // arrange
         var exptectedCount = 30;
@@ -36,7 +36,7 @@ public class TransferConsumerTests : IClassFixture<HarnessFixture>
     }
 
     [Fact]
-    public async Task ShouldRecievesBatchAndTransferTons()
+    public async Task Should_Consume_And_TransferTons()
     {
         // arrange
         var batchCount = 30;

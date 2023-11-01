@@ -27,8 +27,25 @@ public class MyEndpointNameFormatter : DefaultEndpointNameFormatter
 
     public override string Consumer<T>()
     {
-        var queueName = $"{_defaultNamespace}.{KebabCaseEndpointNameFormatter.Instance.Message<T>()}".ToLowerInvariant();
+        var messageType = typeof(T).GetInterfaces()[0].GenericTypeArguments[0];
+        var genericArgumentType = messageType;
+
+        if (messageType.IsGenericType && messageType.GetGenericTypeDefinition() == typeof(Batch<>))
+            genericArgumentType = messageType.GenericTypeArguments[0];
+
+        var fullMessageName = $"{genericArgumentType.FullName}";
+
+        var queueName = $"{_defaultNamespace}.consumer-{fullMessageName}".ToLowerInvariant();
 
         return queueName;
+    }
+
+    public Uri CommandUri<T>()
+    {
+        var fullMessageName = $"{typeof(T).FullName}";
+
+        var queueName = $"{_defaultNamespace}.consumer-{fullMessageName}".ToLowerInvariant();
+
+        return new Uri($"queue:{queueName}");
     }
 }
