@@ -40,6 +40,6 @@ public class TransferConsumerDefinition : ConsumerDefinition<TransferConsumer>
         consumerConfigurator.Options<BatchOptions>(options => options
         .SetMessageLimit(100)
         .SetConcurrencyLimit(4)
-        .SetTimeLimit(TimeSpan.FromSeconds(1)));
+        .SetTimeLimit(TimeSpan.FromSeconds(10)));
     }
 }
