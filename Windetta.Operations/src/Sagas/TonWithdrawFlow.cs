@@ -53,20 +53,28 @@ public class BalanceWithdrawFlowStateMachine : MassTransitStateMachine<TonWithdr
                 .TransitionTo(Expired));
 
         DuringAny(
-            When(TransferTonCompleted)
-                .Unschedule(ExpirationSchedule)
-                .Finalize());
+           When(TransferTonCompleted)
+               .Unschedule(ExpirationSchedule)
+               .Finalize());
+
+        During(BalanceDeductedSuccess,
+          When(TransferTonFailed)
+              .Unschedule(ExpirationSchedule)
+              .UnDeductFromBalance()
+              .TransitionTo(TransferTonFail));
     }
 
     public State AwaitingDeduction { get; set; }
     public State BalanceDeductedSuccess { get; set; }
     public State BalanceDeductFail { get; set; }
+    public State TransferTonFail { get; set; }
     public State Expired { get; set; }
 
     public Event<IWithdrawTonRequested> WithdrawRequested { get; }
     public Event<IBalanceDeducted> BalanceDeducted { get; }
-    public Event<Fault<IBalanceDeducted>> BalanceDeductFailed { get; }
+    public Event<Fault<IDeductBalance>> BalanceDeductFailed { get; }
     public Event<ITransferTonCompleted> TransferTonCompleted { get; }
+    public Event<Fault<ITransferTon>> TransferTonFailed { get; }
     public Event<IWithdrawPeriodExpired> WithdrawPeriodExpired { get; }
 
     public Schedule<TonWithdrawFlow, IWithdrawPeriodExpired> ExpirationSchedule { get; }
@@ -100,7 +108,7 @@ public static class BalanceWithdrawFlowStateMachineExtensions
     public static EventActivityBinder<TonWithdrawFlow, T> UnDeductFromBalance<T>(
      this EventActivityBinder<TonWithdrawFlow, T> binder) where T : class
     {
-        return binder.SendAsync(context => context.Init<IDeductBalance>(new
+        return binder.SendAsync(context => context.Init<IUnDeductBalance>(new
         {
             CorrelationId = context.Saga.CorrelationId,
             UserId = context.Saga.UserId,

@@ -13,7 +13,7 @@ var configuration = builder.Configuration;
 var assembly = Assembly.GetExecutingAssembly();
 
 services.AddControllers();
-services.AddMassTransit(assembly, Svc.Wallet);
+services.AddReadyMassTransit(assembly, Svc.Wallet);
 services.AddMysqlDbContext<WalletDbContext>(assembly);
 
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory(builder =>

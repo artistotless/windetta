@@ -3,6 +3,7 @@ using TonSdk.Client;
 using TonSdk.Contracts.Wallet;
 using TonSdk.Core;
 using TonSdk.Core.Block;
+using Windetta.Common.Types;
 using Windetta.TonTxns.Extensions;
 using Windetta.TonTxns.Infrastructure.Models;
 
@@ -17,7 +18,7 @@ public class HttpTonService : ITonService
         _client = new TonClient(parameters.Value);
     }
 
-    public async Task<long> GetBalance(string address)
+    public async Task<long> GetBalance(TonAddress address)
     {
         Coins balance = await _client.GetBalance(new(address));
 

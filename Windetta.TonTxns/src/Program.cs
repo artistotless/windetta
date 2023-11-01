@@ -12,7 +12,7 @@ var services = builder.Services;
 var configuration = builder.Configuration;
 var assembly = Assembly.GetExecutingAssembly();
 
-services.AddMassTransit(assembly, Svc.TonTxns);
+services.AddReadyMassTransit(assembly, Svc.TonTxns);
 services.AddMysqlDbContext<TonDbContext>(assembly);
 
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory(builder =>

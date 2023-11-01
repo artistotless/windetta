@@ -5,7 +5,7 @@ namespace Windetta.TonTxns.Infrastructure.Services;
 
 public interface ITonService : IScopedService
 {
-    Task<long> GetBalance(string address);
+    Task<long> GetBalance(TonAddress address);
 
     /// <summary>
     /// Transfers specified amount of nanotons from user's balance
