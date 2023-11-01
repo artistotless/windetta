@@ -1,5 +1,4 @@
-﻿using Moq;
-using Windetta.Common.Testing;
+﻿using Windetta.Common.Testing;
 using Windetta.Common.Types;
 using Windetta.TonTxns.Infrastructure.Models;
 using Windetta.TonTxns.Infrastructure.Services;

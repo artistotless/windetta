@@ -1,7 +1,4 @@
-﻿using MassTransit;
-using MassTransit.Testing;
-using Microsoft.Extensions.DependencyInjection;
-using Moq;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Windetta.Common.Constants;
 using Windetta.Common.MassTransit;
 using Windetta.TonTxns.Consumers;

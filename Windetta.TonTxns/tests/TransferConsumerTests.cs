@@ -1,9 +1,4 @@
-﻿using AutoFixture;
-using MassTransit;
-using MassTransit.Testing;
-using Moq;
-using Shouldly;
-using Windetta.Common.Types;
+﻿using Windetta.Common.Types;
 using Windetta.Contracts.Commands;
 using Windetta.TonTxns.Consumers;
 using Windetta.TonTxns.Infrastructure.Models;

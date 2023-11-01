@@ -1,5 +1,4 @@
-﻿using Shouldly;
-using TonSdk.Client;
+﻿using TonSdk.Client;
 using TonSdk.Contracts.Wallet;
 using TonSdk.Core;
 using TonSdk.Core.Block;
