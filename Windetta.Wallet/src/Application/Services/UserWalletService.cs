@@ -132,9 +132,41 @@ public class UserWalletService : IUserWalletService
         }
     }
 
-    public Task DeductAsync(DeductArgument arg)
+    public async Task DeductAsync(DeductArgument arg)
     {
-        throw new NotImplementedException();
+        if ((await _ctx.Transactions
+           .FindAsync(new TxnByIdSpec(arg.OperationId))) is not null) return;
+
+        var wallet = await _ctx.Wallets
+            .FindAsync(new WalletByUserIdSpec(arg.userId));
+
+        if (wallet is null)
+            throw new WindettaException(Errors.Wallet.NotFound);
+
+        using var transaction = _ctx.Database
+            .BeginTransaction(IsolationLevel.Serializable);
+
+        try
+        {
+            wallet.DecreaseBalance(arg.amount);
+
+            _ctx.Transactions.Add(new()
+            {
+                Id = arg.OperationId,
+                Amount = arg.amount,
+                TimeStamp = DateTime.UtcNow,
+                Type = TransactionType.Withdraw,
+                UserId = arg.userId
+            });
+
+            await _ctx.SaveChangesAsync();
+
+            transaction.Commit();
+        }
+        catch
+        {
+            transaction.Rollback();
+        }
     }
 
     public async Task UnHoldBalanceAsync(Guid userId)

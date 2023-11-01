@@ -2,7 +2,6 @@
 
 namespace Windetta.Contracts.Events;
 
-public interface ITransferTonAddedToPool:CorrelatedBy<Guid>
+public interface IWithdrawPeriodExpired : CorrelatedBy<Guid>
 {
-
 }

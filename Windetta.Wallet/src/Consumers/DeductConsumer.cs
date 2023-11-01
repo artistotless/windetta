@@ -7,6 +7,7 @@ namespace Windetta.Wallet.Consumers;
 public class DeductConsumer : IConsumer<IDeductBalance>
 {
     private readonly IUserWalletService _walletService;
+    private readonly IBus _bus;
 
     public DeductConsumer(IUserWalletService walletService)
     {

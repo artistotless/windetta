@@ -10,24 +10,24 @@ public class UserWallet
     public long HeldBalance { get; private set; } = 0; // nanotons
 
     #region Business logic
-    public void IncreaseBalance(long nanotons)
+    public void IncreaseBalance(long amount)
     {
-        Balance += nanotons;
+        Balance += amount;
     }
 
-    public void HoldBalance(long nanotons)
+    public void HoldBalance(long amount)
     {
         if (HeldBalance != 0)
             throw new WindettaException(
                 Errors.Wallet.FundsAlreadyHeld, "Funds already held");
 
-        HeldBalance = nanotons;
+        HeldBalance = amount;
     }
 
-    public void TransferToWallet(UserWallet wallet, long nanotons)
+    public void TransferToWallet(UserWallet wallet, long amount)
     {
-        this.DecreaseBalance(nanotons);
-        wallet.IncreaseBalance(nanotons);
+        this.DecreaseBalance(amount);
+        wallet.IncreaseBalance(amount);
     }
 
     public void UnHoldBalance()
@@ -35,16 +35,16 @@ public class UserWallet
         HeldBalance = 0;
     }
 
-    private void DecreaseBalance(long nanotons)
+    public void DecreaseBalance(long amount)
     {
-        if (nanotons <= 0)
+        if (amount <= 0)
             return;
 
-        if (Balance - HeldBalance < nanotons)
+        if (Balance - HeldBalance < amount)
             throw new WindettaException(
                 Errors.Wallet.FundsNotEnough, "Insufficient funds");
 
-        Balance -= nanotons;
+        Balance -= amount;
     }
     #endregion
 }
