@@ -1,45 +1,53 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Windetta.Common.Helpers;
-using Windetta.Common.Types;
 using Windetta.Wallet.Domain;
 
 namespace Windetta.Wallet.Data;
 
 public sealed class WalletDbContext : DbContext
 {
-    private readonly AesEncryptor _encryptor;
-
-    public WalletDbContext(DbContextOptions options, AesEncryptor aes) : base(options)
+    public WalletDbContext(DbContextOptions options) : base(options)
     {
-        _encryptor = aes;
     }
 
     internal DbSet<UserWallet> Wallets { get; set; }
-    internal DbSet<WalletKeysSet> Credentials { get; set; }
+    internal DbSet<Transaction> Transactions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<WalletKeysSet>()
-         .Property(x => x.PrivateKey)
-         .HasConversion(x => _encryptor.Encrypt(x), x => _encryptor.Decrypt(x));
-
-        modelBuilder.Entity<WalletKeysSet>()
-            .HasKey(x => x.UserId);
-
         modelBuilder.Entity<UserWallet>()
             .HasKey(x => x.UserId);
 
         modelBuilder.Entity<UserWallet>()
-            .Property(x => x.Address)
-            .HasMaxLength(48)
-            .HasColumnType("CHAR")
-            .HasConversion(x => x.Value, x => new TonAddress(x));
+          .Property(x => x.UserId)
+          .HasColumnType("CHAR(36)");
 
         modelBuilder.Entity<UserWallet>()
-            .HasOne(x => x.WalletKeys)
-            .WithOne(k => k.Wallet)
-            .HasForeignKey<WalletKeysSet>(k => k.UserId);
+          .Property(x => x.HeldBalance)
+          .HasColumnType("BIGINT");
+
+        modelBuilder.Entity<UserWallet>()
+          .Property(x => x.Balance)
+          .HasColumnType("BIGINT");
+
+        modelBuilder.Entity<Transaction>()
+            .HasKey(x => x.Id);
+
+        modelBuilder.Entity<Transaction>()
+            .Property(x => x.Id)
+            .HasColumnType("VARCHAR(40)");
+
+        modelBuilder.Entity<Transaction>()
+          .Property(x => x.TimeStamp)
+          .HasColumnType("DATETIME(6)");
+
+        modelBuilder.Entity<Transaction>()
+          .Property(x => x.Nanotons)
+          .HasColumnType("BIGINT");
+
+        modelBuilder.Entity<Transaction>()
+         .Property(x => x.Type)
+         .HasColumnType("TINYINT");
     }
 }

@@ -1,8 +1,8 @@
 ﻿using Shouldly;
 using TonSdk.Contracts.Wallet;
 using TonSdk.Core.Crypto;
-using Windetta.Wallet.Extensions;
-using Windetta.WalletTests.Fixtures;
+using Windetta.Common.Ton;
+using Windetta.TonTxnsTests.Fixtures;
 
 namespace Windetta.WalletTests.TonApi;
 

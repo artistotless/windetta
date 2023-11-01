@@ -3,7 +3,6 @@ using Shouldly;
 using Windetta.Common.Types;
 using Windetta.Contracts.Commands;
 using Windetta.Wallet.Consumers;
-using Windetta.WalletTests.Fixtures;
 
 namespace Windetta.WalletTests.ConsumersTests;
 
@@ -29,7 +28,7 @@ public class ConsumersTests : IClassFixture<HarnessFixture>
         });
         // assert
         (await _harness.Published.Any<ICreateUserWallet>()).ShouldBeTrue();
-        var consumerHarness = _harness.GetConsumerHarness<CreationConsumer>();
+        var consumerHarness = _harness.GetConsumerHarness<CreateConsumer>();
         (await consumerHarness.Consumed.Any<ICreateUserWallet>(
         x => x.Context.Message.UserId == userId)).ShouldBeTrue();
     }

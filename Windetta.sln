@@ -21,6 +21,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Windetta.WalletTests", "Win
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Windetta.IdentityTests", "Windetta.Identity\tests\Windetta.IdentityTests.csproj", "{400CE1BF-3E97-43EA-A257-6169455A23FF}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Windetta.TonTxnsTests", "Windetta.TonTxns\tests\Windetta.TonTxnsTests.csproj", "{559D3CC0-2048-4D0E-801A-4E3104B6446B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Windetta.TonTxns", "Windetta.TonTxns\src\Windetta.TonTxns.csproj", "{299FCDA6-7A66-4879-B0FA-EFEC7E4466A5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -59,6 +63,14 @@ Global
 		{400CE1BF-3E97-43EA-A257-6169455A23FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{400CE1BF-3E97-43EA-A257-6169455A23FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{400CE1BF-3E97-43EA-A257-6169455A23FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{559D3CC0-2048-4D0E-801A-4E3104B6446B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{559D3CC0-2048-4D0E-801A-4E3104B6446B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{559D3CC0-2048-4D0E-801A-4E3104B6446B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{559D3CC0-2048-4D0E-801A-4E3104B6446B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{299FCDA6-7A66-4879-B0FA-EFEC7E4466A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{299FCDA6-7A66-4879-B0FA-EFEC7E4466A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{299FCDA6-7A66-4879-B0FA-EFEC7E4466A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{299FCDA6-7A66-4879-B0FA-EFEC7E4466A5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -66,6 +78,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{9F5269FF-7895-4EAD-991E-7237142E0313} = {D0CB951F-ACE6-4DFE-8916-F4A778AD68E8}
 		{400CE1BF-3E97-43EA-A257-6169455A23FF} = {D0CB951F-ACE6-4DFE-8916-F4A778AD68E8}
+		{559D3CC0-2048-4D0E-801A-4E3104B6446B} = {D0CB951F-ACE6-4DFE-8916-F4A778AD68E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8236D9C0-4521-4D71-A1C3-30D6E29ED273}

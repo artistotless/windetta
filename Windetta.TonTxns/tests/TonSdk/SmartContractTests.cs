@@ -5,10 +5,9 @@ using TonSdk.Core;
 using TonSdk.Core.Block;
 using TonSdk.Core.Crypto;
 using Windetta.Common.Ton;
-using Windetta.Wallet.Extensions;
-using Windetta.WalletTests.Fixtures;
+using Windetta.TonTxnsTests.Fixtures;
 
-namespace Windetta.WalletTests.TonApi;
+namespace Windetta.TonTxnsTests.TonApi;
 
 [Collection("TonTestsCollection")]
 public class SmartContractTests

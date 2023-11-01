@@ -1,6 +1,6 @@
 ﻿using TonSdk.Client;
 
-namespace Windetta.WalletTests.Fixtures;
+namespace Windetta.TonTxnsTests.Fixtures;
 
 public class TonClientFixture : IDisposable
 {

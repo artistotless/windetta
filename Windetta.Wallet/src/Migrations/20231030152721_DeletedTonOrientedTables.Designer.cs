@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Windetta.Wallet.Data;
 
@@ -10,9 +11,11 @@ using Windetta.Wallet.Data;
 namespace Windetta.Wallet.Migrations
 {
     [DbContext(typeof(WalletDbContext))]
-    partial class WalletDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231030152721_DeletedTonOrientedTables")]
+    partial class DeletedTonOrientedTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,16 +25,16 @@ namespace Windetta.Wallet.Migrations
             modelBuilder.Entity("Windetta.Wallet.Domain.Transaction", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("VARCHAR(40)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<long>("Nanotons")
-                        .HasColumnType("BIGINT");
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime>("TimeStamp")
-                        .HasColumnType("DATETIME(6)");
+                        .HasColumnType("datetime(6)");
 
-                    b.Property<sbyte>("Type")
-                        .HasColumnType("TINYINT");
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
                     b.Property<Guid>("UserId")
                         .HasColumnType("char(36)");
@@ -45,13 +48,13 @@ namespace Windetta.Wallet.Migrations
                 {
                     b.Property<Guid>("UserId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("CHAR(36)");
+                        .HasColumnType("char(36)");
 
                     b.Property<long>("Balance")
-                        .HasColumnType("BIGINT");
+                        .HasColumnType("bigint");
 
                     b.Property<long>("HeldBalance")
-                        .HasColumnType("BIGINT");
+                        .HasColumnType("bigint");
 
                     b.HasKey("UserId");
 

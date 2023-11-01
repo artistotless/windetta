@@ -1,7 +1,7 @@
 ﻿using TonSdk.Client;
-using Windetta.Wallet.Infrastructure.Services;
+using Windetta.TonTxns.Infrastructure.Services;
 
-namespace Windetta.Wallet.Extensions;
+namespace Windetta.TonTxns.Extensions;
 
 public static class DependencyResolver
 {
