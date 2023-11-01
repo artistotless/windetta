@@ -8,6 +8,10 @@
 
   <ItemGroup>
     <PackageReference Include="MassTransit" Version="8.1.0" />
+    <PackageReference Include="MassTransit.Analyzers" Version="8.1.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="MassTransit.EntityFrameworkCore" Version="8.1.0" />
     <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="7.3.1" />
     <PackageReference Include="MassTransit.RabbitMQ" Version="8.1.0" />

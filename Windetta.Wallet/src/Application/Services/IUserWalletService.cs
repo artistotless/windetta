@@ -7,9 +7,9 @@ public interface IUserWalletService : IScopedService
 {
     Task<WalletBalanceDto> GetBalance(Guid userId);
     Task<WalletInfoDto> CreateWalletAsync(Guid userId);
-    Task HoldBalanceAsync(Guid userId, long nanotons);
+    Task HoldBalanceAsync(Guid userId, long amount);
     Task UnHoldBalanceAsync(Guid userId);
     Task TransferAsync(TransferArgument arg);
-    Task WithdrawAsync(WithdrawArgument arg);
+    Task DeductAsync(DeductArgument arg);
     Task TopUpBalance(TopUpArgument arg);
 }

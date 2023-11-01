@@ -4,22 +4,21 @@ using Windetta.Wallet.Application.Services;
 
 namespace Windetta.Wallet.Consumers;
 
-public class WithdrawConsumer : IConsumer<IWithdrawTon>
+public class DeductConsumer : IConsumer<IDeductBalance>
 {
     private readonly IUserWalletService _walletService;
 
-    public WithdrawConsumer(IUserWalletService walletService)
+    public DeductConsumer(IUserWalletService walletService)
     {
         _walletService = walletService;
     }
 
-    public async Task Consume(ConsumeContext<IWithdrawTon> context)
+    public async Task Consume(ConsumeContext<IDeductBalance> context)
     {
         var userId = context.Message.UserId;
-        var nanotons = context.Message.Nanotons;
-        var destination = context.Message.Destination;
+        var value = context.Message.Amount;
 
-        await _walletService.WithdrawAsync(new(userId, nanotons, destination)
+        await _walletService.DeductAsync(new(userId, value)
         {
             OperationId = context.Message.CorrelationId
         });

@@ -2,6 +2,7 @@ using MassTransit.Testing;
 using Shouldly;
 using Windetta.Common.Types;
 using Windetta.Contracts.Commands;
+using Windetta.Contracts.Events;
 using Windetta.Wallet.Consumers;
 
 namespace Windetta.WalletTests.ConsumersTests;
@@ -47,14 +48,14 @@ public class ConsumersTests : IClassFixture<HarnessFixture>
         };
 
         // act
-        await _harness.Bus.Publish<IWithdrawTon>(command);
+        await _harness.Bus.Publish<IWithdrawTonRequested>(command);
 
         // assert
-        (await _harness.Published.Any<IWithdrawTon>()).ShouldBeTrue();
+        (await _harness.Published.Any<IWithdrawTonRequested>()).ShouldBeTrue();
 
-        var consumerHarness = _harness.GetConsumerHarness<WithdrawConsumer>();
+        var consumerHarness = _harness.GetConsumerHarness<DeductConsumer>();
 
-        (await consumerHarness.Consumed.Any<IWithdrawTon>(
+        (await consumerHarness.Consumed.Any<IWithdrawTonRequested>(
         x => x.Context.Message.UserId == command.UserId &&
         x.Context.Message.Nanotons == command.Nanotons &&
         x.Context.Message.Destination == command.Destination))

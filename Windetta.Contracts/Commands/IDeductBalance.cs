@@ -1,8 +1,8 @@
 ﻿using MassTransit;
 
-namespace Windetta.Contracts.Events;
+namespace Windetta.Contracts.Commands;
 
-public interface IFundsAdded : CorrelatedBy<Guid>
+public interface IDeductBalance : CorrelatedBy<Guid>
 {
     public Guid UserId { get; set; }
     public long Amount { get; set; }

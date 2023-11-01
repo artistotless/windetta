@@ -1,9 +1,9 @@
 ﻿using MassTransit;
 using Windetta.Common.Types;
 
-namespace Windetta.Contracts.Commands;
+namespace Windetta.Contracts.Events;
 
-public interface IWithdrawTon : CorrelatedBy<Guid>
+public interface IWithdrawTonRequested : CorrelatedBy<Guid>
 {
     public Guid UserId { get; set; }
     public TonAddress Destination { get; set; }

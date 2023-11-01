@@ -71,12 +71,12 @@ public class UserWalletService : IUserWalletService
 
         try
         {
-            wallet.IncreaseBalance(arg.nanotons);
+            wallet.IncreaseBalance(arg.amount);
 
             _ctx.Transactions.Add(new()
             {
                 Id = arg.OperationId,
-                Nanotons = arg.nanotons,
+                Amount = arg.amount,
                 TimeStamp = DateTime.UtcNow,
                 Type = TransactionType.TopUp,
                 UserId = arg.userId
@@ -111,12 +111,12 @@ public class UserWalletService : IUserWalletService
 
         try
         {
-            user1Wallet.TransferToWallet(user2Wallet, arg.nanotons);
+            user1Wallet.TransferToWallet(user2Wallet, arg.amount);
 
             _ctx.Transactions.Add(new()
             {
                 Id = arg.OperationId,
-                Nanotons = arg.nanotons,
+                Amount = arg.amount,
                 TimeStamp = DateTime.UtcNow,
                 Type = TransactionType.Transfer,
                 UserId = arg.userId
@@ -132,7 +132,7 @@ public class UserWalletService : IUserWalletService
         }
     }
 
-    public Task WithdrawAsync(WithdrawArgument arg)
+    public Task DeductAsync(DeductArgument arg)
     {
         throw new NotImplementedException();
     }
