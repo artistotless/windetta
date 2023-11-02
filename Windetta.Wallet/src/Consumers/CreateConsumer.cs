@@ -14,7 +14,7 @@ namespace Windetta.Wallet.Consumers
         {
             _walletService = walletService;
             _bus = bus;
-        }
+        } 
 
         public async Task Consume(ConsumeContext<ICreateUserWallet> context)
         {

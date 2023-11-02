@@ -71,12 +71,12 @@ public class UserWalletService : IUserWalletService
 
         try
         {
-            wallet.IncreaseBalance(arg.nanotons);
+            wallet.IncreaseBalance(arg.amount);
 
             _ctx.Transactions.Add(new()
             {
                 Id = arg.OperationId,
-                Nanotons = arg.nanotons,
+                Amount = arg.amount,
                 TimeStamp = DateTime.UtcNow,
                 Type = TransactionType.TopUp,
                 UserId = arg.userId
@@ -111,12 +111,12 @@ public class UserWalletService : IUserWalletService
 
         try
         {
-            user1Wallet.TransferToWallet(user2Wallet, arg.nanotons);
+            user1Wallet.TransferToWallet(user2Wallet, arg.amount);
 
             _ctx.Transactions.Add(new()
             {
                 Id = arg.OperationId,
-                Nanotons = arg.nanotons,
+                Amount = arg.amount,
                 TimeStamp = DateTime.UtcNow,
                 Type = TransactionType.Transfer,
                 UserId = arg.userId
@@ -132,9 +132,74 @@ public class UserWalletService : IUserWalletService
         }
     }
 
-    public Task WithdrawAsync(WithdrawArgument arg)
+    public async Task DeductAsync(DeductArgument arg)
     {
-        throw new NotImplementedException();
+        if ((await _ctx.Transactions
+           .FindAsync(new TxnByIdSpec(arg.OperationId))) is not null) return;
+
+        var wallet = await _ctx.Wallets
+            .FindAsync(new WalletByUserIdSpec(arg.userId));
+
+        if (wallet is null)
+            throw new WindettaException(Errors.Wallet.NotFound);
+
+        using var transaction = _ctx.Database
+            .BeginTransaction(IsolationLevel.Serializable);
+
+        try
+        {
+            wallet.DecreaseBalance(arg.amount);
+
+            _ctx.Transactions.Add(new()
+            {
+                Id = arg.OperationId,
+                Amount = arg.amount,
+                TimeStamp = DateTime.UtcNow,
+                Type = TransactionType.Withdrawal,
+                UserId = arg.userId
+            });
+
+            await _ctx.SaveChangesAsync();
+
+            transaction.Commit();
+        }
+        catch
+        {
+            transaction.Rollback();
+        }
+    }
+
+    public async Task CancelDeductAsync(Guid operationId)
+    {
+        var txn = await _ctx.Transactions
+             .FindAsync(new TxnByIdSpec(operationId));
+
+        if (txn is null) return;
+
+        var wallet = await _ctx.Wallets
+            .FindAsync(new WalletByUserIdSpec(txn.UserId));
+
+        if (wallet is null)
+            throw new WindettaException(Errors.Wallet.NotFound);
+
+        using var transaction = _ctx.Database
+            .BeginTransaction(IsolationLevel.Serializable);
+
+        try
+        {
+            wallet.IncreaseBalance(txn.Amount);
+
+            txn.TimeStamp = DateTime.UtcNow;
+            txn.Type = TransactionType.CancelWithdrawal;
+
+            await _ctx.SaveChangesAsync();
+
+            transaction.Commit();
+        }
+        catch
+        {
+            transaction.Rollback();
+        }
     }
 
     public async Task UnHoldBalanceAsync(Guid userId)

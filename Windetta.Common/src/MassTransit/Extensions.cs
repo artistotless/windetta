@@ -9,7 +9,9 @@ namespace Windetta.Common.MassTransit;
 
 public static class Extensions
 {
-    public static void AddMassTransit(this IServiceCollection services, Assembly assembly, string serviceName)
+    public static void AddReadyMassTransit(this IServiceCollection services,
+        Assembly assembly,
+        string serviceName)
     {
         var provider = services.BuildServiceProvider();
         var configuration = provider.GetRequiredService<IConfiguration>();

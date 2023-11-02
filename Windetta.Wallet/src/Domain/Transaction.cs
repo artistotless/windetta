@@ -3,7 +3,8 @@
 public enum TransactionType
 {
     TopUp,
-    Withdraw,
+    Withdrawal,
+    CancelWithdrawal,
     Transfer
 }
 
@@ -13,5 +14,5 @@ public class Transaction
     public Guid Id { get; init; }
     public DateTime TimeStamp { get; set; }
     public TransactionType Type { get; set; }
-    public long Nanotons { get; set; }
+    public long Amount { get; set; }
 }

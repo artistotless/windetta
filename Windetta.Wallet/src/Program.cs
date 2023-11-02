@@ -2,7 +2,6 @@ using Autofac.Extensions.DependencyInjection;
 using System.Reflection;
 using Windetta.Common.Constants;
 using Windetta.Common.Database;
-using Windetta.Common.Helpers;
 using Windetta.Common.MassTransit;
 using Windetta.Common.RabbitMQ;
 using Windetta.Common.Types;
@@ -14,8 +13,7 @@ var configuration = builder.Configuration;
 var assembly = Assembly.GetExecutingAssembly();
 
 services.AddControllers();
-services.AddMassTransit(assembly, Svc.Wallet);
-services.AddTransient<AesEncryptor>();
+services.AddReadyMassTransit(assembly, Svc.Wallet);
 services.AddMysqlDbContext<WalletDbContext>(assembly);
 
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory(builder =>

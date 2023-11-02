@@ -22,9 +22,10 @@ namespace Windetta.Wallet.Migrations
             modelBuilder.Entity("Windetta.Wallet.Domain.Transaction", b =>
                 {
                     b.Property<string>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("VARCHAR(40)");
 
-                    b.Property<long>("Nanotons")
+                    b.Property<long>("Amount")
                         .HasColumnType("BIGINT");
 
                     b.Property<DateTime>("TimeStamp")

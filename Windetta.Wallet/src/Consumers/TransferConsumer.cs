@@ -4,7 +4,7 @@ using Windetta.Wallet.Application.Services;
 
 namespace Windetta.Wallet.Consumers;
 
-public class TransferConsumer : IConsumer<ITransferTon>
+public class TransferConsumer : IConsumer<ITransferBalance>
 {
     private readonly IUserWalletService _walletService;
 
@@ -13,10 +13,10 @@ public class TransferConsumer : IConsumer<ITransferTon>
         _walletService = walletService;
     }
 
-    public async Task Consume(ConsumeContext<ITransferTon> context)
+    public async Task Consume(ConsumeContext<ITransferBalance> context)
     {
         var userId = context.Message.InitiatorUserId;
-        var nanotons = context.Message.Nanotons;
+        var nanotons = context.Message.Amount;
         var destination = context.Message.DestinationUserId;
 
         await _walletService.TransferAsync(new(userId, nanotons, destination)

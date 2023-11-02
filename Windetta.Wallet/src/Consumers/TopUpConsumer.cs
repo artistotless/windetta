@@ -17,7 +17,7 @@ namespace Windetta.Wallet.Consumers
         public async Task Consume(ConsumeContext<IFundsAdded> context)
         {
             var userId = context.Message.UserId;
-            var nanotons = context.Message.Nanotons;
+            var nanotons = context.Message.Amount;
 
             await _walletService.TopUpBalance(new TopUpArgument(userId, nanotons)
             {

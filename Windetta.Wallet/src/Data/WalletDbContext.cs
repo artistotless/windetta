@@ -43,7 +43,7 @@ public sealed class WalletDbContext : DbContext
           .HasColumnType("DATETIME(6)");
 
         modelBuilder.Entity<Transaction>()
-          .Property(x => x.Nanotons)
+          .Property(x => x.Amount)
           .HasColumnType("BIGINT");
 
         modelBuilder.Entity<Transaction>()

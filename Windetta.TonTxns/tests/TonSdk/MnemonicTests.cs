@@ -1,5 +1,4 @@
-﻿using Shouldly;
-using TonSdk.Contracts.Wallet;
+﻿using TonSdk.Contracts.Wallet;
 using TonSdk.Core.Crypto;
 using Windetta.Common.Ton;
 using Windetta.TonTxnsTests.Fixtures;

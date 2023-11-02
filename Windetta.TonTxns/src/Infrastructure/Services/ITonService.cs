@@ -5,7 +5,7 @@ namespace Windetta.TonTxns.Infrastructure.Services;
 
 public interface ITonService : IScopedService
 {
-    Task<long> GetBalance(string address);
+    Task<long> GetBalance(TonAddress address);
 
     /// <summary>
     /// Transfers specified amount of nanotons from user's balance
@@ -13,5 +13,5 @@ public interface ITonService : IScopedService
     /// <param name="from">Source wallet credential</param>
     /// <param name="to">Destination TON address</param>
     /// <param name="nanotons">amount of nanotons</param>
-    Task<TransferResult> TransferTon(TonWalletCredential from, string to, long nanotons);
+    Task TransferTon(TonWalletCredential from, IEnumerable<TransferMessage> messages);
 }
