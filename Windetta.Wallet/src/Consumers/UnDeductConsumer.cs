@@ -4,17 +4,16 @@ using Windetta.Wallet.Application.Services;
 
 namespace Windetta.Wallet.Consumers;
 
-public class DeductConsumer : IConsumer<IDeductBalance>
+public class UnDeductConsumer :  IConsumer<IUnDeductBalance>
 {
     private readonly IUserWalletService _walletService;
-    private readonly IBus _bus;
 
-    public DeductConsumer(IUserWalletService walletService)
+    public UnDeductConsumer(IUserWalletService walletService)
     {
         _walletService = walletService;
     }
 
-    public async Task Consume(ConsumeContext<IDeductBalance> context)
+    public async Task Consume(ConsumeContext<IUnDeductBalance> context)
     {
         var userId = context.Message.UserId;
         var value = context.Message.Amount;

@@ -155,9 +155,42 @@ public class UserWalletService : IUserWalletService
                 Id = arg.OperationId,
                 Amount = arg.amount,
                 TimeStamp = DateTime.UtcNow,
-                Type = TransactionType.Withdraw,
+                Type = TransactionType.Withdrawal,
                 UserId = arg.userId
             });
+
+            await _ctx.SaveChangesAsync();
+
+            transaction.Commit();
+        }
+        catch
+        {
+            transaction.Rollback();
+        }
+    }
+
+    public async Task CancelDeductAsync(Guid operationId)
+    {
+        var txn = await _ctx.Transactions
+             .FindAsync(new TxnByIdSpec(operationId));
+
+        if (txn is null) return;
+
+        var wallet = await _ctx.Wallets
+            .FindAsync(new WalletByUserIdSpec(txn.UserId));
+
+        if (wallet is null)
+            throw new WindettaException(Errors.Wallet.NotFound);
+
+        using var transaction = _ctx.Database
+            .BeginTransaction(IsolationLevel.Serializable);
+
+        try
+        {
+            wallet.IncreaseBalance(txn.Amount);
+
+            txn.TimeStamp = DateTime.UtcNow;
+            txn.Type = TransactionType.CancelWithdrawal;
 
             await _ctx.SaveChangesAsync();
 

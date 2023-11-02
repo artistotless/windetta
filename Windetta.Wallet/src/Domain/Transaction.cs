@@ -3,7 +3,8 @@
 public enum TransactionType
 {
     TopUp,
-    Withdraw,
+    Withdrawal,
+    CancelWithdrawal,
     Transfer
 }
 

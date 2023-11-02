@@ -38,11 +38,8 @@ public class TonWithdrawFlowTests : IClassFixture<HarnessFixture>
         (await _harness.Consumed.Any<IWithdrawTonRequested>()).ShouldBe(true);
         (await stateMachineHarness.Consumed.Any<IWithdrawTonRequested>()).ShouldBe(true);
 
-        //var instance = stateMachineHarness.Created
-        //     .ContainsInState(argument.CorrelationId, stateMachine,
-        //     stateMachine.AwaitingDeduction);
-
         var instance = stateMachineHarness.Created
-            .Contains(argument.CorrelationId);
+             .ContainsInState(argument.CorrelationId, stateMachine,
+             stateMachine.AwaitingDeduction);
     }
 }
