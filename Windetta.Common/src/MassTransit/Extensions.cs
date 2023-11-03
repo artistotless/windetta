@@ -3,7 +3,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using Windetta.Common.Configuration;
-using Windetta.Common.RabbitMQ;
 
 namespace Windetta.Common.MassTransit;
 

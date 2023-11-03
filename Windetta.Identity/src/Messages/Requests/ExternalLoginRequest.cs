@@ -5,7 +5,6 @@ using MassTransit;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using Windetta.Common.Messages;
-using Windetta.Common.RabbitMQ;
 using Windetta.Identity.Domain.Entities;
 using Windetta.Identity.Extensions;
 using Windetta.Identity.Infrastructure.IdentityParsers;

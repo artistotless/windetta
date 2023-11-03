@@ -1,6 +1,6 @@
 ﻿using RawRabbit.Configuration;
 
-namespace Windetta.Common.RabbitMQ;
+namespace Windetta.Common.MassTransit;
 
 public class RabbitMqOptions : RawRabbitConfiguration
 {
