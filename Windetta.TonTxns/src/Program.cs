@@ -3,7 +3,6 @@ using System.Reflection;
 using Windetta.Common.Constants;
 using Windetta.Common.Database;
 using Windetta.Common.MassTransit;
-using Windetta.Common.RabbitMQ;
 using Windetta.Common.Types;
 using Windetta.TonTxns.Data;
 
@@ -17,7 +16,6 @@ services.AddMysqlDbContext<TonDbContext>(assembly);
 
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory(builder =>
 {
-    builder.AddRabbitMq();
     builder.ResolveDependenciesFromAssembly();
 }));
 

@@ -4,7 +4,7 @@ using Windetta.Wallet.Application.Services;
 
 namespace Windetta.Wallet.Consumers;
 
-public class UnDeductConsumer :  IConsumer<IUnDeductBalance>
+public class UnDeductConsumer : IConsumer<IUnDeductBalance>
 {
     private readonly IUserWalletService _walletService;
 
@@ -14,13 +14,17 @@ public class UnDeductConsumer :  IConsumer<IUnDeductBalance>
     }
 
     public async Task Consume(ConsumeContext<IUnDeductBalance> context)
-    {
-        var userId = context.Message.UserId;
-        var value = context.Message.Amount;
+        => await _walletService.CancelDeductAsync(context.Message.CorrelationId);
+}
 
-        await _walletService.DeductAsync(new(userId, value)
+public class UnDeductConsumerDefinition : ConsumerDefinition<UnDeductConsumer>
+{
+    protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator,
+    IConsumerConfigurator<UnDeductConsumer> consumerConfigurator, IRegistrationContext context)
+    {
+        consumerConfigurator.UseMessageRetry(r =>
         {
-            OperationId = context.Message.CorrelationId
+            r.Interval(retryCount: 3, interval: TimeSpan.FromSeconds(5));
         });
     }
 }

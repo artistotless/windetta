@@ -25,7 +25,7 @@ public class HarnessFixture
         .AddMassTransitTestHarness(cfg =>
         {
             cfg.SetEndpointNameFormatter(new MyEndpointNameFormatter(Svc.TonTxns));
-            cfg.AddConsumer<TransferConsumer>(typeof(TestTransferConsumerDefinition));
+            cfg.AddConsumer<BatchSendTonsConsumer>(typeof(TestTransferConsumerDefinition));
 
         }).BuildServiceProvider(true);
 
@@ -34,10 +34,10 @@ public class HarnessFixture
     }
 }
 
-public class TestTransferConsumerDefinition : ConsumerDefinition<TransferConsumer>
+public class TestTransferConsumerDefinition : ConsumerDefinition<BatchSendTonsConsumer>
 {
     protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator,
-    IConsumerConfigurator<TransferConsumer> consumerConfigurator, IRegistrationContext context)
+    IConsumerConfigurator<BatchSendTonsConsumer> consumerConfigurator, IRegistrationContext context)
     {
         endpointConfigurator.PrefetchCount = 100;
         consumerConfigurator.Options<BatchOptions>(options => options

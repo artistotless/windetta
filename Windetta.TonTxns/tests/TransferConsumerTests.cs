@@ -1,5 +1,6 @@
 ﻿using Windetta.Common.Types;
 using Windetta.Contracts.Commands;
+using Windetta.Contracts.Events;
 using Windetta.TonTxns.Consumers;
 using Windetta.TonTxns.Infrastructure.Models;
 using Windetta.TonTxns.Infrastructure.Services;
@@ -22,16 +23,16 @@ public class TransferConsumerTests : IClassFixture<HarnessFixture>
     {
         // arrange
         var exptectedCount = 30;
-        var consumerHarness = _harness.GetConsumerHarness<TransferConsumer>();
+        var consumerHarness = _harness.GetConsumerHarness<BatchSendTonsConsumer>();
         var transfers = new Fixture().Build<TransferTonImpl>()
             .With(x => x.Destination, new TonAddress("EQCBvjU7mYLJQCIEtJGOiUWxmW0NI1Gn-1zzyTJ5zRBtLoLV"))
             .CreateMany(exptectedCount);
 
         // act
-        await _harness.Bus.PublishBatch<ITransferTon>(transfers);
+        await _harness.Bus.PublishBatch<ISendTons>(transfers);
 
         // assert
-        (await consumerHarness.Consumed.Any<Batch<ITransferTon>>(
+        (await consumerHarness.Consumed.Any<Batch<ISendTons>>(
             x => x.Context.Message.Length == exptectedCount)).ShouldBeTrue();
     }
 
@@ -46,18 +47,18 @@ public class TransferConsumerTests : IClassFixture<HarnessFixture>
             .CreateMany(batchCount);
 
         // act
-        await _harness.Bus.PublishBatch<ITransferTon>(transfers);
+        await _harness.Bus.PublishBatch<ISendTons>(transfers);
         await Task.Delay(200);
 
         // assert
-        _tonServiceMock.Verify(x => x.TransferTon(
+        _tonServiceMock.Verify(x => x.SendTons(
                 It.IsAny<TonWalletCredential>(),
                 It.Is<IEnumerable<TransferMessage>>(x => x.Count() == batchCount)), Times.Once);
     }
 }
 
 
-public class TransferTonImpl : ITransferTon
+public class TransferTonImpl : ISendTons
 {
     public long Nanotons { get; set; }
     public TonAddress Destination { get; set; }

@@ -2,6 +2,7 @@
 using Windetta.Contracts.Events;
 using Windetta.Wallet.Application.Dto;
 using Windetta.Wallet.Application.Services;
+using Windetta.Wallet.Consumers;
 
 namespace Windetta.Wallet.Consumers
 {
@@ -24,5 +25,22 @@ namespace Windetta.Wallet.Consumers
                 OperationId = context.Message.CorrelationId,
             });
         }
+    }
+}
+
+public class TopUpConsumerDefinition : ConsumerDefinition<TopUpConsumer>
+{
+    protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator,
+    IConsumerConfigurator<TopUpConsumer> consumerConfigurator, IRegistrationContext context)
+    {
+        consumerConfigurator.UseScheduledRedelivery(r =>
+        {
+            r.Intervals(TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(4), TimeSpan.FromMinutes(10));
+        });
+
+        consumerConfigurator.UseMessageRetry(r =>
+        {
+            r.Interval(retryCount: 3, interval: TimeSpan.FromSeconds(10));
+        });
     }
 }

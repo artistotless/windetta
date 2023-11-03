@@ -13,5 +13,5 @@ public interface ITonService : IScopedService
     /// <param name="from">Source wallet credential</param>
     /// <param name="to">Destination TON address</param>
     /// <param name="nanotons">amount of nanotons</param>
-    Task TransferTon(TonWalletCredential from, IEnumerable<TransferMessage> messages);
+    Task SendTons(TonWalletCredential from, IEnumerable<TransferMessage> messages);
 }

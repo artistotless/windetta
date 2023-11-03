@@ -6,7 +6,6 @@ using Windetta.Common.Constants;
 using Windetta.Common.Database;
 using Windetta.Common.MassTransit;
 using Windetta.Common.Options;
-using Windetta.Common.RabbitMQ;
 using Windetta.Operations.Data;
 
 namespace Windetta.Operations.Extensions;

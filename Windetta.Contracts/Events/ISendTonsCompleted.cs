@@ -2,7 +2,7 @@
 
 namespace Windetta.Contracts.Events;
 
-public interface ITransferTonCompleted:CorrelatedBy<Guid>
+public interface ISendTonsCompleted:CorrelatedBy<Guid>
 {
 
 }

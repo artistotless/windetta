@@ -3,7 +3,6 @@ using System.Reflection;
 using Windetta.Common.Constants;
 using Windetta.Common.Database;
 using Windetta.Common.MassTransit;
-using Windetta.Common.RabbitMQ;
 using Windetta.Common.Types;
 using Windetta.Wallet.Data;
 
@@ -18,7 +17,6 @@ services.AddMysqlDbContext<WalletDbContext>(assembly);
 
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory(builder =>
 {
-    builder.AddRabbitMq();
     builder.ResolveDependenciesFromAssembly();
 }));
 
