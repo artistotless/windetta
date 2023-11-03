@@ -24,6 +24,7 @@ public sealed class TonDbContext : DbContext
 
         modelBuilder.Entity<Transaction>()
           .Property(x => x.Status)
+          .HasDefaultValue(TransactionStatus.Pending)
           .HasColumnType("TINYINT");
 
         modelBuilder.Entity<Transaction>()

@@ -2,6 +2,7 @@
 using MassTransit.Events;
 using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
+using Windetta.TonTxns.Application.Services;
 using Windetta.TonTxns.Infrastructure.Models;
 using Windetta.TonTxns.Infrastructure.Services;
 
@@ -12,18 +13,36 @@ public class SendTonsConsumer : IConsumer<IPackedSendTons>
     public const int RetryCount = 3;
 
     private readonly ITonService _tonService;
-    private readonly IWalletCredentialSource _walletCredentialSource;
+    private readonly IWalletCredentialSource _credentialSource;
+    private readonly ITransactionsService _txnService;
 
-    public SendTonsConsumer(ITonService tonService, IWalletCredentialSource walletCredentialSource)
+    public SendTonsConsumer(
+        ITonService tonService,
+        IWalletCredentialSource credentialSource,
+        ITransactionsService txnService)
     {
         _tonService = tonService;
-        _walletCredentialSource = walletCredentialSource;
+        _credentialSource = credentialSource;
+        _txnService = txnService;
     }
 
     public async Task Consume(ConsumeContext<IPackedSendTons> context)
     {
-        var credential = await _walletCredentialSource.GetCredential();
+        if (await _txnService.ExistAsync(context.Message.CorrelationId))
+            return;
+
         var transferMessages = LoadTransferMessageArray(context.Message.Sends);
+        var totalAmount = transferMessages.Sum(x => x.nanotons);
+
+        await _txnService.AddAsync(new()
+        {
+            Id = context.Message.CorrelationId,
+            Status = Domain.TransactionStatus.Pending,
+            TotalAmount = totalAmount,
+            TransfersCount = transferMessages.Count()
+        });
+
+        var credential = await _credentialSource.GetCredential();
 
         try
         {
@@ -39,7 +58,6 @@ public class SendTonsConsumer : IConsumer<IPackedSendTons>
 
         await context.PublishBatch(BuildConfirmationMessages(context.Message.Sends));
     }
-
 
     private IEnumerable<ISendTonsCompleted> BuildConfirmationMessages(ISendTons[] sends)
     {

@@ -14,6 +14,7 @@ public class BatchSendTonsConsumer : IConsumer<Batch<ISendTons>>
 
         await context.Send<IPackedSendTons>(endpoint, new
         {
+            CorrelationId = Guid.NewGuid(),
             Transfers = context.Message.Select(x => x.Message)
         });
     }

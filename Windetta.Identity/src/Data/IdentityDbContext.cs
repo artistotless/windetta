@@ -25,7 +25,7 @@ public class IdentityDbContext : IdentityDbContext<User, Role, Guid>
             // If the entity state is Added let's set
             // the  CreatedAt property
             if (entityEntry.State == EntityState.Added)
-                ((AuditableEntity)entityEntry.Entity).Created = DateTime.UtcNow;
+                ((AuditableEntity)entityEntry.Entity).Created = DateTimeOffset.UtcNow;
             else
                 // If the state is Modified then we don't want
                 // to modify the CreatedAt and CreatedAt properties
@@ -34,7 +34,7 @@ public class IdentityDbContext : IdentityDbContext<User, Role, Guid>
 
             // In any case we always want to set the properties
             // LastModifiedAt
-            ((AuditableEntity)entityEntry.Entity).LastModified = DateTime.UtcNow;
+            ((AuditableEntity)entityEntry.Entity).LastModified = DateTimeOffset.UtcNow;
         }
 
         // After we set all the needed properties

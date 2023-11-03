@@ -1,6 +1,8 @@
-﻿namespace Windetta.TonTxns.Domain;
+﻿using Windetta.Common.Types;
 
-public class Transaction
+namespace Windetta.TonTxns.Domain;
+
+public class Transaction : AuditableEntity
 {
     public Guid Id { get; set; }
     public int TransfersCount { get; set; }
