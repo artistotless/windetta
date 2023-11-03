@@ -25,3 +25,20 @@ public class TransferConsumer : IConsumer<ITransferBalance>
         });
     }
 }
+
+public class TransferConsumerDefinition : ConsumerDefinition<TransferConsumer>
+{
+    protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator,
+    IConsumerConfigurator<TransferConsumer> consumerConfigurator, IRegistrationContext context)
+    {
+        consumerConfigurator.UseScheduledRedelivery(r =>
+        {
+            r.Intervals(TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(4), TimeSpan.FromMinutes(10));
+        });
+
+        consumerConfigurator.UseMessageRetry(r =>
+        {
+            r.Interval(retryCount: 3, interval: TimeSpan.FromSeconds(10));
+        });
+    }
+}

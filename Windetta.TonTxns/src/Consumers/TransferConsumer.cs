@@ -1,5 +1,6 @@
 ﻿using MassTransit;
 using Windetta.Contracts.Commands;
+using Windetta.Contracts.Events;
 using Windetta.TonTxns.Infrastructure.Models;
 using Windetta.TonTxns.Infrastructure.Services;
 
@@ -22,6 +23,14 @@ public class TransferConsumer : IConsumer<Batch<ITransferTon>>
         var transferMessages = LoadTransferMessageArray(context.Message);
 
         await _tonService.TransferTon(credential, transferMessages);
+
+        IEnumerable<ITransferTonCompleted> BuildConfirmationMessages()
+        {
+            foreach (var item in context.Message)
+                yield return new TransferTonCompleted(item.Message.CorrelationId);
+        }
+
+        await context.PublishBatch(BuildConfirmationMessages());
     }
 
     private IEnumerable<TransferMessage> LoadTransferMessageArray(Batch<ITransferTon> batch)
@@ -43,3 +52,5 @@ public class TransferConsumerDefinition : ConsumerDefinition<TransferConsumer>
         .SetTimeLimit(TimeSpan.FromSeconds(10)));
     }
 }
+
+public record TransferTonCompleted(Guid CorrelationId) : ITransferTonCompleted;

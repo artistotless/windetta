@@ -27,6 +27,7 @@ public class TonWithdrawFlowStateMachine : MassTransitStateMachine<TonWithdrawFl
         Event(() => BalanceDeducted, x => x.CorrelateById(ctx => ctx.Message.CorrelationId));
         Event(() => TransferTonCompleted, x => x.CorrelateById(ctx => ctx.Message.CorrelationId));
         Event(() => BalanceDeductFailed, x => x.CorrelateById(ctx => ctx.Message.Message.CorrelationId));
+        Event(() => BalanceUnDeductFailed, x => x.CorrelateById(ctx => ctx.Message.Message.CorrelationId));
         Event(() => TransferTonConfirmationPeriodExpired, x => x.CorrelateById(ctx => ctx.Message.CorrelationId));
         Event(() => WithdrawalStatusRequested, x =>
         {
@@ -49,31 +50,29 @@ public class TonWithdrawFlowStateMachine : MassTransitStateMachine<TonWithdrawFl
                 .TransitionTo(BalanceDeductedSuccess)
                 .TransferTon()
                 .Schedule(ExpirationSchedule,
-                ctx => ctx.Init<ITransferTonConfirmationPeriodExpired>(new { CorrelationId = ctx.Saga.CorrelationId })),
+                ctx => ctx.Init<ITransferTonConfirmationPeriodExpired>
+                (new { CorrelationId = ctx.Saga.CorrelationId })),
             When(BalanceDeductFailed)
-                .Then(ctx => { ctx.Saga.FailReason = ctx.Message.Exceptions.FirstOrDefault()?.Message; })
-                .Unschedule(ExpirationSchedule)
+                .SaveError()
                 .TransitionTo(BalanceDeductFail));
 
         During(BalanceDeductedSuccess,
-            When(TransferTonFailed)
-                .Unschedule(ExpirationSchedule)
-                .Then(ctx => { ctx.Saga.FailReason = ctx.Message.Exceptions.FirstOrDefault()?.Message; })
-                .UnDeductFromBalance()
-                .TransitionTo(TransferTonFail));
-
-        DuringAny(
-            When(TransferTonConfirmationPeriodExpired)
-                .PublishAsync(ctx => ctx.Init<ITransferTonConfirmationPeriodExpired>(new
-                {
-                    CorrelationId = ctx.Message.CorrelationId
-                }))
-                .TransitionTo(Expired));
-
-        DuringAny(
             When(TransferTonCompleted)
                 .Unschedule(ExpirationSchedule)
-                .Finalize());
+                .Finalize(),
+            When(TransferTonFailed)
+                .Unschedule(ExpirationSchedule)
+                .SaveError()
+                .UnDeductFromBalance()
+                .TransitionTo(TransferTonFail),
+            When(TransferTonConfirmationPeriodExpired)
+                .NotifyWithdrawalExpired()
+                .TransitionTo(Expired));
+
+        During(TransferTonFail,
+            When(BalanceUnDeductFailed)
+                .NotifyUnDeductBalanceFailed()
+                .TransitionTo(BalanceUnDeductFail));
 
         DuringAny(
             When(WithdrawalStatusRequested)
@@ -83,12 +82,14 @@ public class TonWithdrawFlowStateMachine : MassTransitStateMachine<TonWithdrawFl
     public State AwaitingDeduction { get; set; }
     public State BalanceDeductedSuccess { get; set; }
     public State BalanceDeductFail { get; set; }
+    public State BalanceUnDeductFail { get; set; }
     public State TransferTonFail { get; set; }
     public State Expired { get; set; }
 
     public Event<IWithdrawTonRequested> WithdrawRequested { get; }
     public Event<IBalanceDeducted> BalanceDeducted { get; }
     public Event<Fault<IDeductBalance>> BalanceDeductFailed { get; }
+    public Event<Fault<IUnDeductBalance>> BalanceUnDeductFailed { get; }
     public Event<ITransferTonCompleted> TransferTonCompleted { get; }
     public Event<Fault<ITransferTon>> TransferTonFailed { get; }
     public Event<ITransferTonConfirmationPeriodExpired> TransferTonConfirmationPeriodExpired { get; }
@@ -97,6 +98,7 @@ public class TonWithdrawFlowStateMachine : MassTransitStateMachine<TonWithdrawFl
     public Schedule<TonWithdrawFlow, ITransferTonConfirmationPeriodExpired> ExpirationSchedule { get; }
 }
 
+#region Extension methods
 public static class BalanceWithdrawFlowStateMachineExtensions
 {
     public static EventActivityBinder<TonWithdrawFlow, IWithdrawTonRequested> CopyDataToInstance(
@@ -159,6 +161,45 @@ public static class BalanceWithdrawFlowStateMachineExtensions
         return binder.Respond(ctx => new TonWithdrawalStatus(
             ctx.Saga.Nanotons,
             ctx.Saga.CurrentState,
+            ctx.Saga.Destination,
             ctx.Saga.FailReason));
     }
+
+    public static EventActivityBinder<TonWithdrawFlow, T> SaveError<T>(
+    this EventActivityBinder<TonWithdrawFlow, T> binder) where T : class, Fault
+    {
+        return binder.Then(ctx =>
+        {
+            ctx.Saga.FailReason = ctx.Message.Exceptions.FirstOrDefault()?.Message;
+        });
+    }
+
+    public static EventActivityBinder<TonWithdrawFlow, T> NotifyWithdrawalExpired<T>(
+    this EventActivityBinder<TonWithdrawFlow, T> binder) where T : class
+    {
+        var endpoint = new MyEndpointNameFormatter(Svc.Notifications)
+        .CommandUri<INotifyTonWithdrawalExpired>();
+
+        return binder.SendAsync(endpoint, ctx => ctx.Init<INotifyTonWithdrawalExpired>(new
+        {
+            CorrelationId = ctx.Saga.CorrelationId,
+            Destination = ctx.Saga.Destination,
+            Nanotons = ctx.Saga.Nanotons,
+            UserId = ctx.Saga.UserId
+        }));
+    }
+
+    public static EventActivityBinder<TonWithdrawFlow, T> NotifyUnDeductBalanceFailed<T>(
+    this EventActivityBinder<TonWithdrawFlow, T> binder) where T : class
+    {
+        var endpoint = new MyEndpointNameFormatter(Svc.Notifications)
+        .CommandUri<INotifyUnDeductBalanceFailed>();
+
+        return binder.SendAsync(endpoint, ctx => ctx.Init<INotifyUnDeductBalanceFailed>(new
+        {
+            CorrelationId = ctx.Saga.CorrelationId,
+            UserId = ctx.Saga.UserId
+        }));
+    }
+    #endregion
 }

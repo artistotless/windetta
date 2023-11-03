@@ -2,31 +2,45 @@
 using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
 using Windetta.Wallet.Application.Services;
+using Windetta.Wallet.Consumers;
 
 namespace Windetta.Wallet.Consumers
 {
     public class CreateConsumer : IConsumer<ICreateUserWallet>
     {
         private readonly IUserWalletService _walletService;
-        private readonly IBus _bus;
 
-        public CreateConsumer(IUserWalletService walletService, IBus bus)
+        public CreateConsumer(IUserWalletService walletService)
         {
             _walletService = walletService;
-            _bus = bus;
-        } 
+        }
 
         public async Task Consume(ConsumeContext<ICreateUserWallet> context)
         {
             await _walletService.CreateWalletAsync(context.Message.UserId);
 
-            await _bus.Publish<IUserWalletCreated>(new
+            await context.Publish<IUserWalletCreated>(new
             {
                 UserId = context.Message.UserId,
                 TimeStamp = DateTime.UtcNow,
             });
-
-            await Task.CompletedTask;
         }
+    }
+}
+
+public class CreateConsumerDefinition : ConsumerDefinition<CreateConsumer>
+{
+    protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator,
+    IConsumerConfigurator<CreateConsumer> consumerConfigurator, IRegistrationContext context)
+    {
+        consumerConfigurator.UseScheduledRedelivery(r =>
+        {
+            r.Intervals(TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(4), TimeSpan.FromMinutes(10));
+        });
+
+        consumerConfigurator.UseMessageRetry(r =>
+        {
+            r.Interval(retryCount: 3, interval: TimeSpan.FromSeconds(10));
+        });
     }
 }
