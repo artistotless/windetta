@@ -90,8 +90,8 @@ public class TonWithdrawFlowStateMachine : MassTransitStateMachine<TonWithdrawFl
     public Event<IBalanceDeducted> BalanceDeducted { get; }
     public Event<Fault<IDeductBalance>> BalanceDeductFailed { get; }
     public Event<Fault<IUnDeductBalance>> BalanceUnDeductFailed { get; }
-    public Event<ITransferTonCompleted> TransferTonCompleted { get; }
-    public Event<Fault<ITransferTon>> TransferTonFailed { get; }
+    public Event<ISendTonsCompleted> TransferTonCompleted { get; }
+    public Event<Fault<ISendTons>> TransferTonFailed { get; }
     public Event<ITransferTonConfirmationPeriodExpired> TransferTonConfirmationPeriodExpired { get; }
     public Event<IGetTonWithdrawalStatus> WithdrawalStatusRequested { get; }
 
@@ -145,9 +145,9 @@ public static class BalanceWithdrawFlowStateMachineExtensions
     this EventActivityBinder<TonWithdrawFlow, T> binder) where T : class
     {
         var endpoint = new MyEndpointNameFormatter(Svc.TonTxns)
-           .CommandUri<ITransferTon>();
+           .CommandUri<ISendTons>();
 
-        return binder.SendAsync(endpoint, ctx => ctx.Init<ITransferTon>(new
+        return binder.SendAsync(endpoint, ctx => ctx.Init<ISendTons>(new
         {
             CorrelationId = ctx.Saga.CorrelationId,
             Destination = new TonAddress(ctx.Saga.Destination),

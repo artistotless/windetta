@@ -25,7 +25,7 @@ public class HttpTonService : ITonService
         return long.Parse(balance.ToNano());
     }
 
-    public async Task TransferTon(TonWalletCredential from, IEnumerable<TransferMessage> messages)
+    public async Task SendTons(TonWalletCredential from, IEnumerable<TransferMessage> messages)
     {
         // Create a new preprocessed wallet using the public key
         var wallet = new HighloadV2(new HighloadV2Options

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Windetta.TonTxns.Data;
 
@@ -10,9 +11,11 @@ using Windetta.TonTxns.Data;
 namespace Windetta.TonTxns.Migrations
 {
     [DbContext(typeof(TonDbContext))]
-    partial class TonDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231103123134_AddedTransactionsTable")]
+    partial class AddedTransactionsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

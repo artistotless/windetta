@@ -14,4 +14,9 @@ public static class Errors
         public const string FundsAlreadyHeld = "funds_already_held";
         public const string NotFound = "wallet_notfound";
     }
+
+    public static class TonTxns
+    {
+        public const string TonTransferError = "ton_transfer_error";
+    }
 }

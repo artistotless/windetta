@@ -12,6 +12,6 @@ internal class TonServiceMock : MockInitializator<ITonService>
         mock.Setup(x => x.GetBalance(It.IsAny<TonAddress>()))
             .ReturnsAsync(Random.Shared.Next(0, 100000));
 
-        mock.Setup(x => x.TransferTon(It.IsAny<TonWalletCredential>(), It.IsAny<IEnumerable<TransferMessage>>()));
+        mock.Setup(x => x.SendTons(It.IsAny<TonWalletCredential>(), It.IsAny<IEnumerable<TransferMessage>>()));
     }
 }
