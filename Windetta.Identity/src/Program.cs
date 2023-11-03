@@ -6,8 +6,8 @@ using Windetta.Common.Database;
 using Windetta.Common.MassTransit;
 using Windetta.Common.Redis;
 using Windetta.Common.Types;
-using Windetta.Identity.Data.Seed;
 using Windetta.Identity.Extensions;
+using Windetta.Identity.Infrastructure.Data.Seed;
 using Windetta.Identity.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);

@@ -4,7 +4,7 @@ using Windetta.Common.Constants;
 using Windetta.Common.Database;
 using Windetta.Common.MassTransit;
 using Windetta.Common.Types;
-using Windetta.TonTxns.Data;
+using Windetta.TonTxns.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 var services = builder.Services;

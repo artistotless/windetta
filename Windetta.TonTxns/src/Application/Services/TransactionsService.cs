@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Windetta.TonTxns.Data;
 using Windetta.TonTxns.Domain;
+using Windetta.TonTxns.Infrastructure.Data;
 
 namespace Windetta.TonTxns.Application.Services;
 

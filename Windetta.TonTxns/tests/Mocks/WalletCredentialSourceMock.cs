@@ -1,6 +1,4 @@
-﻿using AutoFixture;
-using Moq;
-using Windetta.Common.Testing;
+﻿using Windetta.Common.Testing;
 using Windetta.TonTxns.Infrastructure.Models;
 using Windetta.TonTxns.Infrastructure.Services;
 
@@ -10,7 +8,7 @@ internal class WalletCredentialSourceMock : MockInitializator<IWalletCredentialS
 {
     protected override void Setup(Mock<IWalletCredentialSource> mock)
     {
-        mock.Setup(x => x.GetCredential())
-            .ReturnsAsync(new Fixture().Create<TonWalletCredential>());
+        mock.Setup(x => x.Value)
+            .Returns(new Fixture().Create<TonWalletCredential>());
     }
 }

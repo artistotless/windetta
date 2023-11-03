@@ -3,7 +3,7 @@ using Shouldly;
 using Windetta.Common.Types;
 using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
-using Windetta.Wallet.Consumers;
+using Windetta.Wallet.Application.Consumers;
 
 namespace Windetta.WalletTests.ConsumersTests;
 

@@ -3,9 +3,9 @@ using System.Data;
 using Windetta.Common.Constants;
 using Windetta.Common.Types;
 using Windetta.Wallet.Application.Dto;
-using Windetta.Wallet.Data;
-using Windetta.Wallet.Data.Specifications;
 using Windetta.Wallet.Domain;
+using Windetta.Wallet.Infrastructure.Data;
+using Windetta.Wallet.Infrastructure.Data.Specifications;
 
 namespace Windetta.Wallet.Application.Services;
 

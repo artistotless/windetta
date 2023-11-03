@@ -1,7 +1,6 @@
 ﻿using Windetta.Common.Types;
 using Windetta.Contracts.Commands;
-using Windetta.Contracts.Events;
-using Windetta.TonTxns.Consumers;
+using Windetta.TonTxns.Application.Consumers;
 using Windetta.TonTxns.Infrastructure.Models;
 using Windetta.TonTxns.Infrastructure.Services;
 

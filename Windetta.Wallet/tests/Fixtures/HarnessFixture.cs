@@ -3,7 +3,7 @@ using MassTransit.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Windetta.Common.Constants;
 using Windetta.Common.MassTransit;
-using Windetta.Wallet.Consumers;
+using Windetta.Wallet.Application.Consumers;
 using Windetta.WalletTests.Mocks;
 
 namespace Windetta.WalletTests;
