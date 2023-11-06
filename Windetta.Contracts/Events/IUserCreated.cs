@@ -1,6 +1,8 @@
-﻿namespace Windetta.Contracts.Events;
+﻿using Windetta.Common.Messages;
 
-public interface IUserCreated
+namespace Windetta.Contracts.Events;
+
+public interface IUserCreated : IEvent
 {
     public Guid Id { get; set; }
     public string UserName { get; set; }

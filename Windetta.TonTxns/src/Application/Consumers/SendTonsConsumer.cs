@@ -30,6 +30,8 @@ public class SendTonsConsumer : IConsumer<IPackedSendTons>
 
     public async Task Consume(ConsumeContext<IPackedSendTons> context)
     {
+        // TODO: If txn.Status == pending - Search ton transaction by bodyHash,
+        // which should be precalculated here
         if (await _txnService.ExistAsync(context.Message.CorrelationId))
             return;
 
@@ -44,7 +46,10 @@ public class SendTonsConsumer : IConsumer<IPackedSendTons>
             TransfersCount = transferMessages.Count()
         };
 
-        await _txnService.AddAsync(txn);
+        await GetRetryPipeline().ExecuteAsync(async (token) =>
+        {
+            await _txnService.AddAsync(txn);
+        });
 
         try
         {
@@ -60,8 +65,11 @@ public class SendTonsConsumer : IConsumer<IPackedSendTons>
 
         await context.PublishBatch(BuildConfirmationMessages(context.Message.Sends));
 
-        txn.Status = TransactionStatus.Confirmed;
-        await _txnService.UpdateAsync(txn);
+        await GetRetryPipeline().ExecuteAsync(async (token) =>
+        {
+            txn.Status = TransactionStatus.Confirmed;
+            await _txnService.UpdateAsync(txn);
+        });
     }
 
     private static ResiliencePipeline GetRetryPipeline()

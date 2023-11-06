@@ -9,13 +9,13 @@ public class BatchSendTonsConsumer : IConsumer<Batch<ISendTons>>
 {
     public async Task Consume(ConsumeContext<Batch<ISendTons>> context)
     {
-        var endpoint = new MyEndpointNameFormatter(Svc.TonTxns)
-        .CommandUri<IPackedSendTons>();
+        var endpoint = MyEndpointNameFormatter
+        .CommandUri<IPackedSendTons>(Svc.TonTxns);
 
         await context.Send<IPackedSendTons>(endpoint, new
         {
             CorrelationId = Guid.NewGuid(),
-            Transfers = context.Message.Select(x => x.Message)
+            Sends = context.Message.Select(x => x.Message)
         });
     }
 }

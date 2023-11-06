@@ -13,30 +13,11 @@ public class SmartContractTests
 {
     private readonly TonClient _client;
     private const uint sub_wallet_id = 698983191;
-    private const string _dest = "EQCBvjU7mYLJQCIEtJGOiUWxmW0NI1Gn-1zzyTJ5zRBtLoLV";
+    private const string _dest = "EQBWfV4S6FXo-EJzSd8QhE7XsmiwxXSsSSBXSC3x8t2KwuVa";
 
     public SmartContractTests(TonClientFixture tonClientFixture)
     {
         _client = tonClientFixture.Client;
-    }
-
-    [Fact]
-    public async Task DeployHighloadV1Custom()
-    {
-        var mn = new Mnemonic(new[] { "better", "air", "abstract", "bacon", "bird", "auto", "also", "awkward", "business", "barrel", "between", "boring", "avocado", "assault", "baby", "arch", "baby", "already", "awkward", "boy", "answer", "bonus", "adapt", "ask", });
-        (string publicKey, string privateKey) = mn.GetKeysPair();
-
-        var wallet = new HighloadV1Custom(new()
-        {
-            PublicKey = Convert.FromBase64String(publicKey),
-            SubwalletId = sub_wallet_id,
-            Workchain = 0
-        });
-
-        var deployMessage = wallet.CreateDeployMessage()
-        .Sign(Convert.FromBase64String(privateKey), false);
-
-        (await _client.SendBoc(deployMessage.Cell!)).Type.ToLower().ShouldBe("ok");
     }
 
     [Fact]
@@ -56,7 +37,7 @@ public class SmartContractTests
 
         var transferMessage = wallet.CreateTransferMessage(new[]
         {
-            CreateIntTransferMessage(_dest,new Coins(0.001),1),
+            CreateIntTransferMessage(_dest, new Coins(0.001),1),
         }, seqno).Sign(Convert.FromBase64String(privateKey));
 
         (await _client.SendBoc(transferMessage.Cell!)).Type.ToLower().ShouldBe("ok");

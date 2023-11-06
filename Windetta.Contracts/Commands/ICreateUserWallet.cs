@@ -1,6 +1,8 @@
-﻿namespace Windetta.Contracts.Commands;
+﻿using Windetta.Common.Messages;
 
-public interface ICreateUserWallet
+namespace Windetta.Contracts.Commands;
+
+public interface ICreateUserWallet : ICommand
 {
     public Guid UserId { get; set; }
 }

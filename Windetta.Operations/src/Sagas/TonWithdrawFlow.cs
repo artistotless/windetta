@@ -4,7 +4,6 @@ using Windetta.Common.MassTransit;
 using Windetta.Common.Types;
 using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
-using Windetta.Contracts.Queries;
 
 namespace Windetta.Operations.Sagas;
 
@@ -116,8 +115,8 @@ public static class BalanceWithdrawFlowStateMachineExtensions
     public static EventActivityBinder<TonWithdrawFlow, IWithdrawTonRequested> DeductFromBalance(
         this EventActivityBinder<TonWithdrawFlow, IWithdrawTonRequested> binder)
     {
-        var endpoint = new MyEndpointNameFormatter(Svc.Wallet)
-            .CommandUri<IDeductBalance>();
+        var endpoint = MyEndpointNameFormatter
+            .CommandUri<IDeductBalance>(Svc.Wallet);
 
         return binder.SendAsync(endpoint, ctx => ctx.Init<IDeductBalance>(new
         {
@@ -130,8 +129,8 @@ public static class BalanceWithdrawFlowStateMachineExtensions
     public static EventActivityBinder<TonWithdrawFlow, T> UnDeductFromBalance<T>(
      this EventActivityBinder<TonWithdrawFlow, T> binder) where T : class
     {
-        var endpoint = new MyEndpointNameFormatter(Svc.Wallet)
-           .CommandUri<IUnDeductBalance>();
+        var endpoint = MyEndpointNameFormatter
+           .CommandUri<IUnDeductBalance>(Svc.Wallet);
 
         return binder.SendAsync(endpoint, ctx => ctx.Init<IUnDeductBalance>(new
         {
@@ -144,8 +143,8 @@ public static class BalanceWithdrawFlowStateMachineExtensions
     public static EventActivityBinder<TonWithdrawFlow, T> TransferTon<T>(
     this EventActivityBinder<TonWithdrawFlow, T> binder) where T : class
     {
-        var endpoint = new MyEndpointNameFormatter(Svc.TonTxns)
-           .CommandUri<ISendTons>();
+        var endpoint = MyEndpointNameFormatter
+           .CommandUri<ISendTons>(Svc.TonTxns);
 
         return binder.SendAsync(endpoint, ctx => ctx.Init<ISendTons>(new
         {
@@ -177,8 +176,8 @@ public static class BalanceWithdrawFlowStateMachineExtensions
     public static EventActivityBinder<TonWithdrawFlow, T> NotifyWithdrawalExpired<T>(
     this EventActivityBinder<TonWithdrawFlow, T> binder) where T : class
     {
-        var endpoint = new MyEndpointNameFormatter(Svc.Notifications)
-        .CommandUri<INotifyTonWithdrawalExpired>();
+        var endpoint = MyEndpointNameFormatter
+        .CommandUri<INotifyTonWithdrawalExpired>(Svc.Notifications);
 
         return binder.SendAsync(endpoint, ctx => ctx.Init<INotifyTonWithdrawalExpired>(new
         {
@@ -192,8 +191,8 @@ public static class BalanceWithdrawFlowStateMachineExtensions
     public static EventActivityBinder<TonWithdrawFlow, T> NotifyUnDeductBalanceFailed<T>(
     this EventActivityBinder<TonWithdrawFlow, T> binder) where T : class
     {
-        var endpoint = new MyEndpointNameFormatter(Svc.Notifications)
-        .CommandUri<INotifyUnDeductBalanceFailed>();
+        var endpoint = MyEndpointNameFormatter
+            .CommandUri<INotifyUnDeductBalanceFailed>(Svc.Notifications);
 
         return binder.SendAsync(endpoint, ctx => ctx.Init<INotifyUnDeductBalanceFailed>(new
         {

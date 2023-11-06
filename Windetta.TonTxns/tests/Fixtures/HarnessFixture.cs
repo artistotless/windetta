@@ -2,6 +2,7 @@
 using Windetta.Common.Constants;
 using Windetta.Common.MassTransit;
 using Windetta.TonTxns.Application.Consumers;
+using Windetta.TonTxns.Application.Services;
 using Windetta.TonTxns.Infrastructure.Services;
 using Windetta.TonTxnsTests.Mocks;
 
@@ -12,21 +13,24 @@ public class HarnessFixture
     public ITestHarness Harness { get; private set; }
 
     public Mock<ITonService> TonServiceMock { get; private set; }
+    public Mock<ITransactionsService> TxnsServiceMock { get; private set; }
     public Mock<IWalletCredentialSource> WalletCredentialSourceMock { get; private set; }
 
     public HarnessFixture()
     {
         TonServiceMock = new TonServiceMock().Mock;
+        TxnsServiceMock = new TxnsServiceMock().Mock;
         WalletCredentialSourceMock = new WalletCredentialSourceMock().Mock;
 
         var provider = new ServiceCollection()
         .AddSingleton(x => TonServiceMock.Object)
+        .AddScoped(x => TxnsServiceMock.Object)
         .AddSingleton(x => WalletCredentialSourceMock.Object)
         .AddMassTransitTestHarness(cfg =>
         {
             cfg.SetEndpointNameFormatter(new MyEndpointNameFormatter(Svc.TonTxns));
-            cfg.AddConsumer<BatchSendTonsConsumer>(typeof(TestTransferConsumerDefinition));
-
+            cfg.AddConsumer<BatchSendTonsConsumer, TestTransferConsumerDefinition>();
+            cfg.AddConsumer<SendTonsConsumer>();
         }).BuildServiceProvider(true);
 
         Harness = provider.GetRequiredService<ITestHarness>();

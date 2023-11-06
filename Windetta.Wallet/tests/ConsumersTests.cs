@@ -1,8 +1,8 @@
 using MassTransit.Testing;
 using Shouldly;
-using Windetta.Common.Types;
+using Windetta.Common.Constants;
+using Windetta.Common.MassTransit;
 using Windetta.Contracts.Commands;
-using Windetta.Contracts.Events;
 using Windetta.Wallet.Application.Consumers;
 
 namespace Windetta.WalletTests.ConsumersTests;
@@ -17,7 +17,7 @@ public class ConsumersTests : IClassFixture<HarnessFixture>
     }
 
     [Fact]
-    public async Task CreationConsumerShouldRespondsToEvent()
+    public async Task CreateConsumer_ShouldRespondsToEvent()
     {
         // arrange
         var userId = Guid.NewGuid();
@@ -37,28 +37,34 @@ public class ConsumersTests : IClassFixture<HarnessFixture>
     private const string address = "EQCNkSLURL98zKoKQeEoMSCb7uMO5JFWF5CEaJ-f1baspjA2";
 
     [Fact]
-    public async Task WithdrawConsumerShouldRespondsToEvent()
+    public async Task DeductConsumer_ShouldRespondsToEvent()
     {
         // arrange
-        var command = new
+        var command = new DeductBalanceImpl()
         {
-            Destination = TonAddress.Parse(address),
-            Nanotons = 100,
+            CorrelationId = Guid.NewGuid(),
+            Amount = 100,
             UserId = Guid.NewGuid()
         };
 
+        var consumerHarness = _harness.GetConsumerHarness<DeductConsumer>();
+        var endpoint = await _harness.Bus.GetSendEndpoint(
+            MyEndpointNameFormatter.CommandUri<IDeductBalance>(Svc.Wallet));
+
         // act
-        await _harness.Bus.Publish<IWithdrawTonRequested>(command);
+        await endpoint.Send(command);
 
         // assert
-        (await _harness.Published.Any<IWithdrawTonRequested>()).ShouldBeTrue();
-
-        var consumerHarness = _harness.GetConsumerHarness<DeductConsumer>();
-
-        (await consumerHarness.Consumed.Any<IWithdrawTonRequested>(
-        x => x.Context.Message.UserId == command.UserId &&
-        x.Context.Message.Nanotons == command.Nanotons &&
-        x.Context.Message.Destination == command.Destination))
+        (await _harness.Sent.Any<IDeductBalance>()).ShouldBeTrue();
+        (await consumerHarness.Consumed.Any<IDeductBalance>(
+        x => x.Context.Message.CorrelationId == command.CorrelationId))
         .ShouldBeTrue();
     }
+}
+
+public class DeductBalanceImpl : IDeductBalance
+{
+    public Guid UserId { get; set; }
+    public long Amount { get; set; }
+    public Guid CorrelationId { get; set; }
 }
