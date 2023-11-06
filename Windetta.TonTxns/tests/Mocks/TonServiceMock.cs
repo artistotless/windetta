@@ -1,7 +1,7 @@
 ﻿using Windetta.Common.Testing;
 using Windetta.Common.Types;
+using Windetta.TonTxns.Application.Services;
 using Windetta.TonTxns.Infrastructure.Models;
-using Windetta.TonTxns.Infrastructure.Services;
 
 namespace Windetta.TonTxnsTests.Mocks;
 

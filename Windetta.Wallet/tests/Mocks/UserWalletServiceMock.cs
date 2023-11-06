@@ -1,6 +1,4 @@
-﻿using AutoFixture;
-using Moq;
-using Windetta.Common.Testing;
+﻿using Windetta.Common.Testing;
 using Windetta.Wallet.Application.Dto;
 using Windetta.Wallet.Application.Services;
 

@@ -53,10 +53,8 @@ public class MyEndpointNameFormatter : DefaultEndpointNameFormatter
 
     public static Uri CommandUri<T>(string serviceName)
     {
-        var fullMessageName = $"{typeof(T).FullName}";
+        var queueName = $"{serviceName.ToLower()}.command.consumer-{typeof(T).Name}";
 
-        var queueName = $"{serviceName}.consumer-{fullMessageName}".ToLowerInvariant();
-
-        return new Uri($"exchange:{queueName}");
+        return new Uri($"queue:{queueName}");
     }
 }

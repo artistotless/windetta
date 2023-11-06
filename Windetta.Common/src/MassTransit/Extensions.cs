@@ -1,5 +1,6 @@
 ﻿using MassTransit;
 using MassTransit.Metadata;
+using MassTransit.SagaStateMachine;
 using MassTransit.Util;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -62,6 +63,18 @@ public static class Extensions
     private interface IFormatterWrapper
     {
         public string Consume();
+    }
+
+    public static EventActivityBinder<TSaga, TData> SendCommandAsync<TSaga, TData, TMessage>(this EventActivityBinder<TSaga, TData> source,
+            string serviceName, Func<BehaviorContext<TSaga, TData>, Task<SendTuple<TMessage>>> messageFactory,
+            Action<SendContext<TMessage>> callback = null)
+            where TSaga : class, SagaStateMachineInstance
+            where TData : class
+            where TMessage : class
+    {
+        var endpoint = MyEndpointNameFormatter.CommandUri<TMessage>(serviceName);
+
+        return source.Add(new SendActivity<TSaga, TData, TMessage>(_ => endpoint, MessageFactory<TMessage>.Create(messageFactory, callback)));
     }
 
     private class FormatterWrapper<T> : IFormatterWrapper where T : class, IConsumer

@@ -97,6 +97,17 @@ public class TonWithdrawFlowStateMachine : MassTransitStateMachine<TonWithdrawFl
     public Schedule<TonWithdrawFlow, ITransferTonConfirmationPeriodExpired> ExpirationSchedule { get; }
 }
 
+public class TonWithdrawFlowDefinition : SagaDefinition<TonWithdrawFlow>
+{
+    protected override void ConfigureSaga(
+        IReceiveEndpointConfigurator endpointConfigurator,
+        ISagaConfigurator<TonWithdrawFlow> sagaConfigurator,
+        IRegistrationContext context)
+    {
+        sagaConfigurator.UseInMemoryOutbox(context);
+    }
+}
+
 #region Extension methods
 public static class BalanceWithdrawFlowStateMachineExtensions
 {
@@ -115,10 +126,7 @@ public static class BalanceWithdrawFlowStateMachineExtensions
     public static EventActivityBinder<TonWithdrawFlow, IWithdrawTonRequested> DeductFromBalance(
         this EventActivityBinder<TonWithdrawFlow, IWithdrawTonRequested> binder)
     {
-        var endpoint = MyEndpointNameFormatter
-            .CommandUri<IDeductBalance>(Svc.Wallet);
-
-        return binder.SendAsync(endpoint, ctx => ctx.Init<IDeductBalance>(new
+        return binder.SendCommandAsync(Svc.Wallet, ctx => ctx.Init<IDeductBalance>(new
         {
             Amount = ctx.Message.Nanotons,
             CorrelationId = ctx.Message.CorrelationId,
@@ -129,10 +137,7 @@ public static class BalanceWithdrawFlowStateMachineExtensions
     public static EventActivityBinder<TonWithdrawFlow, T> UnDeductFromBalance<T>(
      this EventActivityBinder<TonWithdrawFlow, T> binder) where T : class
     {
-        var endpoint = MyEndpointNameFormatter
-           .CommandUri<IUnDeductBalance>(Svc.Wallet);
-
-        return binder.SendAsync(endpoint, ctx => ctx.Init<IUnDeductBalance>(new
+        return binder.SendCommandAsync(Svc.Wallet, ctx => ctx.Init<IUnDeductBalance>(new
         {
             CorrelationId = ctx.Saga.CorrelationId,
             UserId = ctx.Saga.UserId,
@@ -143,10 +148,7 @@ public static class BalanceWithdrawFlowStateMachineExtensions
     public static EventActivityBinder<TonWithdrawFlow, T> TransferTon<T>(
     this EventActivityBinder<TonWithdrawFlow, T> binder) where T : class
     {
-        var endpoint = MyEndpointNameFormatter
-           .CommandUri<ISendTons>(Svc.TonTxns);
-
-        return binder.SendAsync(endpoint, ctx => ctx.Init<ISendTons>(new
+        return binder.SendCommandAsync(Svc.TonTxns, ctx => ctx.Init<ISendTons>(new
         {
             CorrelationId = ctx.Saga.CorrelationId,
             Destination = new TonAddress(ctx.Saga.Destination),
@@ -176,10 +178,7 @@ public static class BalanceWithdrawFlowStateMachineExtensions
     public static EventActivityBinder<TonWithdrawFlow, T> NotifyWithdrawalExpired<T>(
     this EventActivityBinder<TonWithdrawFlow, T> binder) where T : class
     {
-        var endpoint = MyEndpointNameFormatter
-        .CommandUri<INotifyTonWithdrawalExpired>(Svc.Notifications);
-
-        return binder.SendAsync(endpoint, ctx => ctx.Init<INotifyTonWithdrawalExpired>(new
+        return binder.SendCommandAsync(Svc.Notifications, ctx => ctx.Init<INotifyTonWithdrawalExpired>(new
         {
             CorrelationId = ctx.Saga.CorrelationId,
             Destination = ctx.Saga.Destination,
@@ -191,10 +190,7 @@ public static class BalanceWithdrawFlowStateMachineExtensions
     public static EventActivityBinder<TonWithdrawFlow, T> NotifyUnDeductBalanceFailed<T>(
     this EventActivityBinder<TonWithdrawFlow, T> binder) where T : class
     {
-        var endpoint = MyEndpointNameFormatter
-            .CommandUri<INotifyUnDeductBalanceFailed>(Svc.Notifications);
-
-        return binder.SendAsync(endpoint, ctx => ctx.Init<INotifyUnDeductBalanceFailed>(new
+        return binder.SendCommandAsync(Svc.Notifications, ctx => ctx.Init<INotifyUnDeductBalanceFailed>(new
         {
             CorrelationId = ctx.Saga.CorrelationId,
             UserId = ctx.Saga.UserId

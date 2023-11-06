@@ -1,4 +1,5 @@
 ﻿using Windetta.Common.Types;
+using Windetta.TonTxns.Application.Services;
 
 namespace Windetta.TonTxns.Infrastructure.Services;
 

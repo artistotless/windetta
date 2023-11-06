@@ -1,4 +1,5 @@
 ﻿using TonSdk.Client;
+using Windetta.TonTxns.Application.Services;
 using Windetta.TonTxns.Infrastructure.Services;
 
 namespace Windetta.TonTxns.Extensions;

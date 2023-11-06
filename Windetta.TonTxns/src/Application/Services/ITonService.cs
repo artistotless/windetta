@@ -1,7 +1,7 @@
 ﻿using Windetta.Common.Types;
 using Windetta.TonTxns.Infrastructure.Models;
 
-namespace Windetta.TonTxns.Infrastructure.Services;
+namespace Windetta.TonTxns.Application.Services;
 
 public interface ITonService : IScopedService
 {

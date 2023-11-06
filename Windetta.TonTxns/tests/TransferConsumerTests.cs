@@ -2,7 +2,6 @@
 using Windetta.Contracts.Commands;
 using Windetta.TonTxns.Application.Consumers;
 using Windetta.TonTxns.Application.Services;
-using Windetta.TonTxns.Infrastructure.Services;
 
 namespace Windetta.TonTxnsTests;
 
