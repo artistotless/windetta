@@ -1,5 +1,4 @@
-﻿using MassTransit;
-using Windetta.Contracts.Events;
+﻿using Windetta.Contracts.Events;
 
 namespace Windetta.Identity.Messages.Events;
 

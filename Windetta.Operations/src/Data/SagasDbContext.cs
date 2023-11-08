@@ -15,6 +15,7 @@ public class UserRegistrationMap : SagaClassMap<NewUserFlow>
         entity.HasIndex(x => x.CorrelationId);
     }
 }
+
 public class SagasDbContext : SagaDbContext
 {
     public SagasDbContext(DbContextOptions options) : base(options) { }

@@ -2,7 +2,7 @@
 
 namespace Windetta.Wallet.Application.Dto;
 
-public record DeductArgument(Guid userId, long amount): IHasOperationId
+public record DeductArgument(Guid userId, int currencyId, long amount) : IHasOperationId
 {
     public Guid OperationId { get; init; }
 }

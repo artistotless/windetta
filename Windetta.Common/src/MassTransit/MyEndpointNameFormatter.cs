@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using Windetta.Common.Messages;
 
 namespace Windetta.Common.MassTransit;
 
@@ -33,18 +34,26 @@ public class MyEndpointNameFormatter : DefaultEndpointNameFormatter
         if (messageType.IsGenericType && messageType.GetGenericTypeDefinition() == typeof(Batch<>))
             genericArgumentType = messageType.GenericTypeArguments[0];
 
-        var fullMessageName = $"{genericArgumentType.FullName}";
+        if (!genericArgumentType.IsAssignableTo(typeof(IMessage)))
+            throw new InvalidCastException("Specify the message as 'IEvent' or 'ICommand'");
 
-        var queueName = $"{_defaultNamespace}.consumer-{fullMessageName}".ToLowerInvariant();
+        var consumerName = string.Empty;
 
-        return queueName;
+        if (genericArgumentType.IsAssignableTo(typeof(ICommand)))
+        {
+            consumerName = $"command.consumer";
+        }
+        else if (genericArgumentType.IsAssignableTo(typeof(IEvent)))
+        {
+            consumerName = $"event.consumer.{typeof(T).Name.Replace("Consumer", string.Empty)}";
+        }
+
+        return $"{_defaultNamespace.ToLower()}.{consumerName.ToLower()}-{genericArgumentType.Name}";
     }
 
-    public Uri CommandUri<T>()
+    public static Uri CommandUri<T>(string serviceName)
     {
-        var fullMessageName = $"{typeof(T).FullName}";
-
-        var queueName = $"{_defaultNamespace}.consumer-{fullMessageName}".ToLowerInvariant();
+        var queueName = $"{serviceName.ToLower()}.command.consumer-{typeof(T).Name}";
 
         return new Uri($"queue:{queueName}");
     }

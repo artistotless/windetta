@@ -1,11 +1,11 @@
 ﻿using Windetta.Common.Testing;
 using Windetta.Common.Types;
-using Windetta.TonTxns.Infrastructure.Models;
-using Windetta.TonTxns.Infrastructure.Services;
+using Windetta.TonTxns.Application.Models;
+using Windetta.TonTxns.Application.Services;
 
 namespace Windetta.TonTxnsTests.Mocks;
 
-internal class TonServiceMock : MockInitializator<ITonService>
+public class TonServiceMock : MockInitializator<ITonService>
 {
     protected override void Setup(Mock<ITonService> mock)
     {

@@ -1,6 +1,8 @@
-﻿namespace Windetta.Contracts.Events;
+﻿using Windetta.Common.Messages;
 
-public interface IUserEmailConfirmed
+namespace Windetta.Contracts.Events;
+
+public interface IUserEmailConfirmed : IEvent
 {
     public Guid UserId { get; set; }
 }

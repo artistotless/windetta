@@ -1,6 +1,8 @@
-﻿namespace Windetta.Contracts.Commands;
+﻿using Windetta.Common.Messages;
 
-public interface INotifyUserCreated
+namespace Windetta.Contracts.Commands;
+
+public interface INotifyUserCreated : ICommand
 {
     public Guid UserId { get; set; }
     public string Email { get; set; }

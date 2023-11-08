@@ -14,10 +14,10 @@ public class WalletsController : ControllerBase
     }
 
     [HttpGet]
-    [Route("{userId:guid}/balance")]
-    public async Task<IActionResult> GetBalance(Guid userId)
+    [Route("{userId:guid}/balances/{currencyId:int}")]
+    public async Task<IActionResult> GetBalance(Guid userId, int currencyId)
     {
-        var balance = await _walletService.GetBalance(userId);
+        var balance = await _walletService.GetBalance(userId, currencyId);
 
         return Ok(balance);
     }

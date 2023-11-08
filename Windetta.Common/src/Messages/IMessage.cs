@@ -1,4 +1,7 @@
-﻿namespace Windetta.Common.Messages;
+﻿using MassTransit;
 
-// Marker interface
+namespace Windetta.Common.Messages;
+
+// marker interface
+[ExcludeFromTopology]
 public interface IMessage { }

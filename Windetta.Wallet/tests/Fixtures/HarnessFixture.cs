@@ -3,25 +3,30 @@ using MassTransit.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Windetta.Common.Constants;
 using Windetta.Common.MassTransit;
-using Windetta.Wallet.Consumers;
+using Windetta.Wallet.Application.Services;
+using Windetta.Wallet.Infrastructure.Consumers;
 using Windetta.WalletTests.Mocks;
 
 namespace Windetta.WalletTests;
 
 public class HarnessFixture
 {
+    public Mock<IUserWalletService> UserWalletServiceMock { get; private set; }
     public ITestHarness Harness { get; private set; }
 
     public HarnessFixture()
     {
-        var services = new ServiceCollection()
-        .AddScoped(x => new UserWalletServiceMock().Mock.Object)
-        .AddMassTransitTestHarness(cfg =>
-        {
-            cfg.SetEndpointNameFormatter(new MyEndpointNameFormatter(Svc.Wallet));
-            cfg.AddConsumers(typeof(CreateConsumer).Assembly);
+        UserWalletServiceMock = new UserWalletServiceMock().Mock;
 
-        }).BuildServiceProvider(true);
+        var services = new ServiceCollection()
+       .AddSingleton(UserWalletServiceMock)
+       .AddScoped(x => UserWalletServiceMock.Object)
+       .AddMassTransitTestHarness(cfg =>
+       {
+           cfg.SetEndpointNameFormatter(new MyEndpointNameFormatter(Svc.Wallet));
+           cfg.AddConsumers(typeof(CreateConsumer).Assembly);
+
+       }).BuildServiceProvider(true);
 
         Harness = services.GetRequiredService<ITestHarness>();
         Harness.Start().GetAwaiter().GetResult();

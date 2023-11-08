@@ -10,8 +10,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
 using Windetta.Common.Database;
 using Windetta.Common.Options;
-using Windetta.Identity.Data;
 using Windetta.Identity.Domain.Entities;
+using Windetta.Identity.Infrastructure.Data;
 using Windetta.Identity.Services;
 
 namespace Windetta.Identity.Extensions;

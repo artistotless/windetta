@@ -13,6 +13,7 @@ public static class Errors
         public const string FundsNotEnough = "funds_not_enough";
         public const string FundsAlreadyHeld = "funds_already_held";
         public const string NotFound = "wallet_notfound";
+        public const string BalanceNotFound = "wallet_balance_notfound";
     }
 
     public static class TonTxns

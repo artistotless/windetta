@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Windetta.Common.Constants;
 using Windetta.Common.MassTransit;
-using Windetta.TonTxns.Consumers;
-using Windetta.TonTxns.Infrastructure.Services;
+using Windetta.TonTxns.Application.Services;
+using Windetta.TonTxns.Infrastructure.Consumers;
 using Windetta.TonTxnsTests.Mocks;
 
 namespace Windetta.TonTxnsTests;
@@ -12,25 +12,32 @@ public class HarnessFixture
     public ITestHarness Harness { get; private set; }
 
     public Mock<ITonService> TonServiceMock { get; private set; }
+    public Mock<ITransactionsService> TxnsServiceMock { get; private set; }
     public Mock<IWalletCredentialSource> WalletCredentialSourceMock { get; private set; }
 
-    public HarnessFixture()
+    public static HarnessFixture Create()
     {
-        TonServiceMock = new TonServiceMock().Mock;
-        WalletCredentialSourceMock = new WalletCredentialSourceMock().Mock;
+        var fixure = new HarnessFixture();
+
+        fixure.TonServiceMock = new TonServiceMock().Mock;
+        fixure.TxnsServiceMock = new TxnsServiceMock().Mock;
+        fixure.WalletCredentialSourceMock = new WalletCredentialSourceMock().Mock;
 
         var provider = new ServiceCollection()
-        .AddSingleton(x => TonServiceMock.Object)
-        .AddSingleton(x => WalletCredentialSourceMock.Object)
+        .AddScoped(x => fixure.TonServiceMock.Object)
+        .AddScoped(x => fixure.TxnsServiceMock.Object)
+        .AddScoped(x => fixure.WalletCredentialSourceMock.Object)
         .AddMassTransitTestHarness(cfg =>
         {
             cfg.SetEndpointNameFormatter(new MyEndpointNameFormatter(Svc.TonTxns));
-            cfg.AddConsumer<BatchSendTonsConsumer>(typeof(TestTransferConsumerDefinition));
-
+            cfg.AddConsumer<BatchSendTonsConsumer, TestTransferConsumerDefinition>();
+            cfg.AddConsumer<SendTonsConsumer>();
         }).BuildServiceProvider(true);
 
-        Harness = provider.GetRequiredService<ITestHarness>();
-        Harness.Start().GetAwaiter().GetResult();
+        fixure.Harness = provider.GetRequiredService<ITestHarness>();
+        fixure.Harness.Start().GetAwaiter().GetResult();
+
+        return fixure;
     }
 }
 

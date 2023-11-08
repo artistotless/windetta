@@ -4,8 +4,9 @@ using TonSdk.Contracts.Wallet;
 using TonSdk.Core;
 using TonSdk.Core.Block;
 using Windetta.Common.Types;
-using Windetta.TonTxns.Extensions;
-using Windetta.TonTxns.Infrastructure.Models;
+using Windetta.TonTxns.Application.Models;
+using Windetta.TonTxns.Application.Services;
+using Windetta.TonTxns.Infrastructure.Extensions;
 
 namespace Windetta.TonTxns.Infrastructure.Services;
 
