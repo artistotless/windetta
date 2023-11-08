@@ -6,7 +6,7 @@ namespace Windetta.Wallet.Domain;
 public class UserBalance
 {
     public Guid WalletId { get; init; }
-    public int CurrencyId { get; private set; }
+    public int CurrencyId { get; init; }
     public long Amount { get; private set; } = 0;
     public long HeldAmount { get; private set; } = 0;
 

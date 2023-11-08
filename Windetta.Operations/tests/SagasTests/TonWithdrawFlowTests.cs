@@ -48,7 +48,7 @@ public class TonWithdrawFlowTests : IClassFixture<HarnessFixture>
              stateMachine.AwaitingDeduction);
 
         instance.ShouldNotBeNull();
-        new QuartzTimeAdjustment()
+
         await _harness.OutputTimeline(_output, x => x.Now()); ;
     }
 

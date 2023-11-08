@@ -18,23 +18,15 @@ public class HarnessFixture
     {
         UserWalletServiceMock = new UserWalletServiceMock().Mock;
 
-        var services = new ServiceCollection();
+        var services = new ServiceCollection()
+       .AddSingleton(UserWalletServiceMock)
+       .AddScoped(x => UserWalletServiceMock.Object)
+       .AddMassTransitTestHarness(cfg =>
+       {
+           cfg.SetEndpointNameFormatter(new MyEndpointNameFormatter(Svc.Wallet));
+           cfg.AddConsumers(typeof(CreateConsumer).Assembly);
 
-        services.AddSingleton(UserWalletServiceMock);
-        services
-            .ConfigureMassTransit(
-            Svc.Wallet, cfg =>
-            {
-
-            });
-
-        .AddScoped(x => UserWalletServiceMock.Object)
-        .AddMassTransitTestHarness(cfg =>
-        {
-            cfg.SetEndpointNameFormatter(new MyEndpointNameFormatter(Svc.Wallet));
-            cfg.AddConsumers(typeof(CreateConsumer).Assembly);
-
-        }).BuildServiceProvider(true);
+       }).BuildServiceProvider(true);
 
         Harness = services.GetRequiredService<ITestHarness>();
         Harness.Start().GetAwaiter().GetResult();

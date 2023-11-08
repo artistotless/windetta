@@ -5,8 +5,8 @@ namespace Windetta.Wallet.Domain;
 
 public class UserWallet
 {
-    public Guid UserId { get; set; }
-    public List<UserBalance>? Balances { get; set; }
+    public Guid UserId { get; init; }
+    public List<UserBalance> Balances { get; set; }
 
     public void TransferToWallet(UserWallet to, int currencyId, long amount)
     {
@@ -25,8 +25,8 @@ public class UserWallet
         if (balance is null)
         {
             throw new WindettaException(
-        Errors.Wallet.BalanceNotFound,
-        nameof(Errors.Wallet.BalanceNotFound));
+                Errors.Wallet.BalanceNotFound,
+                nameof(Errors.Wallet.BalanceNotFound));
         }
 
         return balance;

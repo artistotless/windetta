@@ -140,8 +140,6 @@ public static class BalanceWithdrawFlowStateMachineExtensions
         return binder.SendCommandAsync(Svc.Wallet, ctx => ctx.Init<IUnDeductBalance>(new
         {
             CorrelationId = ctx.Saga.CorrelationId,
-            UserId = ctx.Saga.UserId,
-            Amount = ctx.Saga.Nanotons,
         }));
     }
 
