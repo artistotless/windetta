@@ -1,13 +1,14 @@
 ﻿using Windetta.Common.Configuration;
-using Windetta.TonTxns.Infrastructure.Models;
+using Windetta.TonTxns.Application.Models;
+using Windetta.TonTxns.Application.Services;
 
 namespace Windetta.TonTxns.Infrastructure.Services;
 
-public class DefaultCredentialSource : IWalletCredentialSource
+public class CfgCredentialSource : IWalletCredentialSource
 {
     public TonWalletCredential Value { get; set; }
 
-    public DefaultCredentialSource(IConfiguration configuration)
+    public CfgCredentialSource(IConfiguration configuration)
     {
         SetCredential(configuration);
     }

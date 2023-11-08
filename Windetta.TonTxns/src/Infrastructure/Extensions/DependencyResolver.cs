@@ -2,7 +2,7 @@
 using Windetta.TonTxns.Application.Services;
 using Windetta.TonTxns.Infrastructure.Services;
 
-namespace Windetta.TonTxns.Extensions;
+namespace Windetta.TonTxns.Infrastructure.Extensions;
 
 public static class DependencyResolver
 {

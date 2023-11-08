@@ -1,9 +1,9 @@
 ﻿using TonSdk.Contracts.Wallet;
 using TonSdk.Core;
 using TonSdk.Core.Block;
-using Windetta.TonTxns.Infrastructure.Models;
+using Windetta.TonTxns.Application.Models;
 
-namespace Windetta.TonTxns.Extensions;
+namespace Windetta.TonTxns.Infrastructure.Extensions;
 
 public static class Extensions
 {

@@ -1,9 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Windetta.Common.Constants;
 using Windetta.Common.MassTransit;
-using Windetta.TonTxns.Application.Consumers;
 using Windetta.TonTxns.Application.Services;
-using Windetta.TonTxns.Infrastructure.Services;
+using Windetta.TonTxns.Infrastructure.Consumers;
 using Windetta.TonTxnsTests.Mocks;
 
 namespace Windetta.TonTxnsTests;

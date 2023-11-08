@@ -32,7 +32,7 @@ public class ConsumersTests : IClassFixture<HarnessFixture>
         await ShouldRespondsToCommand<ICreateUserWallet, CreateConsumer>(command);
 
         _userWalletServiceMock.Verify(
-            x => x.CreateWalletAsync(It.Is<Guid>(x => x == command.UserId)));
+            x => x.CreateWalletAsync(It.Is<Guid>(x => x == command.UserId), null));
     }
 
     [Fact]
@@ -81,7 +81,7 @@ public class ConsumersTests : IClassFixture<HarnessFixture>
     public async Task UnDeductConsumer_ShouldRespondsToEvent()
     {
         // arrange
-        var command = new Fixture().Create<BalanceOperationImpl>();
+        var command = new Fixture().Create<UnDeductBalanceImpl>();
 
         // act, assert
         await ShouldRespondsToCommand<IUnDeductBalance, UnDeductConsumer>(command);
@@ -136,10 +136,16 @@ public class CreateUserWalletImpl : ICreateUserWallet
     public Guid CorrelationId { get; set; }
 }
 
-public class BalanceOperationImpl : IDeductBalance, IUnDeductBalance, IFundsAdded
+public class BalanceOperationImpl : IDeductBalance, IFundsAdded
 {
     public Guid UserId { get; set; }
     public long Amount { get; set; }
+    public int CurrencyId { get; set; }
+    public Guid CorrelationId { get; set; }
+}
+
+public class UnDeductBalanceImpl : IUnDeductBalance
+{
     public Guid CorrelationId { get; set; }
 }
 
@@ -148,5 +154,6 @@ public class TransferBalanceImpl : ITransferBalance
     public Guid InitiatorUserId { get; set; }
     public Guid DestinationUserId { get; set; }
     public long Amount { get; set; }
+    public int CurrencyId { get; set; }
     public Guid CorrelationId { get; set; }
 }

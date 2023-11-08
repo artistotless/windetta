@@ -1,36 +1,35 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Windetta.TonTxns.Application.DAL;
 using Windetta.TonTxns.Domain;
-using Windetta.TonTxns.Infrastructure.Data;
 
 namespace Windetta.TonTxns.Application.Services;
 
 public class TransactionsService : ITransactionsService
 {
-    private readonly TonDbContext _ctx;
+    private readonly UnitOfWork _uow;
 
-    public TransactionsService(TonDbContext ctx)
+    public TransactionsService(UnitOfWork uow)
     {
-        _ctx = ctx;
+        _uow = uow;
     }
 
     public async Task<bool> ExistAsync(Guid id)
-        => await _ctx.Transactions.AnyAsync(x => x.Id == id);
+        => await _uow.Transactions.ExistAsync(id);
 
     public async Task AddAsync(Transaction transaction)
     {
         transaction.Created = DateTimeOffset.UtcNow;
 
-        _ctx.Transactions.Add(transaction);
+        await _uow.Transactions.AddAsync(transaction);
 
-        await _ctx.SaveChangesAsync();
+        await _uow.SaveChangesAsync();
     }
 
     public async Task UpdateAsync(Transaction transaction)
     {
         transaction.LastModified = DateTimeOffset.UtcNow;
 
-        _ctx.Transactions.Update(transaction);
+        await _uow.Transactions.UpdateAsync(transaction);
 
-        await _ctx.SaveChangesAsync();
+        await _uow.SaveChangesAsync();
     }
 }

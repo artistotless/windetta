@@ -3,7 +3,7 @@ using Windetta.Common.Constants;
 using Windetta.Common.MassTransit;
 using Windetta.Contracts.Commands;
 
-namespace Windetta.TonTxns.Application.Consumers;
+namespace Windetta.TonTxns.Infrastructure.Consumers;
 
 public class BatchSendTonsConsumer : IConsumer<Batch<ISendTons>>
 {

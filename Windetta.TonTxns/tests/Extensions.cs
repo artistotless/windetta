@@ -1,4 +1,4 @@
-﻿using Windetta.TonTxns.Infrastructure.Models;
+﻿using Windetta.TonTxns.Application.Models;
 using Windetta.TonTxnsTests.ConsumersTests;
 
 namespace Windetta.TonTxnsTests;

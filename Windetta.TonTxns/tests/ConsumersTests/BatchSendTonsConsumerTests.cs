@@ -1,5 +1,6 @@
 ﻿using Windetta.Common.Types;
 using Windetta.Contracts.Commands;
+using Windetta.TonTxns.Infrastructure.Consumers;
 
 namespace Windetta.TonTxnsTests.ConsumersTests;
 
@@ -17,7 +18,7 @@ public class BatchSendTonsConsumerTests : IClassFixture<HarnessFixture>
     {
         // arrange
         var exptectedCount = 30;
-        var consumerHarness = _fixture.Harness.GetConsumerHarness<TonTxns.Application.Consumers.BatchSendTonsConsumer>();
+        var consumerHarness = _fixture.Harness.GetConsumerHarness<BatchSendTonsConsumer>();
         var transfers = new Fixture().Build<SendTonsImpl>()
             .With(x => x.Destination, new TonAddress("EQCBvjU7mYLJQCIEtJGOiUWxmW0NI1Gn-1zzyTJ5zRBtLoLV"))
             .CreateMany(exptectedCount);

@@ -3,9 +3,9 @@ using Windetta.Common.MassTransit;
 using Windetta.Common.Types;
 using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
-using Windetta.TonTxns.Application.Consumers;
+using Windetta.TonTxns.Application.Models;
 using Windetta.TonTxns.Domain;
-using Windetta.TonTxns.Infrastructure.Models;
+using Windetta.TonTxns.Infrastructure.Consumers;
 using Windetta.TonTxnsTests.Mocks;
 
 namespace Windetta.TonTxnsTests.ConsumersTests;

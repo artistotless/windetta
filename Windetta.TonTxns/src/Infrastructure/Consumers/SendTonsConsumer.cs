@@ -3,12 +3,11 @@ using MassTransit.Events;
 using Polly;
 using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
+using Windetta.TonTxns.Application.Models;
 using Windetta.TonTxns.Application.Services;
 using Windetta.TonTxns.Domain;
-using Windetta.TonTxns.Infrastructure.Models;
-using Windetta.TonTxns.Infrastructure.Services;
 
-namespace Windetta.TonTxns.Application.Consumers;
+namespace Windetta.TonTxns.Infrastructure.Consumers;
 
 public class SendTonsConsumer : IConsumer<IPackedSendTons>
 {
