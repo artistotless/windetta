@@ -1,37 +1,37 @@
 ﻿using MassTransit;
+using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
-using Windetta.Wallet.Application.Consumers;
-using Windetta.Wallet.Application.Dto;
 using Windetta.Wallet.Application.Services;
+using Windetta.Wallet.Infrastructure.Consumers;
 
-namespace Windetta.Wallet.Application.Consumers
+namespace Windetta.Wallet.Infrastructure.Consumers
 {
-    public class TopUpConsumer : IConsumer<IFundsAdded>
+    public class CreateConsumer : IConsumer<ICreateUserWallet>
     {
         private readonly IUserWalletService _walletService;
 
-        public TopUpConsumer(IUserWalletService walletService)
+        public CreateConsumer(IUserWalletService walletService)
         {
             _walletService = walletService;
         }
 
-        public async Task Consume(ConsumeContext<IFundsAdded> context)
+        public async Task Consume(ConsumeContext<ICreateUserWallet> context)
         {
-            var userId = context.Message.UserId;
-            var nanotons = context.Message.Amount;
+            await _walletService.CreateWalletAsync(context.Message.UserId);
 
-            await _walletService.TopUpBalance(new TopUpArgument(userId, nanotons)
+            await context.Publish<IUserWalletCreated>(new
             {
-                OperationId = context.Message.CorrelationId,
+                context.Message.UserId,
+                TimeStamp = DateTime.UtcNow,
             });
         }
     }
 }
 
-public class TopUpConsumerDefinition : ConsumerDefinition<TopUpConsumer>
+public class CreateConsumerDefinition : ConsumerDefinition<CreateConsumer>
 {
     protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator,
-    IConsumerConfigurator<TopUpConsumer> consumerConfigurator, IRegistrationContext context)
+    IConsumerConfigurator<CreateConsumer> consumerConfigurator, IRegistrationContext context)
     {
         consumerConfigurator.UseScheduledRedelivery(r =>
         {

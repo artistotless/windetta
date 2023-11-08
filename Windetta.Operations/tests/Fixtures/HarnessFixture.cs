@@ -15,6 +15,14 @@ public class HarnessFixture
         var provider = new ServiceCollection()
         .AddMassTransitTestHarness(cfg =>
         {
+            cfg.AddPublishMessageScheduler();
+
+            cfg.UsingInMemory((context, cfg) =>
+            {
+                cfg.UsePublishMessageScheduler();
+                cfg.ConfigureEndpoints(context);
+            });
+
             cfg.SetEndpointNameFormatter(new MyEndpointNameFormatter(Svc.Operations));
             cfg.AddSagaStateMachines(assembly);
 

@@ -8,4 +8,5 @@ public interface ITransferBalance : CorrelatedBy<Guid>, ICommand
     public Guid InitiatorUserId { get; set; }
     public Guid DestinationUserId { get; set; }
     public long Amount { get; set; }
+    public int CurrencyId { get; set; }
 }

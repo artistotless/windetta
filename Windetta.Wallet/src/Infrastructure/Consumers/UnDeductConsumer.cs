@@ -2,7 +2,7 @@
 using Windetta.Contracts.Commands;
 using Windetta.Wallet.Application.Services;
 
-namespace Windetta.Wallet.Application.Consumers;
+namespace Windetta.Wallet.Infrastructure.Consumers;
 
 public class UnDeductConsumer : IConsumer<IUnDeductBalance>
 {

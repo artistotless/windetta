@@ -2,7 +2,7 @@
 using Windetta.Contracts.Commands;
 using Windetta.Wallet.Application.Services;
 
-namespace Windetta.Wallet.Application.Consumers;
+namespace Windetta.Wallet.Infrastructure.Consumers;
 
 public class DeductConsumer : IConsumer<IDeductBalance>
 {
@@ -17,8 +17,9 @@ public class DeductConsumer : IConsumer<IDeductBalance>
     {
         var userId = context.Message.UserId;
         var value = context.Message.Amount;
+        var currencyId = context.Message.CurrencyId;
 
-        await _walletService.DeductAsync(new(userId, value)
+        await _walletService.DeductAsync(new(userId, currencyId, value)
         {
             OperationId = context.Message.CorrelationId
         });

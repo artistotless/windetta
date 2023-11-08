@@ -1,79 +1,79 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System.Data;
+﻿using System.Data;
 using Windetta.Common.Constants;
 using Windetta.Common.Types;
+using Windetta.Wallet.Application.DAL;
 using Windetta.Wallet.Application.Dto;
 using Windetta.Wallet.Domain;
-using Windetta.Wallet.Infrastructure.Data;
-using Windetta.Wallet.Infrastructure.Data.Specifications;
 
 namespace Windetta.Wallet.Application.Services;
 
 public class UserWalletService : IUserWalletService
 {
-    private readonly WalletDbContext _ctx;
+    private readonly UnitOfWorkCommittable _uow;
 
-    public UserWalletService(WalletDbContext ctx)
+    public UserWalletService(UnitOfWorkCommittable ctx)
     {
-        _ctx = ctx;
+        _uow = ctx;
     }
-    public Task<WalletBalanceDto> GetBalance(Guid userId)
+    public Task<UserBalance> GetBalance(Guid userId, int currencyId)
     {
         throw new NotImplementedException();
     }
 
-    public async Task<WalletInfoDto> CreateWalletAsync(Guid userId)
+    public async Task CreateWalletAsync(Guid userId, IEnumerable<UserBalance>? initial = null)
     {
         var userWallet = new UserWallet()
         {
             UserId = userId,
+            Balances = initial?.ToList()
         };
 
-        var foundWallet = await _ctx.Wallets.FindAsync(userId);
+        var foundWallet = await _uow.Wallets.GetAsync(userId);
 
         if (foundWallet is not null)
-            return new WalletInfoDto(
-                new(foundWallet.Balance, foundWallet.HeldBalance));
+            return;
 
-        _ctx.Wallets.Add(userWallet);
+        await _uow.Wallets.AddAsync(userWallet);
 
-        await _ctx.SaveChangesAsync();
-
-        return new WalletInfoDto(new(0, 0));
+        await _uow.SaveChangesAsync();
     }
 
-    public async Task HoldBalanceAsync(Guid userId, long nanotons)
+    public async Task HoldBalanceAsync(Guid userId, int currencyId, long amount)
     {
-        var wallet = await _ctx.Wallets
-            .FirstOrDefaultAsync(new WalletByUserIdSpec(userId));
+        var wallet = await _uow.Wallets.GetAsync(userId);
 
         if (wallet is null)
             throw new WindettaException(Errors.Wallet.NotFound);
 
-        wallet.HoldBalance(nanotons);
+        var balance = wallet.GetBalance(currencyId);
 
-        await _ctx.SaveChangesAsync();
+        balance.Hold(amount);
+
+        await _uow.SaveChangesAsync();
     }
 
     public async Task TopUpBalance(TopUpArgument arg)
     {
-        if ((await _ctx.Transactions
-            .FindAsync(new TxnByIdSpec(arg.OperationId))) is not null) return;
+        if (await _uow.Transactions
+            .GetAsync(arg.OperationId) is not null) return;
 
-        var wallet = await _ctx.Wallets
-           .FindAsync(new WalletByUserIdSpec(arg.userId));
+        var wallet = await _uow.Wallets.GetAsync(arg.userId);
 
         if (wallet is null)
             throw new WindettaException(Errors.Wallet.NotFound);
 
-        using var transaction = _ctx.Database
-            .BeginTransaction(IsolationLevel.Serializable);
+        var balance = wallet.GetBalance(arg.currencyId);
+
+        //using var transaction = _ctx.Database
+        //    .BeginTransaction(IsolationLevel.Serializable);
+
+        _uow.BeginTransaction(IsolationLevel.Serializable);
 
         try
         {
-            wallet.IncreaseBalance(arg.amount);
+            balance.Increase(arg.amount);
 
-            _ctx.Transactions.Add(new()
+            await _uow.Transactions.AddAsync(new()
             {
                 Id = arg.OperationId,
                 Amount = arg.amount,
@@ -82,38 +82,34 @@ public class UserWalletService : IUserWalletService
                 UserId = arg.userId
             });
 
-            await _ctx.SaveChangesAsync();
+            await _uow.SaveChangesAsync();
 
-            transaction.Commit();
+            _uow.Commit();
         }
         catch
         {
-            transaction.Rollback();
+            _uow.Rollback();
         }
     }
 
     public async Task TransferAsync(TransferArgument arg)
     {
-        if ((await _ctx.Transactions
-            .FindAsync(new TxnByIdSpec(arg.OperationId))) is not null) return;
+        if ((await _uow.Transactions
+            .GetAsync(arg.OperationId)) is not null) return;
 
-        var user1Wallet = await _ctx.Wallets
-            .FindAsync(new WalletByUserIdSpec(arg.userId));
-
-        var user2Wallet = await _ctx.Wallets
-            .FindAsync(new WalletByUserIdSpec(arg.destinationUser));
+        var user1Wallet = await _uow.Wallets.GetAsync(arg.userId);
+        var user2Wallet = await _uow.Wallets.GetAsync(arg.destinationUserId);
 
         if (user1Wallet is null || user2Wallet is null)
             throw new WindettaException(Errors.Wallet.NotFound);
 
-        using var transaction = _ctx.Database
-            .BeginTransaction(IsolationLevel.Serializable);
+        _uow.BeginTransaction(IsolationLevel.Serializable);
 
         try
         {
-            user1Wallet.TransferToWallet(user2Wallet, arg.amount);
+            user1Wallet.TransferToWallet(user2Wallet, arg.currencyId, arg.amount);
 
-            _ctx.Transactions.Add(new()
+            await _uow.Transactions.AddAsync(new()
             {
                 Id = arg.OperationId,
                 Amount = arg.amount,
@@ -122,35 +118,35 @@ public class UserWalletService : IUserWalletService
                 UserId = arg.userId
             });
 
-            await _ctx.SaveChangesAsync();
+            await _uow.SaveChangesAsync();
 
-            transaction.Commit();
+            _uow.Commit();
         }
         catch
         {
-            transaction.Rollback();
+            _uow.Rollback();
         }
     }
 
     public async Task DeductAsync(DeductArgument arg)
     {
-        if ((await _ctx.Transactions
-           .FindAsync(new TxnByIdSpec(arg.OperationId))) is not null) return;
+        if (await _uow.Transactions
+           .GetAsync(arg.OperationId) is not null) return;
 
-        var wallet = await _ctx.Wallets
-            .FindAsync(new WalletByUserIdSpec(arg.userId));
+        var wallet = await _uow.Wallets.GetAsync(arg.userId);
 
         if (wallet is null)
             throw new WindettaException(Errors.Wallet.NotFound);
 
-        using var transaction = _ctx.Database
-            .BeginTransaction(IsolationLevel.Serializable);
+        var balance = wallet.GetBalance(arg.currencyId);
+
+        _uow.BeginTransaction(IsolationLevel.Serializable);
 
         try
         {
-            wallet.DecreaseBalance(arg.amount);
+            balance.Decrease(arg.amount);
 
-            _ctx.Transactions.Add(new()
+            await _uow.Transactions.AddAsync(new()
             {
                 Id = arg.OperationId,
                 Amount = arg.amount,
@@ -159,59 +155,59 @@ public class UserWalletService : IUserWalletService
                 UserId = arg.userId
             });
 
-            await _ctx.SaveChangesAsync();
+            await _uow.SaveChangesAsync();
 
-            transaction.Commit();
+            _uow.Commit();
         }
         catch
         {
-            transaction.Rollback();
+            _uow.Rollback();
         }
     }
 
     public async Task CancelDeductAsync(Guid operationId)
     {
-        var txn = await _ctx.Transactions
-             .FindAsync(new TxnByIdSpec(operationId));
+        var txn = await _uow.Transactions.GetAsync(operationId);
 
         if (txn is null) return;
 
-        var wallet = await _ctx.Wallets
-            .FindAsync(new WalletByUserIdSpec(txn.UserId));
+        var wallet = await _uow.Wallets.GetAsync(txn.UserId);
 
         if (wallet is null)
             throw new WindettaException(Errors.Wallet.NotFound);
 
-        using var transaction = _ctx.Database
-            .BeginTransaction(IsolationLevel.Serializable);
+        var balance = wallet.GetBalance(txn.CurrencyId);
+
+        _uow.BeginTransaction(IsolationLevel.Serializable);
 
         try
         {
-            wallet.IncreaseBalance(txn.Amount);
+            balance.Increase(txn.Amount);
 
             txn.TimeStamp = DateTime.UtcNow;
             txn.Type = TransactionType.CancelWithdrawal;
 
-            await _ctx.SaveChangesAsync();
+            await _uow.SaveChangesAsync();
 
-            transaction.Commit();
+            _uow.Commit();
         }
         catch
         {
-            transaction.Rollback();
+            _uow.Rollback();
         }
     }
 
-    public async Task UnHoldBalanceAsync(Guid userId)
+    public async Task UnHoldBalanceAsync(Guid userId, int currencyId)
     {
-        var wallet = await _ctx.Wallets
-           .FirstOrDefaultAsync(new WalletByUserIdSpec(userId));
+        var wallet = await _uow.Wallets.GetAsync(userId);
 
         if (wallet is null)
             throw new WindettaException(Errors.Wallet.NotFound);
 
-        wallet.UnHoldBalance();
+        var balance = wallet.GetBalance(currencyId);
 
-        await _ctx.SaveChangesAsync();
+        balance.UnHold();
+
+        await _uow.SaveChangesAsync();
     }
 }

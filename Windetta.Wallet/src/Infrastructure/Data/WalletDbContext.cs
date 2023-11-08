@@ -10,6 +10,7 @@ public sealed class WalletDbContext : DbContext
     }
 
     internal DbSet<UserWallet> Wallets { get; set; }
+    internal DbSet<UserBalance> Balances { get; set; }
     internal DbSet<Transaction> Transactions { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -17,18 +18,31 @@ public sealed class WalletDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<UserWallet>()
-            .HasKey(x => x.UserId);
+          .HasKey(x => x.UserId);
 
         modelBuilder.Entity<UserWallet>()
-          .Property(x => x.UserId)
+          .HasMany(x => x.Balances)
+          .WithOne()
+          .HasForeignKey(x => x.WalletId)
+          .IsRequired();
+
+        modelBuilder.Entity<UserWallet>()
+            .Property(x => x.UserId)
+            .HasColumnType("CHAR(36)");
+
+        modelBuilder.Entity<UserBalance>()
+            .HasKey(x => x.WalletId);
+
+        modelBuilder.Entity<UserBalance>()
+          .Property(x => x.WalletId)
           .HasColumnType("CHAR(36)");
 
-        modelBuilder.Entity<UserWallet>()
-          .Property(x => x.HeldBalance)
+        modelBuilder.Entity<UserBalance>()
+          .Property(x => x.HeldAmount)
           .HasColumnType("BIGINT");
 
-        modelBuilder.Entity<UserWallet>()
-          .Property(x => x.Balance)
+        modelBuilder.Entity<UserBalance>()
+          .Property(x => x.Amount)
           .HasColumnType("BIGINT");
 
         modelBuilder.Entity<Transaction>()

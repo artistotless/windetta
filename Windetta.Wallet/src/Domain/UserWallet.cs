@@ -5,46 +5,30 @@ namespace Windetta.Wallet.Domain;
 
 public class UserWallet
 {
-    public Guid UserId { get; init; }
-    public long Balance { get; private set; } // nanotons
-    public long HeldBalance { get; private set; } = 0; // nanotons
+    public Guid UserId { get; set; }
+    public List<UserBalance>? Balances { get; set; }
 
-    #region Business logic
-    public void IncreaseBalance(long amount)
+    public void TransferToWallet(UserWallet to, int currencyId, long amount)
     {
-        Balance += amount;
+        var balanceFrom = GetBalance(currencyId);
+        var balanceTo = to.GetBalance(currencyId);
+
+        balanceFrom?.Decrease(amount);
+        balanceTo?.Increase(amount);
     }
 
-    public void HoldBalance(long amount)
+    public UserBalance GetBalance(int currencyId)
     {
-        if (HeldBalance != 0)
+        var balance = Balances?
+            .FirstOrDefault(x => currencyId == x.CurrencyId);
+
+        if (balance is null)
+        {
             throw new WindettaException(
-                Errors.Wallet.FundsAlreadyHeld, "Funds already held");
+        Errors.Wallet.BalanceNotFound,
+        nameof(Errors.Wallet.BalanceNotFound));
+        }
 
-        HeldBalance = amount;
+        return balance;
     }
-
-    public void TransferToWallet(UserWallet wallet, long amount)
-    {
-        this.DecreaseBalance(amount);
-        wallet.IncreaseBalance(amount);
-    }
-
-    public void UnHoldBalance()
-    {
-        HeldBalance = 0;
-    }
-
-    public void DecreaseBalance(long amount)
-    {
-        if (amount <= 0)
-            return;
-
-        if (Balance - HeldBalance < amount)
-            throw new WindettaException(
-                Errors.Wallet.FundsNotEnough, "Insufficient funds");
-
-        Balance -= amount;
-    }
-    #endregion
 }

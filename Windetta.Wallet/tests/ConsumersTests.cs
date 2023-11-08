@@ -4,9 +4,9 @@ using Windetta.Common.Constants;
 using Windetta.Common.MassTransit;
 using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
-using Windetta.Wallet.Application.Consumers;
 using Windetta.Wallet.Application.Dto;
 using Windetta.Wallet.Application.Services;
+using Windetta.Wallet.Infrastructure.Consumers;
 
 namespace Windetta.WalletTests.ConsumersTests;
 
@@ -119,7 +119,7 @@ public class ConsumersTests : IClassFixture<HarnessFixture>
         var consumerHarness = _harness.GetConsumerHarness<TConsumer>();
 
         // act
-        await _harness.Bus.Publish<TEvent>(@event);
+        await _harness.Bus.Publish(@event);
 
         // assert
         (await _harness.Published.Any<TEvent>()).ShouldBeTrue();

@@ -41,16 +41,16 @@ public class TonWithdrawFlowStateMachine : MassTransitStateMachine<TonWithdrawFl
         Initially(
             When(WithdrawRequested)
                 .CopyDataToInstance()
-                .TransitionTo(AwaitingDeduction)
-                .DeductFromBalance());
+                .DeductFromBalance()
+                .TransitionTo(AwaitingDeduction));
 
         During(AwaitingDeduction,
             When(BalanceDeducted)
-                .TransitionTo(BalanceDeductedSuccess)
                 .TransferTon()
                 .Schedule(ExpirationSchedule,
                 ctx => ctx.Init<ITransferTonConfirmationPeriodExpired>
-                (new { CorrelationId = ctx.Saga.CorrelationId })),
+                (new { CorrelationId = ctx.Saga.CorrelationId }))
+                .TransitionTo(BalanceDeductedSuccess),
             When(BalanceDeductFailed)
                 .SaveError()
                 .TransitionTo(BalanceDeductFail));
@@ -92,7 +92,7 @@ public class TonWithdrawFlowStateMachine : MassTransitStateMachine<TonWithdrawFl
     public Event<ISendTonsCompleted> TransferTonCompleted { get; }
     public Event<Fault<ISendTons>> TransferTonFailed { get; }
     public Event<ITransferTonConfirmationPeriodExpired> TransferTonConfirmationPeriodExpired { get; }
-    public Event<IGetTonWithdrawalStatus> WithdrawalStatusRequested { get; }
+    public Event<ITonWithdrawalStatusRequested> WithdrawalStatusRequested { get; }
 
     public Schedule<TonWithdrawFlow, ITransferTonConfirmationPeriodExpired> ExpirationSchedule { get; }
 }

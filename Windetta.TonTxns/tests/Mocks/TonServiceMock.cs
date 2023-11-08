@@ -5,7 +5,7 @@ using Windetta.TonTxns.Infrastructure.Models;
 
 namespace Windetta.TonTxnsTests.Mocks;
 
-internal class TonServiceMock : MockInitializator<ITonService>
+public class TonServiceMock : MockInitializator<ITonService>
 {
     protected override void Setup(Mock<ITonService> mock)
     {

@@ -16,16 +16,18 @@ public class HarnessFixture
     public Mock<ITransactionsService> TxnsServiceMock { get; private set; }
     public Mock<IWalletCredentialSource> WalletCredentialSourceMock { get; private set; }
 
-    public HarnessFixture()
+    public static HarnessFixture Create()
     {
-        TonServiceMock = new TonServiceMock().Mock;
-        TxnsServiceMock = new TxnsServiceMock().Mock;
-        WalletCredentialSourceMock = new WalletCredentialSourceMock().Mock;
+        var fixure = new HarnessFixture();
+
+        fixure.TonServiceMock = new TonServiceMock().Mock;
+        fixure.TxnsServiceMock = new TxnsServiceMock().Mock;
+        fixure.WalletCredentialSourceMock = new WalletCredentialSourceMock().Mock;
 
         var provider = new ServiceCollection()
-        .AddSingleton(x => TonServiceMock.Object)
-        .AddScoped(x => TxnsServiceMock.Object)
-        .AddSingleton(x => WalletCredentialSourceMock.Object)
+        .AddScoped(x => fixure.TonServiceMock.Object)
+        .AddScoped(x => fixure.TxnsServiceMock.Object)
+        .AddScoped(x => fixure.WalletCredentialSourceMock.Object)
         .AddMassTransitTestHarness(cfg =>
         {
             cfg.SetEndpointNameFormatter(new MyEndpointNameFormatter(Svc.TonTxns));
@@ -33,8 +35,10 @@ public class HarnessFixture
             cfg.AddConsumer<SendTonsConsumer>();
         }).BuildServiceProvider(true);
 
-        Harness = provider.GetRequiredService<ITestHarness>();
-        Harness.Start().GetAwaiter().GetResult();
+        fixure.Harness = provider.GetRequiredService<ITestHarness>();
+        fixure.Harness.Start().GetAwaiter().GetResult();
+
+        return fixure;
     }
 }
 

@@ -2,7 +2,7 @@
 using Windetta.Contracts.Commands;
 using Windetta.Wallet.Application.Services;
 
-namespace Windetta.Wallet.Application.Consumers;
+namespace Windetta.Wallet.Infrastructure.Consumers;
 
 public class TransferConsumer : IConsumer<ITransferBalance>
 {
@@ -18,8 +18,9 @@ public class TransferConsumer : IConsumer<ITransferBalance>
         var userId = context.Message.InitiatorUserId;
         var nanotons = context.Message.Amount;
         var destination = context.Message.DestinationUserId;
+        var currencyId = context.Message.CurrencyId;
 
-        await _walletService.TransferAsync(new(userId, nanotons, destination)
+        await _walletService.TransferAsync(new(userId, currencyId, nanotons, destination)
         {
             OperationId = context.Message.CorrelationId
         });

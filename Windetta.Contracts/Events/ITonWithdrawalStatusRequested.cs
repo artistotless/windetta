@@ -2,9 +2,9 @@
 using Windetta.Common.Messages;
 using Windetta.Common.Types;
 
-namespace Windetta.Contracts.Commands;
+namespace Windetta.Contracts.Events;
 
-public interface IGetTonWithdrawalStatus : CorrelatedBy<Guid>, ICommand
+public interface ITonWithdrawalStatusRequested : CorrelatedBy<Guid>, IEvent
 {
 
 }

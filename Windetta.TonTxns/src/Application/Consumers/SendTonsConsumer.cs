@@ -61,6 +61,8 @@ public class SendTonsConsumer : IConsumer<IPackedSendTons>
         catch (Exception ex)
         {
             await context.PublishBatch(BuildFaultMessages(context, ex));
+
+            return;
         }
 
         await context.PublishBatch(BuildConfirmationMessages(context.Message.Sends));

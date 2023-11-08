@@ -25,7 +25,6 @@ public static class Extensions
         services.AddMassTransit(x =>
         {
             cfg?.Invoke(x);
-
             x.SetEndpointNameFormatter(new MyEndpointNameFormatter(serviceName));
             x.AddSagaStateMachines(assembly);
             x.AddSagas(assembly);

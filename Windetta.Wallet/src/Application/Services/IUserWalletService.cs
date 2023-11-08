@@ -1,14 +1,15 @@
 ﻿using Windetta.Common.Types;
 using Windetta.Wallet.Application.Dto;
+using Windetta.Wallet.Domain;
 
 namespace Windetta.Wallet.Application.Services;
 
 public interface IUserWalletService : IScopedService
 {
-    Task<WalletBalanceDto> GetBalance(Guid userId);
-    Task<WalletInfoDto> CreateWalletAsync(Guid userId);
-    Task HoldBalanceAsync(Guid userId, long amount);
-    Task UnHoldBalanceAsync(Guid userId);
+    Task<UserBalance> GetBalance(Guid userId, int currencyId);
+    Task CreateWalletAsync(Guid userId, IEnumerable<UserBalance>? initial = null);
+    Task HoldBalanceAsync(Guid userId, int currencyId, long amount);
+    Task UnHoldBalanceAsync(Guid userId, int currencyId);
     Task TransferAsync(TransferArgument arg);
     Task DeductAsync(DeductArgument arg);
     Task CancelDeductAsync(Guid operationId);

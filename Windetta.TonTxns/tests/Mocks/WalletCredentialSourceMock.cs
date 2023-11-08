@@ -4,7 +4,7 @@ using Windetta.TonTxns.Infrastructure.Services;
 
 namespace Windetta.TonTxnsTests.Mocks;
 
-internal class WalletCredentialSourceMock : MockInitializator<IWalletCredentialSource>
+public class WalletCredentialSourceMock : MockInitializator<IWalletCredentialSource>
 {
     protected override void Setup(Mock<IWalletCredentialSource> mock)
     {
