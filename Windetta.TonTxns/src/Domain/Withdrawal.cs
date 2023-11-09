@@ -2,10 +2,10 @@
 
 namespace Windetta.TonTxns.Domain;
 
-public class Transaction : AuditableEntity
+public class Withdrawal : AuditableEntity
 {
     public Guid Id { get; set; }
     public int TransfersCount { get; set; }
     public long TotalAmount { get; set; }
-    public TransactionStatus Status { get; set; }
+    public WithdrawalStatus Status { get; set; }
 }

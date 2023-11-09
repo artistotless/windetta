@@ -5,13 +5,10 @@ using Windetta.TonTxns.Application.Services;
 
 namespace Windetta.TonTxnsTests.Mocks;
 
-public class TonServiceMock : MockInitializator<ITonService>
+public class TonServiceMock : MockInitializator<IWithdrawService>
 {
-    protected override void Setup(Mock<ITonService> mock)
+    protected override void Setup(Mock<IWithdrawService> mock)
     {
-        mock.Setup(x => x.GetBalance(It.IsAny<TonAddress>()))
-            .ReturnsAsync(Random.Shared.Next(0, 100000));
-
-        mock.Setup(x => x.SendTons(It.IsAny<TonWalletCredential>(), It.IsAny<IEnumerable<TransferMessage>>()));
+        mock.Setup(x => x.ExecuteWithdraw(It.IsAny<TonWalletCredential>(), It.IsAny<IEnumerable<TransferMessage>>()));
     }
 }

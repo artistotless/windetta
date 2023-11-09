@@ -1,6 +1,6 @@
 ﻿namespace Windetta.TonTxns.Domain;
 
-public enum TransactionStatus
+public enum WithdrawalStatus
 {
     Pending,
     Confirmed

@@ -1,16 +1,14 @@
 ﻿using Microsoft.Extensions.Options;
 using TonSdk.Client;
 using TonSdk.Contracts.Wallet;
-using TonSdk.Core;
 using TonSdk.Core.Block;
-using Windetta.Common.Types;
 using Windetta.TonTxns.Application.Models;
 using Windetta.TonTxns.Application.Services;
 using Windetta.TonTxns.Infrastructure.Extensions;
 
 namespace Windetta.TonTxns.Infrastructure.Services;
 
-public class HttpTonService : ITonService
+public class HttpTonService : IWithdrawService
 {
     private readonly TonClient _client;
 
@@ -19,14 +17,7 @@ public class HttpTonService : ITonService
         _client = new TonClient(parameters.Value);
     }
 
-    public async Task<long> GetBalance(TonAddress address)
-    {
-        Coins balance = await _client.GetBalance(new(address));
-
-        return long.Parse(balance.ToNano());
-    }
-
-    public async Task SendTons(TonWalletCredential from, IEnumerable<TransferMessage> messages)
+    public async Task ExecuteWithdraw(TonWalletCredential from, IEnumerable<TransferMessage> messages)
     {
         // Create a new preprocessed wallet using the public key
         var wallet = new HighloadV2(new HighloadV2Options

@@ -12,6 +12,6 @@ public static class DependencyResolver
         var cfg = provider.GetRequiredService<IConfiguration>();
 
         services.Configure<TonClientParameters>(cfg.GetSection("TonApi"));
-        services.AddScoped<ITonService, HttpTonService>();
+        services.AddScoped<IWithdrawService, HttpTonService>();
     }
 }

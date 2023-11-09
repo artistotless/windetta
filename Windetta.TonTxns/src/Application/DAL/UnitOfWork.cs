@@ -4,7 +4,7 @@ namespace Windetta.TonTxns.Application.DAL;
 
 public interface UnitOfWork
 {
-    public ITransactionsRepository Transactions { get; set; }
+    public IWithdrawalsRepository Withdrawals { get; set; }
 
     public Task SaveChangesAsync();
 }

@@ -1,23 +1,36 @@
-﻿using MassTransit.QuartzIntegration;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Windetta.Common.Constants;
+using Windetta.Common.MassTransit;
 using Windetta.Common.Testing;
 using Windetta.Common.Types;
 using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
 using Windetta.Operations.Sagas;
-using Windetta.TonTxnsTests;
 using Xunit.Abstractions;
 
 namespace Windetta.OperationsTests.Sagas;
 
-public class TonWithdrawFlowTests : IClassFixture<HarnessFixture>
+public class TonWithdrawFlowTests : IUsesHarness
 {
     private readonly ITestHarness _harness;
     private readonly XUnitOutWrapper _output;
 
-    public TonWithdrawFlowTests(HarnessFixture harnessFixture, ITestOutputHelper output)
+    public TonWithdrawFlowTests(ITestOutputHelper output)
     {
-        _harness = harnessFixture.Harness;
+        var services = new ServiceCollection()
+            .ConfigureMassTransit(Svc.TonTxns, this)
+            .BuildServiceProvider();
+
+        _harness = services.GetRequiredService<ITestHarness>();
         _output = new XUnitOutWrapper(output);
+    }
+
+    public Action<IBusRegistrationConfigurator> ConfigureHarness()
+    {
+        return cfg =>
+        {
+            cfg.AddSagaStateMachine<TonWithdrawFlowStateMachine, TonWithdrawFlow>();
+        };
     }
 
     [Fact]
@@ -32,6 +45,7 @@ public class TonWithdrawFlowTests : IClassFixture<HarnessFixture>
             Nanotons = 1_000_000_000L
         };
 
+        await _harness.Start();
         var stateMachineHarness = _harness.GetSagaStateMachineHarness
             <TonWithdrawFlowStateMachine, TonWithdrawFlow>();
         var stateMachine = stateMachineHarness.StateMachine;
@@ -64,6 +78,7 @@ public class TonWithdrawFlowTests : IClassFixture<HarnessFixture>
             Nanotons = 1_000_000_000L
         };
 
+        await _harness.Start();
         var stateMachineHarness = _harness.GetSagaStateMachineHarness
             <TonWithdrawFlowStateMachine, TonWithdrawFlow>();
         var stateMachine = stateMachineHarness.StateMachine;

@@ -1,5 +1,6 @@
 using MassTransit;
 using MassTransit.Testing;
+using Microsoft.Extensions.DependencyInjection;
 using Windetta.Common.Constants;
 using Windetta.Common.MassTransit;
 using Windetta.Contracts.Commands;
@@ -7,19 +8,38 @@ using Windetta.Contracts.Events;
 using Windetta.Wallet.Application.Dto;
 using Windetta.Wallet.Application.Services;
 using Windetta.Wallet.Infrastructure.Consumers;
+using Windetta.WalletTests.Mocks;
 
 namespace Windetta.WalletTests.ConsumersTests;
 
-public class ConsumersTests : IClassFixture<HarnessFixture>
+public class ConsumersTests : IUsesHarness
 {
     private readonly ITestHarness _harness;
 
-    private readonly Mock<IUserWalletService> _userWalletServiceMock;
+    private Mock<IUserWalletService> _walletSvcMock;
 
-    public ConsumersTests(HarnessFixture harnessFixture)
+    public ConsumersTests()
     {
-        _harness = harnessFixture.Harness;
-        _userWalletServiceMock = harnessFixture.UserWalletServiceMock;
+        _walletSvcMock = new UserWalletServiceMock().Mock;
+
+        var services = new ServiceCollection()
+            .AddSingleton(x => _walletSvcMock.Object)
+            .ConfigureMassTransit(Svc.Wallet, this)
+            .BuildServiceProvider();
+
+        _harness = services.GetRequiredService<ITestHarness>();
+    }
+
+    public Action<IBusRegistrationConfigurator> ConfigureHarness()
+    {
+        return cfg =>
+        {
+            cfg.AddConsumer<CreateConsumer>();
+            cfg.AddConsumer<DeductConsumer>();
+            cfg.AddConsumer<UnDeductConsumer>();
+            cfg.AddConsumer<TopUpConsumer>();
+            cfg.AddConsumer<TransferConsumer>();
+        };
     }
 
     [Fact]
@@ -31,7 +51,7 @@ public class ConsumersTests : IClassFixture<HarnessFixture>
         // act, assert
         await ShouldRespondsToCommand<ICreateUserWallet, CreateConsumer>(command);
 
-        _userWalletServiceMock.Verify(
+        _walletSvcMock.Verify(
             x => x.CreateWalletAsync(It.Is<Guid>(x => x == command.UserId), null));
     }
 
@@ -44,7 +64,7 @@ public class ConsumersTests : IClassFixture<HarnessFixture>
         // act, assert
         await ShouldRespondsToCommand<IDeductBalance, DeductConsumer>(command);
 
-        _userWalletServiceMock.Verify(
+        _walletSvcMock.Verify(
             x => x.DeductAsync(
                 It.Is<DeductArgument>(x => x.OperationId == command.CorrelationId)));
     }
@@ -58,7 +78,7 @@ public class ConsumersTests : IClassFixture<HarnessFixture>
         // act, assert
         await ShouldRespondsToEvent<IFundsAdded, TopUpConsumer>(@event);
 
-        _userWalletServiceMock.Verify(
+        _walletSvcMock.Verify(
             x => x.TopUpBalance(
                 It.Is<TopUpArgument>(x => x.OperationId == @event.CorrelationId)));
     }
@@ -72,7 +92,7 @@ public class ConsumersTests : IClassFixture<HarnessFixture>
         // act, assert
         await ShouldRespondsToCommand<ITransferBalance, TransferConsumer>(command);
 
-        _userWalletServiceMock.Verify(
+        _walletSvcMock.Verify(
             x => x.TransferAsync(
                 It.Is<TransferArgument>(x => x.OperationId == command.CorrelationId)));
     }
@@ -86,7 +106,7 @@ public class ConsumersTests : IClassFixture<HarnessFixture>
         // act, assert
         await ShouldRespondsToCommand<IUnDeductBalance, UnDeductConsumer>(command);
 
-        _userWalletServiceMock.Verify(
+        _walletSvcMock.Verify(
             x => x.CancelDeductAsync(
                 It.Is<Guid>(x => x == command.CorrelationId)));
     }
@@ -96,6 +116,7 @@ public class ConsumersTests : IClassFixture<HarnessFixture>
         where TCommand : class, CorrelatedBy<Guid>
     {
         // arrange
+        await _harness.Start();
         var consumerHarness = _harness.GetConsumerHarness<TConsumer>();
 
         var endpoint = await _harness.Bus.GetSendEndpoint(
@@ -116,6 +137,7 @@ public class ConsumersTests : IClassFixture<HarnessFixture>
         where TEvent : class, CorrelatedBy<Guid>
     {
         // arrange
+        await _harness.Start();
         var consumerHarness = _harness.GetConsumerHarness<TConsumer>();
 
         // act
