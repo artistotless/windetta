@@ -9,6 +9,6 @@ public class TonServiceMock : MockInitializator<IWithdrawService>
 {
     protected override void Setup(Mock<IWithdrawService> mock)
     {
-        mock.Setup(x => x.ExecuteWithdraw(It.IsAny<TonWalletCredential>(), It.IsAny<IEnumerable<TransferMessage>>()));
+        mock.Setup(x => x.ExecuteWithdraw(It.IsAny<WalletCredential>(), It.IsAny<IEnumerable<TransferMessage>>()));
     }
 }

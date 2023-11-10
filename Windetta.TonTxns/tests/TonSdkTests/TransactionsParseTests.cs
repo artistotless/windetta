@@ -1,4 +1,5 @@
-﻿using TonSdk.Client;
+﻿using System.Numerics;
+using TonSdk.Client;
 using TonSdk.Core;
 using Windetta.TonTxnsTests.Fixtures;
 
@@ -17,13 +18,32 @@ public class TransactionsParseTests
     }
 
     [Fact]
-    public async Task ParseTxns()
+    public void ParseTxns()
     {
-        var txns = (await _client.GetTransactions(
+        ulong utime = ulong.MaxValue;
+        ulong lt = 989959884457958;
+
+        UInt128 combined = utime;
+        combined <<= 64;
+        combined += lt;
+
+        var span = new Span<byte>(new byte[16]);
+
+        new Span<byte>(((BigInteger)combined)
+            .ToByteArray(isUnsigned: true))
+            .CopyTo(span);
+
+        var guid = new Guid(span);
+
+
+        Span<ulong> part1 = new Span<ulong>();
+
+
+        var txns = (_client.GetTransactions(
             new Address(_dest),
             limit: 100
             //to_lt: 16133341000001
-            )).Where(x => x.IsInitiator);
+            ).Result).Where(x => x.IsInitiator == false);
         ;
     }
 }

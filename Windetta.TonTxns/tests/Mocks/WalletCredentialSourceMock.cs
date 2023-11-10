@@ -9,6 +9,6 @@ public class WalletCredentialSourceMock : MockInitializator<IWalletCredentialSou
     protected override void Setup(Mock<IWalletCredentialSource> mock)
     {
         mock.Setup(x => x.Value)
-            .Returns(new Fixture().Create<TonWalletCredential>());
+            .Returns(new Fixture().Create<WalletCredential>());
     }
 }

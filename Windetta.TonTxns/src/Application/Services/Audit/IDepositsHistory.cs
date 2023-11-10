@@ -2,6 +2,6 @@
 
 public interface IDepositsHistory
 {
-    Task<ulong> GetLastLtAsync();
-    Task UpdateLastLtAsync(ulong lastLt);
+    Task<ulong> GetLastIdAsync();
+    Task UpdateLasIdAsync(ulong lastId);
 }

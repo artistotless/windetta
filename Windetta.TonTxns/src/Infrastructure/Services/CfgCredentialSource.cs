@@ -6,7 +6,7 @@ namespace Windetta.TonTxns.Infrastructure.Services;
 
 public class CfgCredentialSource : IWalletCredentialSource
 {
-    public TonWalletCredential Value { get; set; }
+    public WalletCredential Value { get; set; }
 
     public CfgCredentialSource(IConfiguration configuration)
     {
@@ -15,6 +15,6 @@ public class CfgCredentialSource : IWalletCredentialSource
 
     private void SetCredential(IConfiguration configuration)
     {
-        Value = configuration.GetOptions<TonWalletCredential>(nameof(TonWalletCredential));
+        Value = configuration.GetOptions<WalletCredential>(nameof(WalletCredential));
     }
 }

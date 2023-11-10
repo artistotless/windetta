@@ -2,8 +2,9 @@
 
 public struct Transaction
 {
-    public ulong Lt { get; set; }
+    public ulong Id { get; set; }
+    public ulong TimeStamp { get; set; }
     public string BodyHash { get; set; }
-    public long Nanotons { get; set; }
-    public string Comment { get; set; }
+    public long Amount { get; set; }
+    public string Message { get; set; }
 }

@@ -2,7 +2,7 @@
 
 namespace Windetta.TonTxns.Application.Services;
 
-public interface ITransactionsLoader
+public interface ITransactionMapper
 {
-    Task<IEnumerable<Transaction>?> LoadAsync(ulong lastId);
+    FundsFoundData Map(Transaction txn);
 }

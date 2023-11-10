@@ -98,8 +98,8 @@ public class SendTonsConsumerTests : IUsesHarness
         (await consumer.Consumed.Any<IPackedSendTons>()).ShouldBeTrue();
         txnsServiceMock.Verify(x => x.ExistAsync(command.CorrelationId));
         txnsServiceMock.Verify(x => x.AddAsync(It.Is<Withdrawal>(x => x.Id == command.CorrelationId)));
-        tonServiceMock.Verify(x => x.ExecuteWithdraw(It.IsAny<TonWalletCredential>(), It.IsAny<IEnumerable<TransferMessage>>()));
-        tonServiceMock.Verify(x => x.ExecuteWithdraw(It.IsAny<TonWalletCredential>(), It.IsAny<IEnumerable<TransferMessage>>()));
+        tonServiceMock.Verify(x => x.ExecuteWithdraw(It.IsAny<WalletCredential>(), It.IsAny<IEnumerable<TransferMessage>>()));
+        tonServiceMock.Verify(x => x.ExecuteWithdraw(It.IsAny<WalletCredential>(), It.IsAny<IEnumerable<TransferMessage>>()));
         harness.Published.Select<ISendTonsCompleted>().Count().ShouldBe(sendsCount);
         txnsServiceMock.Verify(x => x.UpdateAsync(It.Is<Withdrawal>(x =>
         x.Id == command.CorrelationId &&

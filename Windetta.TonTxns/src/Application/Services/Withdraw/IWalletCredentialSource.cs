@@ -5,5 +5,5 @@ namespace Windetta.TonTxns.Application.Services;
 
 public interface IWalletCredentialSource : ISingletonService
 {
-    public TonWalletCredential Value { get; set; }
+    public WalletCredential Value { get; set; }
 }

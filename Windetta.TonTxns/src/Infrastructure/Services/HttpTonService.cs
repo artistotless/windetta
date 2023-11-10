@@ -17,7 +17,7 @@ public class HttpTonService : IWithdrawService
         _client = new TonClient(parameters.Value);
     }
 
-    public async Task ExecuteWithdraw(TonWalletCredential from, IEnumerable<TransferMessage> messages)
+    public async Task ExecuteWithdraw(WalletCredential from, IEnumerable<TransferMessage> messages)
     {
         // Create a new preprocessed wallet using the public key
         var wallet = new HighloadV2(new HighloadV2Options
