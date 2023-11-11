@@ -31,7 +31,8 @@ public class TransactionLoader : ITransactionsLoader
             .OrderBy(x => x.Utime)
             .Where(x => x.IsInitiator == false);
 
-        return txns.Select(MapToTransaction);
+        return txns.Select(MapToTransaction)
+            .Where(x => x.Amount > 0);
     }
 
     private ulong? ConvertToLt(Guid id)

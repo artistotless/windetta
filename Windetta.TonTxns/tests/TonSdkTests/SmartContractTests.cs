@@ -2,7 +2,6 @@
 using TonSdk.Contracts.Wallet;
 using TonSdk.Core;
 using TonSdk.Core.Block;
-using TonSdk.Core.Boc;
 using TonSdk.Core.Crypto;
 using Windetta.Common.Ton;
 using Windetta.TonTxnsTests.Fixtures;
@@ -14,7 +13,7 @@ public class SmartContractTests
 {
     private readonly TonClient _client;
     private const uint sub_wallet_id = 698983191;
-    private const string _dest = "kQBWfV4S6FXo-EJzSd8QhE7XsmiwxXSsSSBXSC3x8t2Kwl7Q";
+    private const string _dest = "EQCBvjU7mYLJQCIEtJGOiUWxmW0NI1Gn-1zzyTJ5zRBtLoLV";
 
     public SmartContractTests(TonClientFixture tonClientFixture)
     {
@@ -36,21 +35,9 @@ public class SmartContractTests
 
         var seqno = await _client.Wallet.GetSeqno(wallet.Address) ?? 0;
 
-        if (seqno == 0)
-        {
-            var deployMessage = wallet.CreateDeployMessage()
-                .Sign(Convert.FromBase64String(privateKey));
-            (await _client.SendBoc(deployMessage.Cell!)).Type.ToLower().ShouldBe("ok");
-        }
-
         var transferMessage = wallet.CreateTransferMessage(new[]
         {
-            CreateIntTransferMessage(_dest, new Coins(0.001),1),
-            CreateIntTransferMessage(_dest, new Coins(0.001),1),
-            CreateIntTransferMessage(_dest, new Coins(0.001),1),
-            CreateIntTransferMessage(_dest, new Coins(0.001),1),
-            CreateIntTransferMessage(_dest, new Coins(0.001),1),
-            CreateIntTransferMessage(_dest, new Coins(0.001),1),
+            CreateIntTransferMessage(_dest, new Coins(0.05),64),
         }, seqno).Sign(Convert.FromBase64String(privateKey));
 
         (await _client.SendBoc(transferMessage.Cell!)).Type.ToLower().ShouldBe("ok");
@@ -84,7 +71,9 @@ public class SmartContractTests
                     Value = coins,
                     Bounce = false
                 }),
-                Body = new CellBuilder().StoreUInt(0, 32).StoreString("c96a90c9-7f24-4e8d-83e6-18bb5488fe86").Build()
+                //Body = new CellBuilder()
+                //.StoreUInt(0, 32)
+                //.StoreString("c96a90c9-7f24-4e8d-83e6-18bb5488fe86").Build()
             }),
             Mode = mode
         };

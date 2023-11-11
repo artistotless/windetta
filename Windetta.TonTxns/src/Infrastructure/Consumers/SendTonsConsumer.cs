@@ -55,17 +55,20 @@ public class SendTonsConsumer : IConsumer<IPackedSendTons>
         {
             await GetRetryPipeline().ExecuteAsync(async (token) =>
             {
-                await _tonService.ExecuteWithdraw(_credentialSource.Value, transferMessages);
+                await _tonService.ExecuteWithdraw(
+                    _credentialSource.Value, transferMessages);
             });
         }
         catch (Exception ex)
         {
-            await context.PublishBatch(BuildFaultMessages(context, ex));
+            await context.PublishBatch(
+                BuildFaultMessages(context, ex));
 
             return;
         }
 
-        await context.PublishBatch(BuildConfirmationMessages(context.Message.Sends));
+        await context.PublishBatch(
+            BuildConfirmationMessages(context.Message.Sends));
 
         await GetRetryPipeline().ExecuteAsync(async (token) =>
         {

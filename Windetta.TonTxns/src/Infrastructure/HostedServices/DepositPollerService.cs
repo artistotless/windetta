@@ -1,6 +1,8 @@
 ﻿using MassTransit;
 using Polly;
+using Windetta.Common.Types;
 using Windetta.Contracts;
+using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
 using Windetta.TonTxns.Application.Services;
 
@@ -18,14 +20,14 @@ public class DepositPollerService : BackgroundService
 
     public DepositPollerService(
         ILogger<DepositPollerService> logger,
-        IPublishEndpoint publishEndpoint,
         DepositPoller poller,
-        ICurrencyIdProvider currencyIdProvider)
+        ICurrencyIdProvider currencyIdProvider,
+        IPublishEndpoint publishEndpoint)
     {
         _logger = logger;
         _poller = poller;
-        _publishEndpoint = publishEndpoint;
         _currencyIdProvider = currencyIdProvider;
+        _publishEndpoint = publishEndpoint;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
