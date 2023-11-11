@@ -15,5 +15,5 @@ public class Transaction
     public DateTime TimeStamp { get; set; }
     public TransactionType Type { get; set; }
     public int CurrencyId { get; set; }
-    public long Amount { get; set; }
+    public ulong Amount { get; set; }
 }

@@ -1,7 +1,9 @@
-﻿namespace Windetta.TonTxns.Application.Services.Audit;
+﻿using Windetta.Common.Types;
 
-public interface IDepositsHistory
+namespace Windetta.TonTxns.Application.Services.Audit;
+
+public interface IDepositsHistory : IScopedService
 {
-    Task<ulong> GetLastIdAsync();
-    Task UpdateLasIdAsync(ulong lastId);
+    Task<Guid> GetLastIdAsync();
+    Task UpdateLasIdAsync(Guid lastId);
 }

@@ -1,9 +1,10 @@
-﻿using Windetta.TonTxns.Application.Models;
+﻿using Windetta.Common.Types;
+using Windetta.TonTxns.Application.Models;
 using Windetta.TonTxns.Application.Services.Audit;
 
 namespace Windetta.TonTxns.Application.Services;
 
-public class DepositPoller
+public class DepositPoller : IScopedService
 {
     private readonly IDepositsHistory _history;
     private readonly ITransactionsLoader _loader;
@@ -24,12 +25,12 @@ public class DepositPoller
         var lastId = await _history.GetLastIdAsync();
         var transactions = await _loader.LoadAsync(lastId);
 
-        if (transactions is null)
+        if (transactions is null || transactions.Count() <= 0)
             return new DepositPollResult(new List<FundsFoundData>());
 
         var fundsAddedData = transactions.Select(_mapper.Map);
 
-        lastId = transactions.Max(x => x.Id);
+        lastId = transactions.Last().Id;
         await _history.UpdateLasIdAsync(lastId);
 
         return new DepositPollResult(fundsAddedData);

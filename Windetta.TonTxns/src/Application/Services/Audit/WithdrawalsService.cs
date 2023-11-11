@@ -5,9 +5,9 @@ namespace Windetta.TonTxns.Application.Services.Audit;
 
 public class WithdrawalsService : IWithdrawalsService
 {
-    private readonly UnitOfWork _uow;
+    private readonly IUnitOfWork _uow;
 
-    public WithdrawalsService(UnitOfWork uow)
+    public WithdrawalsService(IUnitOfWork uow)
     {
         _uow = uow;
     }
@@ -15,20 +15,20 @@ public class WithdrawalsService : IWithdrawalsService
     public async Task<bool> ExistAsync(Guid id)
         => await _uow.Withdrawals.ExistAsync(id);
 
-    public async Task AddAsync(Withdrawal transaction)
+    public async Task AddAsync(Withdrawal withdrawal)
     {
-        transaction.Created = DateTimeOffset.UtcNow;
+        withdrawal.Created = DateTimeOffset.UtcNow;
 
-        await _uow.Withdrawals.AddAsync(transaction);
+        await _uow.Withdrawals.AddAsync(withdrawal);
 
         await _uow.SaveChangesAsync();
     }
 
-    public async Task UpdateAsync(Withdrawal transaction)
+    public async Task UpdateAsync(Withdrawal withdrawal)
     {
-        transaction.LastModified = DateTimeOffset.UtcNow;
+        withdrawal.LastModified = DateTimeOffset.UtcNow;
 
-        await _uow.Withdrawals.UpdateAsync(transaction);
+        await _uow.Withdrawals.UpdateAsync(withdrawal);
 
         await _uow.SaveChangesAsync();
     }

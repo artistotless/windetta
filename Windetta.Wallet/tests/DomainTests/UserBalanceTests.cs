@@ -16,7 +16,7 @@ public class UserBalanceTests
         entity.Increase(100);
 
         // assert
-        entity.Amount.ShouldBe(100);
+        entity.Amount.ShouldBe(100uL);
     }
 
     [Fact]
@@ -30,7 +30,7 @@ public class UserBalanceTests
         entity.Decrease(100);
 
         // assert
-        entity.Amount.ShouldBe(300);
+        entity.Amount.ShouldBe(300uL);
     }
 
     [Fact]

@@ -6,7 +6,7 @@ namespace Windetta.Contracts.Commands;
 
 public interface ISendTons : CorrelatedBy<Guid>, ICommand
 {
-    public long Nanotons { get; set; }
+    public ulong Nanotons { get; set; }
     public TonAddress Destination { get; set; }
 }
 

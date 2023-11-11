@@ -9,4 +9,4 @@ public interface ITonWithdrawalStatusRequested : CorrelatedBy<Guid>, IEvent
 
 }
 
-public record TonWithdrawalStatus(long nanotons, int state, TonAddress destination, string? failReason = null);
+public record TonWithdrawalStatus(ulong nanotons, int state, TonAddress destination, string? failReason = null);

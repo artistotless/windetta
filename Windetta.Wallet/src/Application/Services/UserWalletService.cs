@@ -38,7 +38,7 @@ public class UserWalletService : IUserWalletService
         await _uow.SaveChangesAsync();
     }
 
-    public async Task HoldBalanceAsync(Guid userId, int currencyId, long amount)
+    public async Task HoldBalanceAsync(Guid userId, int currencyId, ulong amount)
     {
         var wallet = await _uow.Wallets.GetAsync(userId);
 

@@ -10,7 +10,7 @@ namespace Windetta.Operations.Sagas;
 public class TonWithdrawFlow : SagaStateMachineInstance
 {
     public Guid UserId { get; set; }
-    public long Nanotons { get; set; }
+    public ulong Nanotons { get; set; }
     public TonAddress Destination { get; set; }
     public int CurrentState { get; set; }
     public Guid CorrelationId { get; set; }

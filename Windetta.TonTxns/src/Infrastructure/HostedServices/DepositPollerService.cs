@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using Polly;
 using Windetta.Contracts;
 using Windetta.Contracts.Events;
 using Windetta.TonTxns.Application.Services;
@@ -29,10 +30,10 @@ public class DepositPollerService : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation($"{nameof(DepositPollerService)} running.");
+        _logger.LogInformation($"Running.");
 
         // When the timer should have no due-time, then do the work once now.
-        await PollAsync();
+        await TryPollAsync();
 
         using PeriodicTimer timer = new(TimeSpan.FromSeconds(_executionPeriodSeconds));
 
@@ -40,12 +41,28 @@ public class DepositPollerService : BackgroundService
         {
             while (await timer.WaitForNextTickAsync(stoppingToken))
             {
-                await PollAsync();
+                await TryPollAsync();
             }
         }
         catch (OperationCanceledException)
         {
-            _logger.LogInformation($"{nameof(DepositPollerService)} is stopping.");
+            _logger.LogInformation($"Stopping.");
+        }
+    }
+
+    private async Task TryPollAsync()
+    {
+        try
+        {
+            await GetRetryPipeline().ExecuteAsync(async (token) =>
+            {
+                await PollAsync();
+            });
+        }
+        catch (Exception e)
+        {
+
+            _logger.LogError(e, $"Error when trying to receive deposits");
         }
     }
 
@@ -62,18 +79,33 @@ public class DepositPollerService : BackgroundService
             CorrelationId = x.Id
         });
 
-        await _publishEndpoint.PublishBatch<IFundsAdded>(batchEvents);
+        if (batchEvents.Any())
+        {
+            await _publishEndpoint.PublishBatch<IFundsAdded>(batchEvents);
+            _logger.LogInformation($"Handled new deposits: {batchEvents.Count()}");
+        }
 
         int count = Interlocked.Increment(ref _executionCount);
 
-        _logger.LogInformation($"{nameof(DepositPollerService)} is working. Count: {count}");
+        _logger.LogInformation($"Working. Requests Count: {count}");
+    }
+
+    private static ResiliencePipeline GetRetryPipeline()
+    {
+        return new ResiliencePipelineBuilder()
+            .AddRetry(new()
+            {
+                MaxRetryAttempts = 3,
+                Delay = TimeSpan.FromSeconds(2)
+            })
+            .Build();
     }
 }
 
 public class FundsAddedImpl : IFundsAdded
 {
     public Guid UserId { get; set; }
-    public long Amount { get; set; }
+    public ulong Amount { get; set; }
     public int CurrencyId { get; set; }
     public Guid CorrelationId { get; set; }
 }

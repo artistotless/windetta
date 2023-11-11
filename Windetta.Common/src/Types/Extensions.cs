@@ -23,6 +23,8 @@ public static class Extensions
 
         var implementationServices = allTypes
             .Where(x => x.IsClass)
+            .Where(x => !x.CustomAttributes.Any(
+                x => x.AttributeType == typeof(ExcludeFromAutoInjectAttribute)))
             .Where(x => x.IsAssignableTo(typeof(IServiceLifetime)))
             .Where(x => x.IsAbstract == false)
             .ToList();
@@ -36,19 +38,46 @@ public static class Extensions
 
         foreach (var s in implementationServices)
         {
-            var serviceType = s.FindInterfaces(filter, null).First();
-            var lifetimeType = serviceType.FindInterfaces(filter, null).FirstOrDefault();
+            var serviceType = GetServiceType(s, filter);
+            var lifetimeType = GetLifeTimeType(s, filter);
 
             AddToContainer(builder, lifetimeType, s, serviceType);
         }
     }
 
-    private static void AddToContainer(ContainerBuilder builder, Type? lifetimeType, Type implementationType, Type serviceType)
+    private static Type GetLifeTimeType(Type root, TypeFilter filter)
+    {
+        var cachedType = root;
+        var type = root.FindInterfaces(filter, null).First();
+
+        if (type.FindInterfaces(filter, null).FirstOrDefault() is null)
+            return cachedType;
+
+        return GetLifeTimeType(type, filter);
+    }
+
+    private static Type GetServiceType(Type root, TypeFilter filter)
+        => root.FindInterfaces(filter, null).First();
+
+    private static void AddToContainer(
+        ContainerBuilder builder,
+        Type? lifetimeType,
+        Type implementationType,
+        Type serviceType)
     {
         var registered = builder
-            .RegisterType(implementationType)
-            .IfNotRegistered(serviceType)
-            .As(serviceType);
+            .RegisterType(implementationType);
+
+        if (lifetimeType == serviceType)
+        {
+            registered = registered.AsSelf();
+        }
+        else
+        {
+            registered = registered
+                .IfNotRegistered(serviceType)
+                .As(serviceType);
+        }
 
         // pattern matching
         Action serviceLifeTimeApply = lifetimeType switch

@@ -8,5 +8,5 @@ public interface IWithdrawTonRequested : CorrelatedBy<Guid>, IEvent
 {
     public Guid UserId { get; set; }
     public TonAddress Destination { get; set; }
-    public long Nanotons { get; set; }
+    public ulong Nanotons { get; set; }
 }

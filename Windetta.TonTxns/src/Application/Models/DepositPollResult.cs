@@ -14,5 +14,5 @@ public class FundsFoundData
 {
     public Guid Id { get; set; }
     public Guid UserId { get; set; }
-    public long Amount { get; set; }
+    public ulong Amount { get; set; }
 }

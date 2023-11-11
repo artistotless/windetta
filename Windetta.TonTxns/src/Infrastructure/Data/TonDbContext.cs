@@ -9,11 +9,19 @@ public sealed class TonDbContext : DbContext
     {
     }
 
-    internal DbSet<Withdrawal> Transactions { get; set; }
+    internal DbSet<Withdrawal> Withdrawals { get; set; }
+    internal DbSet<Deposit> Deposits { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Deposit>()
+            .HasKey(x => x.Id);
+
+        modelBuilder.Entity<Deposit>()
+            .Property(x => x.Id)
+            .HasColumnType("CHAR(36)");
 
         modelBuilder.Entity<Withdrawal>()
             .HasKey(x => x.Id);

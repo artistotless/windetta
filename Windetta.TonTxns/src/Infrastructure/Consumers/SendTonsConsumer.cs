@@ -36,7 +36,7 @@ public class SendTonsConsumer : IConsumer<IPackedSendTons>
             return;
 
         var transferMessages = LoadTransferMessageArray(context.Message.Sends);
-        var totalAmount = transferMessages.Sum(x => x.nanotons);
+        var totalAmount = (ulong)transferMessages.Sum(x => (long)x.nanotons);
 
         var txn = new Withdrawal()
         {

@@ -71,7 +71,7 @@ public class BatchSendTonsConsumerTests : IUsesHarness
 
 public class SendTonsImpl : ISendTons
 {
-    public long Nanotons { get; set; }
+    public ulong Nanotons { get; set; }
     public TonAddress Destination { get; set; }
     public Guid CorrelationId { get; set; }
 }

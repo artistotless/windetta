@@ -7,16 +7,16 @@ public class UserBalance
 {
     public Guid WalletId { get; init; }
     public int CurrencyId { get; init; }
-    public long Amount { get; private set; } = 0;
-    public long HeldAmount { get; private set; } = 0;
+    public ulong Amount { get; private set; } = 0;
+    public ulong HeldAmount { get; private set; } = 0;
 
     #region Business logic
-    public void Increase(long value)
+    public void Increase(ulong value)
     {
         Amount += value;
     }
 
-    public void Hold(long amount)
+    public void Hold(ulong amount)
     {
         if (HeldAmount != 0)
             throw new WindettaException(
@@ -30,7 +30,7 @@ public class UserBalance
         HeldAmount = 0;
     }
 
-    public void Decrease(long value)
+    public void Decrease(ulong value)
     {
         if (value <= 0)
             return;

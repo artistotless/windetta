@@ -161,7 +161,7 @@ public class CreateUserWalletImpl : ICreateUserWallet
 public class BalanceOperationImpl : IDeductBalance, IFundsAdded
 {
     public Guid UserId { get; set; }
-    public long Amount { get; set; }
+    public ulong Amount { get; set; }
     public int CurrencyId { get; set; }
     public Guid CorrelationId { get; set; }
 }
@@ -175,7 +175,7 @@ public class TransferBalanceImpl : ITransferBalance
 {
     public Guid InitiatorUserId { get; set; }
     public Guid DestinationUserId { get; set; }
-    public long Amount { get; set; }
+    public ulong Amount { get; set; }
     public int CurrencyId { get; set; }
     public Guid CorrelationId { get; set; }
 }

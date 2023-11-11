@@ -8,7 +8,7 @@ public class UserWallet
     public Guid UserId { get; init; }
     public List<UserBalance> Balances { get; set; }
 
-    public void TransferToWallet(UserWallet to, int currencyId, long amount)
+    public void TransferToWallet(UserWallet to, int currencyId, ulong amount)
     {
         var balanceFrom = GetBalance(currencyId);
         var balanceTo = to.GetBalance(currencyId);
