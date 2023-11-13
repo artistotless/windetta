@@ -1,8 +1,6 @@
 ﻿using MassTransit;
 using Polly;
-using Windetta.Common.Types;
-using Windetta.Contracts;
-using Windetta.Contracts.Commands;
+using Windetta.Common.Constants;
 using Windetta.Contracts.Events;
 using Windetta.TonTxns.Application.Services;
 
@@ -13,7 +11,6 @@ public class DepositPollerService : BackgroundService
     private readonly ILogger<DepositPollerService> _logger;
     private readonly DepositPoller _poller;
     private readonly IPublishEndpoint _publishEndpoint;
-    private readonly ICurrencyIdProvider _currencyIdProvider;
 
     private int _executionCount;
     private const int _executionPeriodSeconds = 10;
@@ -21,12 +18,10 @@ public class DepositPollerService : BackgroundService
     public DepositPollerService(
         ILogger<DepositPollerService> logger,
         DepositPoller poller,
-        ICurrencyIdProvider currencyIdProvider,
         IPublishEndpoint publishEndpoint)
     {
         _logger = logger;
         _poller = poller;
-        _currencyIdProvider = currencyIdProvider;
         _publishEndpoint = publishEndpoint;
     }
 
@@ -77,7 +72,7 @@ public class DepositPollerService : BackgroundService
         {
             UserId = x.UserId,
             Amount = x.Amount,
-            CurrencyId = _currencyIdProvider.Id,
+            CurrencyId = (int)Currencies.Ton,
             CorrelationId = x.Id
         });
 

@@ -3,6 +3,6 @@ using Windetta.Common.Messages;
 
 namespace Windetta.Contracts.Events;
 
-public interface ITransferTonConfirmationPeriodExpired : CorrelatedBy<Guid>, IEvent
+public interface ISendTonsConfirmationPeriodExpired : CorrelatedBy<Guid>, IEvent
 {
 }

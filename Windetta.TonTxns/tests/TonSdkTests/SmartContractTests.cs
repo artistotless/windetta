@@ -1,4 +1,6 @@
-﻿using TonSdk.Client;
+﻿using System.Globalization;
+using System.Numerics;
+using TonSdk.Client;
 using TonSdk.Contracts.Wallet;
 using TonSdk.Core;
 using TonSdk.Core.Block;
@@ -26,6 +28,7 @@ public class SmartContractTests
         var mn = new Mnemonic(new[] { "better", "air", "abstract", "bacon", "bird", "auto", "also", "awkward", "business", "barrel", "between", "boring", "avocado", "assault", "baby", "arch", "baby", "already", "awkward", "boy", "answer", "bonus", "adapt", "ask", });
         (string publicKey, string privateKey) = mn.GetKeysPair();
 
+        // address - EQCY-EUrQiEgy8a2JI5PNfv3itWseEh1TtzrPsIRDpH8iS2H
         var wallet = new HighloadV1Custom(new()
         {
             PublicKey = Convert.FromBase64String(publicKey),
@@ -33,12 +36,22 @@ public class SmartContractTests
             Workchain = 0
         });
 
+
         var seqno = await _client.Wallet.GetSeqno(wallet.Address) ?? 0;
 
-        var transferMessage = wallet.CreateTransferMessage(new[]
+        ExternalInMessage transferMessage;
+
+        if (seqno == 0)
+            transferMessage = wallet.CreateDeployMessage();
+        else
         {
-            CreateIntTransferMessage(_dest, new Coins(0.05),64),
-        }, seqno).Sign(Convert.FromBase64String(privateKey));
+            transferMessage = wallet.CreateTransferMessage(new[]
+           {
+            CreateIntTransferMessage(_dest, new Coins(0.0001),1),
+            }, seqno);
+        }
+
+        transferMessage = transferMessage.Sign(Convert.FromBase64String(privateKey));
 
         (await _client.SendBoc(transferMessage.Cell!)).Type.ToLower().ShouldBe("ok");
     }

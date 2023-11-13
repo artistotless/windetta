@@ -6,7 +6,7 @@ namespace Windetta.Common.MassTransit;
 
 public static class TestingExtensions
 {
-    public static IServiceCollection ConfigureMassTransit(this IServiceCollection services, string serviceName, IUsesHarness? userCfg = null)
+    public static IServiceCollection ConfigureMassTransit(this IServiceCollection services, string serviceName, IHarnessConfiguration? userCfg = null)
     {
         services.AddQuartz(x =>
         {
@@ -17,7 +17,6 @@ public static class TestingExtensions
             x.SetEndpointNameFormatter(new MyEndpointNameFormatter(serviceName));
 
             x.AddQuartzConsumers();
-
             x.AddPublishMessageScheduler();
 
             userCfg?.ConfigureHarness().Invoke(x);

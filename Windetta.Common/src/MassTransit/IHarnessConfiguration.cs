@@ -2,7 +2,7 @@
 
 namespace Windetta.Common.MassTransit;
 
-public interface IUsesHarness
+public interface IHarnessConfiguration
 {
     public Action<IBusRegistrationConfigurator> ConfigureHarness();
 }

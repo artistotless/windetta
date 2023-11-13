@@ -8,7 +8,7 @@ public static class WalletV3ValidDataExample
         "bridge", "affair", "because", "ball", "brave", "advice",
         "action","bottom", "blind", "basket", "begin"};
 
-    public const string ValidPublicKey = "wuNjNqGfugmYPtIydBypxlc67PIZUMjhuXaXXB3unV8=";
-    public const string ValidPrivateKey = "87/FnGccbqsuipFxE8BJeDwhRp4LNelEqFzseFFPdtg=";
-    public const string ValidAddress = "EQCBvjU7mYLJQCIEtJGOiUWxmW0NI1Gn-1zzyTJ5zRBtLoLV";
+    public const string ValidPublicKey = "suWh8waCFJHFng0gm+22gtvxs+eUcoMAaD4L7XQYdWg=";
+    public const string ValidPrivateKey = "eVG46QuXB1EUDyS9P1imcgfdz0kjLtt0X7KwdGHbVmQ=";
+    public const string ValidAddress = "EQBEbAtyZz8YL5Z-bax8JGzej8GXsl8ke1ZGji9bej5eLv8S";
 }
