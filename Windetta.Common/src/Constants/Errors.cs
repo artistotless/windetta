@@ -2,6 +2,15 @@
 
 public static class Errors
 {
+    public static class Main
+    {
+        #region Room
+        public const string MemberAlreadyJoined = "member_already_joined";
+        public const string MemberNotInRoom = "member_not_in_room";
+        public const string MaxMembersInRoomReached = "maxmembers_in_room_reached";
+        #endregion
+    }
+
     public static class Identity
     {
         public const string UserNotFound = "user_not_found";
