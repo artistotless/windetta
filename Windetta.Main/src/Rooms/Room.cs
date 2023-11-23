@@ -5,11 +5,19 @@ namespace Windetta.Main.Rooms;
 
 public class Room : IDisposable
 {
-    public IReadOnlyCollection<RoomMember> Members => _members;
+    //Events
+    public event EventHandler<RoomEventArg> MemberJoined;
+    public event EventHandler<RoomEventArg> MemberLeft;
 
-    public uint MaxMembers;
+    // Public fields
+    public Guid Id { get; private set; }
+    public IReadOnlyCollection<RoomMember> Members => _members;
+    public DateTimeOffset Created { get; init; }
+    public uint MaxMembers { get; init; }
     public int MembersCount => Members.Count;
 
+
+    // Private fields
     private List<RoomMember> _members;
 
     /// <summary>
@@ -18,32 +26,54 @@ public class Room : IDisposable
     /// <param name="maxMembers">0 - unlimit</param>
     public Room(uint maxMembers = 0)
     {
+        Id = Guid.NewGuid();
         _members = new List<RoomMember>((int)maxMembers);
         MaxMembers = maxMembers;
+        Created = DateTimeOffset.UtcNow;
     }
 
-    internal void Add(RoomMember player)
+    internal void Add(RoomMember member)
     {
         if (MaxMembers != 0 && MembersCount == MaxMembers)
             throw new WindettaException(
                 Errors.Main.MaxMembersInRoomReached);
 
-        if (Members.Contains(player))
+        if (Members.Contains(member))
             throw new WindettaException(Errors.Main.MemberAlreadyJoined);
 
-        _members.Add(player);
+        _members.Add(member);
+
+        OnMemberJoined(member);
     }
 
-    internal void Remove(RoomMember player)
+    internal void Remove(RoomMember member)
     {
-        if (!Members.Contains(player))
+        if (!Members.Contains(member))
             throw new WindettaException(Errors.Main.MemberNotInRoom);
 
-        _members.Remove(player);
+        _members.Remove(member);
+
+        OnMemberLeft(member);
     }
 
     public void Dispose()
     {
         _members = null;
+    }
+
+    private void OnMemberJoined(RoomMember member)
+    {
+        MemberJoined?.Invoke(this, new()
+        {
+            MemberId = member.Id
+        });
+    }
+
+    private void OnMemberLeft(RoomMember member)
+    {
+        MemberLeft?.Invoke(this, new()
+        {
+            MemberId = member.Id
+        });
     }
 }

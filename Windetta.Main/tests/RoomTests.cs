@@ -18,11 +18,11 @@ public class RoomTests
     public void JoiningRoomShouldIncreasePlayersNumber()
     {
         // arrange
-        var player = new RoomMember(id: Guid.NewGuid());
+        var member = new RoomMember(id: Guid.NewGuid());
         var room = new Room();
 
         // act
-        player.Join(room);
+        member.Join(room);
 
         // assert
         room.MembersCount.ShouldBe(1);
@@ -32,12 +32,12 @@ public class RoomTests
     public void JoiningRoomShouldThrowsExceptionIfPlayerAlreadyJoinedRoom()
     {
         // arrange
-        var player = new RoomMember(id: Guid.NewGuid());
+        var member = new RoomMember(id: Guid.NewGuid());
         var room = new Room();
 
         // act
-        player.Join(room);
-        var exception = Should.Throw<WindettaException>(() => player.Join(room));
+        member.Join(room);
+        var exception = Should.Throw<WindettaException>(() => member.Join(room));
 
         // assert
         exception.ShouldNotBeNull();
@@ -48,13 +48,13 @@ public class RoomTests
     public void LeaveRoomShouldDecreasePlayersNumber()
     {
         // arrange
-        var player = new RoomMember(id: Guid.NewGuid());
+        var member = new RoomMember(id: Guid.NewGuid());
         var room = new Room();
 
         // act, assert
-        player.Join(room);
+        member.Join(room);
         room.MembersCount.ShouldBe(1);
-        player.LeaveRoom();
+        member.LeaveRoom();
         room.MembersCount.ShouldBe(0);
     }
 
@@ -62,11 +62,11 @@ public class RoomTests
     public void LeaveRoomShouldBeIdempotenticIfPlayerNotInRoom()
     {
         // arrange
-        var player = new RoomMember(id: Guid.NewGuid());
+        var member = new RoomMember(id: Guid.NewGuid());
         var room = new Room();
 
         // act
-        var exception = Should.Throw<WindettaException>(() => player.LeaveRoom());
+        var exception = Should.Throw<WindettaException>(() => member.LeaveRoom());
 
         // assert
         exception.ShouldNotBeNull();
@@ -77,11 +77,11 @@ public class RoomTests
     public void JoinRoomShouldThrowExceptionIfArgumentIsNull()
     {
         // arrange
-        var player = new RoomMember(id: Guid.NewGuid());
+        var member = new RoomMember(id: Guid.NewGuid());
 
         // act
         var exception = Should.Throw<ArgumentNullException>(
-            () => player.Join(null));
+            () => member.Join(null));
 
         // assert
         exception.ShouldNotBeNull();
@@ -91,14 +91,14 @@ public class RoomTests
     public void JoinRoomShouldThrowExceptionIfMaxPlayersLimitReached()
     {
         // arrange
-        var player = new RoomMember(id: Guid.NewGuid());
-        var player2 = new RoomMember(id: Guid.NewGuid());
+        var member = new RoomMember(id: Guid.NewGuid());
+        var member2 = new RoomMember(id: Guid.NewGuid());
         var room = new Room(maxMembers: 1);
 
         // act
-        player.Join(room);
+        member.Join(room);
         var exception = Should.Throw<WindettaException>(
-            () => player2.Join(room));
+            () => member2.Join(room));
 
         // assert
         exception.ShouldNotBeNull();
