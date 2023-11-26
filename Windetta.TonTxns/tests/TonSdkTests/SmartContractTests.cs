@@ -1,4 +1,6 @@
-﻿using TonSdk.Client;
+﻿using System.Globalization;
+using System.Numerics;
+using TonSdk.Client;
 using TonSdk.Contracts.Wallet;
 using TonSdk.Core;
 using TonSdk.Core.Block;
@@ -13,7 +15,7 @@ public class SmartContractTests
 {
     private readonly TonClient _client;
     private const uint sub_wallet_id = 698983191;
-    private const string _dest = "EQBWfV4S6FXo-EJzSd8QhE7XsmiwxXSsSSBXSC3x8t2KwuVa";
+    private const string _dest = "EQCBvjU7mYLJQCIEtJGOiUWxmW0NI1Gn-1zzyTJ5zRBtLoLV";
 
     public SmartContractTests(TonClientFixture tonClientFixture)
     {
@@ -26,6 +28,7 @@ public class SmartContractTests
         var mn = new Mnemonic(new[] { "better", "air", "abstract", "bacon", "bird", "auto", "also", "awkward", "business", "barrel", "between", "boring", "avocado", "assault", "baby", "arch", "baby", "already", "awkward", "boy", "answer", "bonus", "adapt", "ask", });
         (string publicKey, string privateKey) = mn.GetKeysPair();
 
+        // address - EQCY-EUrQiEgy8a2JI5PNfv3itWseEh1TtzrPsIRDpH8iS2H
         var wallet = new HighloadV1Custom(new()
         {
             PublicKey = Convert.FromBase64String(publicKey),
@@ -33,12 +36,22 @@ public class SmartContractTests
             Workchain = 0
         });
 
+
         var seqno = await _client.Wallet.GetSeqno(wallet.Address) ?? 0;
 
-        var transferMessage = wallet.CreateTransferMessage(new[]
+        ExternalInMessage transferMessage;
+
+        if (seqno == 0)
+            transferMessage = wallet.CreateDeployMessage();
+        else
         {
-            CreateIntTransferMessage(_dest, new Coins(0.001),1),
-        }, seqno).Sign(Convert.FromBase64String(privateKey));
+            transferMessage = wallet.CreateTransferMessage(new[]
+           {
+            CreateIntTransferMessage(_dest, new Coins(0.0001),1),
+            }, seqno);
+        }
+
+        transferMessage = transferMessage.Sign(Convert.FromBase64String(privateKey));
 
         (await _client.SendBoc(transferMessage.Cell!)).Type.ToLower().ShouldBe("ok");
     }
@@ -71,6 +84,9 @@ public class SmartContractTests
                     Value = coins,
                     Bounce = false
                 }),
+                //Body = new CellBuilder()
+                //.StoreUInt(0, 32)
+                //.StoreString("c96a90c9-7f24-4e8d-83e6-18bb5488fe86").Build()
             }),
             Mode = mode
         };

@@ -5,6 +5,7 @@ using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
 using Windetta.TonTxns.Application.Models;
 using Windetta.TonTxns.Application.Services;
+using Windetta.TonTxns.Application.Services.Audit;
 using Windetta.TonTxns.Domain;
 
 namespace Windetta.TonTxns.Infrastructure.Consumers;
@@ -13,14 +14,14 @@ public class SendTonsConsumer : IConsumer<IPackedSendTons>
 {
     public const int RetryCount = 3;
 
-    private readonly ITonService _tonService;
+    private readonly IWithdrawService _tonService;
     private readonly IWalletCredentialSource _credentialSource;
-    private readonly ITransactionsService _txnService;
+    private readonly IWithdrawalsService _txnService;
 
     public SendTonsConsumer(
-        ITonService tonService,
+        IWithdrawService tonService,
         IWalletCredentialSource credentialSource,
-        ITransactionsService txnService)
+        IWithdrawalsService txnService)
     {
         _tonService = tonService;
         _credentialSource = credentialSource;
@@ -35,12 +36,12 @@ public class SendTonsConsumer : IConsumer<IPackedSendTons>
             return;
 
         var transferMessages = LoadTransferMessageArray(context.Message.Sends);
-        var totalAmount = transferMessages.Sum(x => x.nanotons);
+        var totalAmount = (ulong)transferMessages.Sum(x => (long)x.nanotons);
 
-        var txn = new Transaction()
+        var txn = new Withdrawal()
         {
             Id = context.Message.CorrelationId,
-            Status = TransactionStatus.Pending,
+            Status = WithdrawalStatus.Pending,
             TotalAmount = totalAmount,
             TransfersCount = transferMessages.Count()
         };
@@ -54,21 +55,24 @@ public class SendTonsConsumer : IConsumer<IPackedSendTons>
         {
             await GetRetryPipeline().ExecuteAsync(async (token) =>
             {
-                await _tonService.SendTons(_credentialSource.Value, transferMessages);
+                await _tonService.ExecuteWithdraw(
+                    _credentialSource.Value, transferMessages);
             });
         }
         catch (Exception ex)
         {
-            await context.PublishBatch(BuildFaultMessages(context, ex));
+            await context.PublishBatch(
+                BuildFaultMessages(context, ex));
 
             return;
         }
 
-        await context.PublishBatch(BuildConfirmationMessages(context.Message.Sends));
+        await context.PublishBatch(
+            BuildConfirmationMessages(context.Message.Sends));
 
         await GetRetryPipeline().ExecuteAsync(async (token) =>
         {
-            txn.Status = TransactionStatus.Confirmed;
+            txn.Status = WithdrawalStatus.Confirmed;
             await _txnService.UpdateAsync(txn);
         });
     }

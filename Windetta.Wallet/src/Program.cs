@@ -15,7 +15,8 @@ services.AddControllers();
 services.AddReadyMassTransit(assembly, Svc.Wallet);
 services.AddMysqlDbContext<WalletDbContext>(assembly);
 
-builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory(builder =>
+builder.Host.UseServiceProviderFactory(
+    new AutofacServiceProviderFactory(builder =>
 {
     builder.ResolveDependenciesFromAssembly();
 }));

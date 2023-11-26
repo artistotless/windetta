@@ -3,7 +3,7 @@ using TonSdk.Core.Crypto;
 using Windetta.Common.Ton;
 using Windetta.TonTxnsTests.Fixtures;
 
-namespace Windetta.WalletTests.TonApi;
+namespace Windetta.TonTxnsTests.TonApi;
 
 public class MnemonicTests
 {

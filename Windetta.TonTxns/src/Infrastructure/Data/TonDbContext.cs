@@ -9,29 +9,37 @@ public sealed class TonDbContext : DbContext
     {
     }
 
-    internal DbSet<Transaction> Transactions { get; set; }
+    internal DbSet<Withdrawal> Withdrawals { get; set; }
+    internal DbSet<Deposit> Deposits { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<Transaction>()
+        modelBuilder.Entity<Deposit>()
             .HasKey(x => x.Id);
 
-        modelBuilder.Entity<Transaction>()
+        modelBuilder.Entity<Deposit>()
             .Property(x => x.Id)
             .HasColumnType("CHAR(36)");
 
-        modelBuilder.Entity<Transaction>()
+        modelBuilder.Entity<Withdrawal>()
+            .HasKey(x => x.Id);
+
+        modelBuilder.Entity<Withdrawal>()
+            .Property(x => x.Id)
+            .HasColumnType("CHAR(36)");
+
+        modelBuilder.Entity<Withdrawal>()
           .Property(x => x.Status)
-          .HasDefaultValue(TransactionStatus.Pending)
+          .HasDefaultValue(WithdrawalStatus.Pending)
           .HasColumnType("TINYINT");
 
-        modelBuilder.Entity<Transaction>()
+        modelBuilder.Entity<Withdrawal>()
           .Property(x => x.TransfersCount)
           .HasColumnType("SMALLINT");
 
-        modelBuilder.Entity<Transaction>()
+        modelBuilder.Entity<Withdrawal>()
           .Property(x => x.TotalAmount)
           .HasColumnType("BIGINT");
     }

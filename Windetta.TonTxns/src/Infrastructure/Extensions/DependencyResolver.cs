@@ -12,6 +12,19 @@ public static class DependencyResolver
         var cfg = provider.GetRequiredService<IConfiguration>();
 
         services.Configure<TonClientParameters>(cfg.GetSection("TonApi"));
-        services.AddScoped<ITonService, HttpTonService>();
+        services.AddScoped<IWithdrawService, HttpTonService>();
+    }
+
+    public static void AddDepositAddress(this IServiceCollection services)
+    {
+        var provider = services.BuildServiceProvider();
+        var cfg = provider.GetRequiredService<IConfiguration>();
+
+        var address = cfg.GetValue<string>("TonDepositAddress");
+        if (address is null)
+            throw new Exception("TonDepositAddress value not found in cfg");
+
+        services.Configure<DepositAddressSource>(x => x.Address = address);
     }
 }
+

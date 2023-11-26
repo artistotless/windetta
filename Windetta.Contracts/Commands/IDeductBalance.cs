@@ -7,5 +7,5 @@ public interface IDeductBalance : ICommand, CorrelatedBy<Guid>
 {
     public Guid UserId { get; set; }
     public int CurrencyId { get; set; }
-    public long Amount { get; set; }
+    public ulong Amount { get; set; }
 }

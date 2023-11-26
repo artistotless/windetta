@@ -1,19 +1,23 @@
 ﻿using Windetta.Common.Testing;
-using Windetta.TonTxns.Application.Services;
+using Windetta.TonTxns.Application.Services.Audit;
 
 namespace Windetta.TonTxnsTests.Mocks;
 
-public class TxnsServiceMock : MockInitializator<ITransactionsService>
+public class TxnsServiceMock : MockInitializator<IWithdrawalsService>
 {
-    public static Guid ExistingTxn = Guid.NewGuid();
-    public static Guid NonExistingTxn = Guid.NewGuid();
+    public bool UseExistingTxnCase = false;
 
-    protected override void Setup(Mock<ITransactionsService> mock)
+    public TxnsServiceMock(bool useExistingTxnCase = false)
     {
-        mock.Setup(x => x.ExistAsync(It.Is<Guid>(x => x == ExistingTxn)))
-            .Throws(new Exception(nameof(ExistingTxn)));
+        UseExistingTxnCase = useExistingTxnCase;
+    }
 
-        mock.Setup(x => x.ExistAsync(It.Is<Guid>(x => x == NonExistingTxn)))
+    protected override void Setup(Mock<IWithdrawalsService> mock)
+    {
+        mock.Setup(x => x.ExistAsync(It.IsAny<Guid>()))
             .ReturnsAsync(false);
+
+        mock.Setup(x => x.ExistAsync(It.Is<Guid>(x => UseExistingTxnCase)))
+            .ThrowsAsync(new Exception(nameof(UseExistingTxnCase)));
     }
 }

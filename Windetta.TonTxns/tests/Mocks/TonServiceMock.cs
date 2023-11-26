@@ -1,17 +1,24 @@
 ﻿using Windetta.Common.Testing;
-using Windetta.Common.Types;
 using Windetta.TonTxns.Application.Models;
 using Windetta.TonTxns.Application.Services;
 
 namespace Windetta.TonTxnsTests.Mocks;
 
-public class TonServiceMock : MockInitializator<ITonService>
+public class TonServiceMock : MockInitializator<IWithdrawService>
 {
-    protected override void Setup(Mock<ITonService> mock)
-    {
-        mock.Setup(x => x.GetBalance(It.IsAny<TonAddress>()))
-            .ReturnsAsync(Random.Shared.Next(0, 100000));
+    private bool _useFailCase = false;
 
-        mock.Setup(x => x.SendTons(It.IsAny<TonWalletCredential>(), It.IsAny<IEnumerable<TransferMessage>>()));
+    public TonServiceMock(bool useFailCase = false)
+    {
+        _useFailCase = useFailCase;
+    }
+
+    protected override void Setup(Mock<IWithdrawService> mock)
+    {
+        mock.Setup(x => x.ExecuteWithdraw(It.IsAny<WalletCredential>(), It.IsAny<IEnumerable<TransferMessage>>()));
+
+        mock.Setup(x => x.ExecuteWithdraw(It.Is<WalletCredential>(x => _useFailCase), It.IsAny<IEnumerable<TransferMessage>>()))
+            .ThrowsAsync(new Exception(nameof(_useFailCase)));
+
     }
 }
