@@ -5,7 +5,7 @@ using Windetta.Main.Rooms;
 
 namespace Windetta.Main.MatchHub;
 
-public class MatchHub : IMatchHub
+internal sealed class MatchHub : IMatchHub
 {
     public bool IsPublic { get; init; }
     public DateTimeOffset Created { get; init; }
@@ -22,6 +22,8 @@ public class MatchHub : IMatchHub
     private AutoDisposeStrategy _disposeStrategy;
 
     private IReadOnlyDictionary<Guid, Room> _rooms;
+
+    private bool _disposed;
 
     public MatchHub(MatchHubOptions options)
     {
@@ -82,6 +84,9 @@ public class MatchHub : IMatchHub
 
     public void Dispose()
     {
+        if (_disposed)
+            return;
+
         _readyStrategy?.Dispose();
         _disposeStrategy?.Dispose();
 
@@ -90,6 +95,8 @@ public class MatchHub : IMatchHub
         _rooms = null;
 
         Disposed?.Invoke(this, null);
+
+        _disposed = true;
     }
 
     void IHubReadyListener.OnHubAutoReady()

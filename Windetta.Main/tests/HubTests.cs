@@ -9,7 +9,7 @@ namespace Windetta.MainTests;
 public class HubTests
 {
     [Fact]
-    public void ShouldCreatesRoomsAccordingGameConfig()
+    public async Task ShouldCreatesRoomsAccordingGameConfig()
     {
         // arrange
         var config = new GameConfiguration()
@@ -27,14 +27,17 @@ public class HubTests
         };
 
         // act
-        IMatchHub hub = new MatchHub(options);
+        var storageMock = new Mock<IMatchHubs>();
+        var interactor = new MatchHubsInteractor(storageMock.Object);
+
+        IMatchHub hub = await interactor.Create(options);
 
         // assert
         hub.Rooms.Count().ShouldBe((int)config.MaxTeams);
     }
 
     [Fact]
-    public void ShouldAddMemberToSelectedRoom()
+    public async void ShouldAddMemberToSelectedRoom()
     {
         // arrange
         var config = new GameConfiguration()
@@ -49,7 +52,10 @@ public class HubTests
             Bet = new Bet(currencyId: 1, bet: 100)
         };
 
-        IMatchHub hub = new MatchHub(options);
+        var storageMock = new Mock<IMatchHubs>();
+        var interactor = new MatchHubsInteractor(storageMock.Object);
+
+        IMatchHub hub = await interactor.Create(options);
         var member = new RoomMember(Guid.NewGuid());
         var room = hub.Rooms.First();
 

@@ -22,14 +22,14 @@ public abstract class AutoDisposeStrategy : IDisposable
 
     private void Update(object? state)
     {
-        if (CheckReady())
+        if (CheckDisposed())
         {
             _timer.Dispose();
             Hub.OnHubAutoDisposed();
         }
     }
 
-    protected abstract bool CheckReady();
+    protected abstract bool CheckDisposed();
 
     public void Dispose()
     {
