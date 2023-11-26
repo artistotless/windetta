@@ -12,7 +12,6 @@ public class Room : IDisposable
     // Public fields
     public Guid Id { get; private set; }
     public IReadOnlyCollection<RoomMember> Members => _members;
-    public DateTimeOffset Created { get; init; }
     public uint MaxMembers { get; init; }
     public int MembersCount => Members.Count;
 
@@ -24,12 +23,13 @@ public class Room : IDisposable
     /// Room constructor
     /// </summary>
     /// <param name="maxMembers">0 - unlimit</param>
-    public Room(uint maxMembers = 0)
+    public Room(uint maxMembers = 0) : this(Guid.NewGuid(), maxMembers) { }
+
+    public Room(Guid id, uint maxMembers = 0)
     {
-        Id = Guid.NewGuid();
+        Id = id;
         _members = new List<RoomMember>((int)maxMembers);
         MaxMembers = maxMembers;
-        Created = DateTimeOffset.UtcNow;
     }
 
     internal void Add(RoomMember member)

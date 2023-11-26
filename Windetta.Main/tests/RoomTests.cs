@@ -104,4 +104,49 @@ public class RoomTests
         exception.ShouldNotBeNull();
         exception.ErrorCode.ShouldBe(Errors.Main.MaxMembersInRoomReached);
     }
+
+    [Fact]
+    public void JoinRoomShouldRaiseEvent()
+    {
+        // arrange
+        var member = new RoomMember(id: Guid.NewGuid());
+        var room = new Room(maxMembers: 1);
+        bool eventRaised = false;
+
+        EventHandler<RoomEventArg> callback = (object? sender, RoomEventArg arg) =>
+        {
+            eventRaised = true;
+        };
+
+        room.MemberJoined += callback;
+
+        // act
+        member.Join(room);
+
+        // assert
+        eventRaised.ShouldBeTrue();
+    }
+
+    [Fact]
+    public void LeaveRoomShouldRaiseEvent()
+    {
+        // arrange
+        var member = new RoomMember(id: Guid.NewGuid());
+        var room = new Room(maxMembers: 1);
+        bool eventRaised = false;
+
+        EventHandler<RoomEventArg> callback = (object? sender, RoomEventArg arg) =>
+        {
+            eventRaised = true;
+        };
+
+        room.MemberLeft += callback;
+
+        // act
+        member.Join(room);
+        member.LeaveRoom();
+
+        // assert
+        eventRaised.ShouldBeTrue();
+    }
 }

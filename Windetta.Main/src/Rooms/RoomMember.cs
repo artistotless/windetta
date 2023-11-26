@@ -3,7 +3,7 @@ using Windetta.Common.Types;
 
 namespace Windetta.Main.Rooms;
 
-public sealed class RoomMember : IDisposable
+public sealed class RoomMember
 {
     public Guid Id { get; init; }
 
@@ -11,7 +11,7 @@ public sealed class RoomMember : IDisposable
 
     public RoomMember(Guid id)
     {
-        this.Id = id;
+        Id = id;
     }
 
     public void Join(Room room)
@@ -30,10 +30,5 @@ public sealed class RoomMember : IDisposable
             throw new WindettaException(Errors.Main.MemberNotInRoom);
 
         _room.Remove(this);
-    }
-
-    public void Dispose()
-    {
-        _room = null;
     }
 }
