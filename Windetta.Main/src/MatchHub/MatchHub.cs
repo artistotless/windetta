@@ -7,6 +7,7 @@ namespace Windetta.Main.MatchHub;
 
 internal sealed class MatchHub : IMatchHub
 {
+    public Guid Id { get; init; }
     public bool IsPublic { get; init; }
     public DateTimeOffset Created { get; init; }
     public Bet Bet { get; init; }
@@ -27,6 +28,8 @@ internal sealed class MatchHub : IMatchHub
 
     public MatchHub(MatchHubOptions options)
     {
+        Id = Guid.NewGuid();
+
         IsPublic = !options.Private;
         Configuration = options.GameConfiguration;
         Bet = options.Bet;

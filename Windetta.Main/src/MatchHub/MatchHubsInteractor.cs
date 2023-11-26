@@ -32,6 +32,12 @@ public class MatchHubsInteractor
     public async Task JoinMember(Guid userId, Guid hubId, Guid roomId)
     {
         var hub = await _hubs.GetAsync(hubId);
+
+        JoinMember(userId, hub, roomId);
+    }
+
+    public void JoinMember(Guid userId, IMatchHub hub, Guid roomId)
+    {
         var member = new RoomMember(userId);
 
         hub.Add(member, roomId);
@@ -41,6 +47,11 @@ public class MatchHubsInteractor
     {
         var hub = await _hubs.GetAsync(hubId);
 
+        LeaveMember(userId, hub);
+    }
+
+    public void LeaveMember(Guid userId, IMatchHub hub)
+    {
         hub.Remove(userId);
     }
 }

@@ -1,7 +1,5 @@
-﻿using Moq;
-using Windetta.Main.Games;
+﻿using Windetta.Main.Games;
 using Windetta.Main.MatchHub;
-using Windetta.Main.Rooms;
 using Windetta.MainTests.Mocks;
 
 namespace Windetta.MainTests;
@@ -27,14 +25,13 @@ public class AutoStrategiesTests
                 checkInterval: TimeSpan.FromSeconds(1))
         };
 
-        var storageMock = new Mock<IMatchHubs>();
-        var interactor = new MatchHubsInteractor(storageMock.Object);
+        var interactor = new MatchHubsInteractor(new Mock<IMatchHubs>().Object);
 
         IMatchHub hub = await interactor.Create(options);
 
-        var member1 = new RoomMember(Guid.NewGuid());
-        var member2 = new RoomMember(Guid.NewGuid());
-        var room = hub.Rooms.First();
+        var member1Id = Guid.NewGuid();
+        var member2Id = Guid.NewGuid();
+        var roomId = hub.Rooms.First().Id;
 
         bool autoStrategyWorkedOut = false;
         var tcs = new TaskCompletionSource<bool>();
@@ -48,8 +45,8 @@ public class AutoStrategiesTests
         hub.Ready += callback;
 
         // act
-        hub.Add(member1, room.Id);
-        hub.Add(member2, room.Id);
+        interactor.JoinMember(member1Id, hub, roomId);
+        interactor.JoinMember(member2Id, hub, roomId);
 
         await tcs.Task;
 
@@ -76,8 +73,7 @@ public class AutoStrategiesTests
                 checkInterval: TimeSpan.FromSeconds(1))
         };
 
-        var storageMock = new Mock<IMatchHubs>();
-        var interactor = new MatchHubsInteractor(storageMock.Object);
+        var interactor = new MatchHubsInteractor(new Mock<IMatchHubs>().Object);
 
         IMatchHub hub = await interactor.Create(options);
 

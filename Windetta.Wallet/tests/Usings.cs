@@ -1,4 +1,4 @@
-global using Xunit;
+global using AutoFixture;
 global using Moq;
 global using Shouldly;
-global using AutoFixture;
+global using Xunit;

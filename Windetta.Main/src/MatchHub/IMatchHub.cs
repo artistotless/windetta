@@ -1,14 +1,15 @@
-﻿using Windetta.Main.MatchHub.Strategies;
-using Windetta.Main.Rooms;
+﻿using Windetta.Main.Rooms;
 
 namespace Windetta.Main.MatchHub;
 
 public interface IMatchHub : IHubDisposeListener, IHubReadyListener, IDisposable
 {
+    Guid Id { get; }
+
     event EventHandler Updated;
     event EventHandler Disposed;
     event EventHandler Ready;
 
-    void Add(RoomMember member, Guid roomId);
-    void Remove(Guid memberId);
+    internal void Add(RoomMember member, Guid roomId);
+    internal void Remove(Guid memberId);
 }

@@ -1,8 +1,5 @@
-﻿using AutoFixture;
-using Moq;
-using Windetta.Main.Games;
+﻿using Windetta.Main.Games;
 using Windetta.Main.MatchHub;
-using Windetta.Main.Rooms;
 using Windetta.Main.Services;
 
 namespace Windetta.MainTests;
@@ -27,8 +24,7 @@ public class HubTests
         };
 
         // act
-        var storageMock = new Mock<IMatchHubs>();
-        var interactor = new MatchHubsInteractor(storageMock.Object);
+        var interactor = new MatchHubsInteractor(new Mock<IMatchHubs>().Object);
 
         IMatchHub hub = await interactor.Create(options);
 
@@ -52,18 +48,95 @@ public class HubTests
             Bet = new Bet(currencyId: 1, bet: 100)
         };
 
-        var storageMock = new Mock<IMatchHubs>();
-        var interactor = new MatchHubsInteractor(storageMock.Object);
+        var interactor = new MatchHubsInteractor(new Mock<IMatchHubs>().Object);
 
         IMatchHub hub = await interactor.Create(options);
-        var member = new RoomMember(Guid.NewGuid());
+        var userId = Guid.NewGuid();
         var room = hub.Rooms.First();
 
         // act
-        hub.Add(member, room.Id);
+        interactor.JoinMember(userId, hub, room.Id);
 
         // assert
-        room.Members.ShouldContain(member);
+        room.Members.ShouldContain(x => x.Id == userId);
+    }
+
+    [Fact]
+    public async void JoinMemberShouldCauseUpdateEvent()
+    {
+        // arrange
+        var config = new GameConfiguration()
+        {
+            MinPlayers = 1,
+            MaxPlayers = 100,
+        };
+
+        var options = new MatchHubOptions()
+        {
+            GameConfiguration = config,
+            Bet = new Bet(currencyId: 1, bet: 100)
+        };
+
+        var interactor = new MatchHubsInteractor(new Mock<IMatchHubs>().Object);
+
+        IMatchHub hub = await interactor.Create(options);
+        var memberId = Guid.NewGuid();
+        var roomId = hub.Rooms.First().Id;
+        bool updateEventRaised = false;
+        var tcs = new TaskCompletionSource<bool>();
+
+        EventHandler callback = delegate (object? sender, EventArgs e)
+        {
+            tcs.SetResult(true);
+            updateEventRaised = true;
+        };
+
+        hub.Updated += callback;
+
+        // act
+        interactor.JoinMember(memberId, hub, roomId);
+
+        // assert
+        updateEventRaised.ShouldBeTrue();
+    }
+
+    [Fact]
+    public async void LeaveMemberShouldCauseUpdateEvent()
+    {
+        // arrange
+        var config = new GameConfiguration()
+        {
+            MinPlayers = 1,
+            MaxPlayers = 100,
+        };
+
+        var options = new MatchHubOptions()
+        {
+            GameConfiguration = config,
+            Bet = new Bet(currencyId: 1, bet: 100)
+        };
+
+        var interactor = new MatchHubsInteractor(new Mock<IMatchHubs>().Object);
+
+        IMatchHub hub = await interactor.Create(options);
+        var memberId = Guid.NewGuid();
+        var roomId = hub.Rooms.First().Id;
+        bool updateEventRaised = false;
+        var tcs = new TaskCompletionSource<bool>();
+
+        EventHandler callback = delegate (object? sender, EventArgs e)
+        {
+            tcs.SetResult(true);
+            updateEventRaised = true;
+        };
+
+        // act
+        interactor.JoinMember(memberId, hub, roomId);
+        hub.Updated += callback;
+        interactor.LeaveMember(memberId, hub);
+
+        // assert
+        updateEventRaised.ShouldBeTrue();
     }
 
 
