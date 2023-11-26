@@ -8,6 +8,7 @@ public static class Errors
         public const string MemberAlreadyJoined = "member_already_joined";
         public const string MemberNotInRoom = "member_not_in_room";
         public const string MaxMembersInRoomReached = "maxmembers_in_room_reached";
+        public const string JoinFilterValidationFail = "join_filter_validation_fail";
         #endregion
     }
 

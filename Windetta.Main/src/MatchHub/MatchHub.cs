@@ -12,6 +12,7 @@ internal sealed class MatchHub : IMatchHub
     public DateTimeOffset Created { get; init; }
     public Bet Bet { get; init; }
     public GameConfiguration Configuration { get; init; }
+    public IReadOnlyCollection<string>? JoinFilters { get; init; }
     public IEnumerable<Room> Rooms => _rooms.Values;
 
     //Events
@@ -40,6 +41,8 @@ internal sealed class MatchHub : IMatchHub
 
         if (options.AutoDisposeStrategy is not null)
             SetDisposeStrategy(options.AutoDisposeStrategy);
+
+        JoinFilters = options.JoinFilters;
     }
 
     public void SetAutoReadyStrategy(AutoReadyStrategy strategy)

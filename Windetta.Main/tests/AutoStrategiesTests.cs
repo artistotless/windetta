@@ -27,7 +27,7 @@ public class AutoStrategiesTests
 
         var interactor = new MatchHubsInteractor(new Mock<IMatchHubs>().Object);
 
-        IMatchHub hub = await interactor.Create(options);
+        IMatchHub hub = await interactor.CreateAsync(options);
 
         var member1Id = Guid.NewGuid();
         var member2Id = Guid.NewGuid();
@@ -75,7 +75,7 @@ public class AutoStrategiesTests
 
         var interactor = new MatchHubsInteractor(new Mock<IMatchHubs>().Object);
 
-        IMatchHub hub = await interactor.Create(options);
+        IMatchHub hub = await interactor.CreateAsync(options);
 
         bool autoStrategyWorkedOut = false;
         var tcs = new TaskCompletionSource<bool>();

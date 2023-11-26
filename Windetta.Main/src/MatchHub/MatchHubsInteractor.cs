@@ -1,17 +1,22 @@
-﻿using Windetta.Main.Rooms;
+﻿using Windetta.Common.Constants;
+using Windetta.Common.Types;
+using Windetta.Main.MatchHub.Filters;
+using Windetta.Main.Rooms;
 
 namespace Windetta.Main.MatchHub;
 
 public class MatchHubsInteractor
 {
     private readonly IMatchHubs _hubs;
+    private readonly IEnumerable<IJoinFilter>? _filters;
 
-    public MatchHubsInteractor(IMatchHubs hubs)
+    public MatchHubsInteractor(IMatchHubs hubs, IEnumerable<IJoinFilter>? filters = null)
     {
         _hubs = hubs;
+        _filters = filters;
     }
 
-    public async Task<IMatchHub> Create(MatchHubOptions options)
+    public async Task<IMatchHub> CreateAsync(MatchHubOptions options)
     {
         IMatchHub hub = new MatchHub(options);
 
@@ -20,7 +25,7 @@ public class MatchHubsInteractor
         return hub;
     }
 
-    public async Task Delete(Guid hubId)
+    public async Task DeleteAsync(Guid hubId)
     {
         var hub = await _hubs.GetAsync(hubId);
 
@@ -33,11 +38,16 @@ public class MatchHubsInteractor
     {
         var hub = await _hubs.GetAsync(hubId);
 
-        JoinMember(userId, hub, roomId);
+        await JoinMember(userId, hub, roomId);
     }
 
-    public void JoinMember(Guid userId, IMatchHub hub, Guid roomId)
+    public async Task JoinMember(Guid userId, IMatchHub hub, Guid roomId)
     {
+        if (_filters is not null && hub.JoinFilters is not null)
+        {
+            await ExecuteJoinFilters(userId, hub.JoinFilters);
+        }
+
         var member = new RoomMember(userId);
 
         hub.Add(member, roomId);
@@ -53,5 +63,40 @@ public class MatchHubsInteractor
     public void LeaveMember(Guid userId, IMatchHub hub)
     {
         hub.Remove(userId);
+    }
+
+    private async Task ExecuteJoinFilters(Guid userId, IReadOnlyCollection<string> joinFilters)
+    {
+        var cancelTokenSource = new CancellationTokenSource();
+        var token = cancelTokenSource.Token;
+
+        var filters = _filters!.Where(x => joinFilters.Contains(x.Name));
+        var filterTasksQuery = filters.Select(x => x.ValidateAsync(userId, token));
+
+        List<Task<(bool, string?)>> filterTasks = filterTasksQuery.ToList();
+
+        bool allowToJoin = true;
+        string errorMessage = string.Empty;
+
+        while (filterTasks.Any())
+        {
+            var finishedTask = await Task.WhenAny(filterTasks);
+            filterTasks.Remove(finishedTask);
+
+            (allowToJoin, errorMessage) = await finishedTask;
+
+            if (!allowToJoin)
+            {
+                // cancel other filter tasks
+                cancelTokenSource.Cancel();
+                break;
+            }
+        }
+
+        if (!allowToJoin)
+        {
+            throw new WindettaException(
+                Errors.Main.JoinFilterValidationFail, errorMessage);
+        }
     }
 }

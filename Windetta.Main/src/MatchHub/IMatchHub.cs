@@ -10,6 +10,8 @@ public interface IMatchHub : IHubDisposeListener, IHubReadyListener, IDisposable
     event EventHandler Disposed;
     event EventHandler Ready;
 
+    IReadOnlyCollection<string>? JoinFilters { get; init; }
+
     internal void Add(RoomMember member, Guid roomId);
     internal void Remove(Guid memberId);
 }
