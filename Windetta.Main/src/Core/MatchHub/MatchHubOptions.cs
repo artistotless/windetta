@@ -1,10 +1,9 @@
 ﻿using Windetta.Main.Games;
-using Windetta.Main.MatchHub.Filters;
 using Windetta.Main.MatchHub.Strategies;
 
 namespace Windetta.Main.MatchHub;
 
-public struct MatchHubOptions
+public record MatchHubOptions
 {
     public Bet Bet { get; init; }
     public GameConfiguration GameConfiguration { get; init; }
@@ -13,4 +12,11 @@ public struct MatchHubOptions
     public AutoDisposeStrategy? AutoDisposeStrategy { get; init; }
 
     public string[]? JoinFilters { get; init; }
+}
+
+public record TournamentMatchHubOptions : MatchHubOptions
+{
+    public Guid OrganizerId { get; set; }
+    public string? Description { get; set; }
+    public string? Site { get; set; }
 }

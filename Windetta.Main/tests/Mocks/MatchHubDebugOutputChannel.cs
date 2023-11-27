@@ -14,7 +14,7 @@ public class MatchHubDebugOutputChannel : IMatchHubDispatcherOutputChannel
         _buffer = buffer;
     }
 
-    public async Task SendHubDeleted(IMatchHub hub)
+    public async Task WriteHubDeleted(IMatchHub hub)
     {
         var text = $"Hub deleted: {hub.Id}";
 
@@ -22,7 +22,7 @@ public class MatchHubDebugOutputChannel : IMatchHubDispatcherOutputChannel
         await _output.WriteLineAsync(text);
     }
 
-    public async Task SendHubReady(IMatchHub hub)
+    public async Task WriteHubReady(IMatchHub hub)
     {
         var text = $"Hub ready: {hub.Id}";
 
@@ -30,7 +30,7 @@ public class MatchHubDebugOutputChannel : IMatchHubDispatcherOutputChannel
         await _output.WriteLineAsync(text);
     }
 
-    public async Task SendHubUpdated(IMatchHub hub)
+    public async Task WriteHubUpdated(IMatchHub hub)
     {
         var text = $"Hub updated: {hub.Id}";
 

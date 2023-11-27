@@ -5,7 +5,7 @@ using Windetta.Main.Rooms;
 
 namespace Windetta.Main.MatchHub;
 
-internal sealed class MatchHub : IMatchHub
+internal class MatchHub : IMatchHub
 {
     public Guid Id { get; init; }
     public bool IsPublic { get; init; }
@@ -30,7 +30,7 @@ internal sealed class MatchHub : IMatchHub
     public MatchHub(MatchHubOptions options)
     {
         Id = Guid.NewGuid();
-
+        Created = DateTimeOffset.UtcNow;
         IsPublic = !options.Private;
         Configuration = options.GameConfiguration;
         Bet = options.Bet;

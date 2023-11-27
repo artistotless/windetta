@@ -7,4 +7,5 @@ public class Game
     public string Description { get; set; }
     public string IconPath { get; set; }
     public GameConfiguration Configuration { get; set; }
+    public IEnumerable<SupportedCurrency> SupportedCurrencies { get; set; }
 }

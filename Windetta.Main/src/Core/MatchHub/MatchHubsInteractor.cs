@@ -5,7 +5,7 @@ using Windetta.Main.Rooms;
 
 namespace Windetta.Main.MatchHub;
 
-public class MatchHubsInteractor
+public class MatchHubsInteractor : IScopedService
 {
     private readonly IMatchHubs _hubs;
     private readonly IEnumerable<IJoinFilter>? _filters;
@@ -16,9 +16,23 @@ public class MatchHubsInteractor
         _filters = filters;
     }
 
+    public async Task<IEnumerable<IMatchHub>> GetAllAsync()
+    {
+        return await _hubs.GetAllAsync();
+    }
+
     public async Task<IMatchHub> CreateAsync(MatchHubOptions options)
     {
         IMatchHub hub = new MatchHub(options);
+
+        await _hubs.AddAsync(hub);
+
+        return hub;
+    }
+
+    public async Task<IMatchHub> CreateAsync(TournamentMatchHubOptions options)
+    {
+        IMatchHub hub = new TournamentMatchHub(options);
 
         await _hubs.AddAsync(hub);
 
@@ -33,10 +47,24 @@ public class MatchHubsInteractor
 
         hub.Dispose();
     }
+    public async Task JoinMember(Guid userId, Guid hubId)
+    {
+        var hub = await _hubs.GetAsync(hubId);
+        var roomId = hub.Rooms.First().Id;
+
+        await JoinMember(userId, hub, roomId);
+    }
 
     public async Task JoinMember(Guid userId, Guid hubId, Guid roomId)
     {
         var hub = await _hubs.GetAsync(hubId);
+
+        await JoinMember(userId, hub, roomId);
+    }
+
+    public async Task JoinMember(Guid userId, IMatchHub hub)
+    {
+        var roomId = hub.Rooms.First().Id;
 
         await JoinMember(userId, hub, roomId);
     }

@@ -22,14 +22,14 @@ public class MatchHubsDispatcher : ISingletonService
     {
         var hub = (IMatchHub)sender!;
 
-        await _output.SendHubUpdated(hub);
+        await _output.WriteHubUpdated(hub);
     }
 
     private async void Hub_Ready(object? sender, EventArgs e)
     {
         var hub = (IMatchHub)sender!;
 
-        await _output.SendHubReady(hub);
+        await _output.WriteHubReady(hub);
     }
 
     private async void Hub_Disposed(object? sender, EventArgs e)
@@ -40,6 +40,6 @@ public class MatchHubsDispatcher : ISingletonService
         hub.Updated -= Hub_Updated;
         hub.Disposed -= Hub_Disposed;
 
-        await _output.SendHubDeleted(hub);
+        await _output.WriteHubDeleted(hub);
     }
 }

@@ -166,7 +166,7 @@ public class HubTests
         var gamesMock = new Mock<IGames>();
 
         gamesMock
-        .Setup(x => x.Get(It.IsAny<Guid>()))
+        .Setup(x => x.GetAsync(It.IsAny<Guid>()))
         .ReturnsAsync((Guid id) => new Fixture()
         .Build<Game>()
         .With(x => x.Id, id)
