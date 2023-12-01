@@ -32,8 +32,8 @@ public class MatchHubDispatcherTests
         var buffer = new Queue<string>();
         var interactor = new MatchHubsInteractor(new Mock<IMatchHubs>().Object);
         var outputChannel = new MatchHubDebugOutputChannel(_output, ref buffer);
-        var dispatcher = new MatchHubsDispatcher(outputChannel);
-        var hub = await interactor.CreateAsync(options);
+        var dispatcher = new MatchHubsDispatcher(outputChannel, new Mock<IMatchHubs>().Object);
+        var hub = await interactor.CreateAsync(options, Guid.NewGuid());
         var roomId = hub.Rooms.First().Id;
 
         // act
@@ -64,8 +64,8 @@ public class MatchHubDispatcherTests
         var storage = new MatchHubsInMemoryStorage();
         var interactor = new MatchHubsInteractor(storage);
         var outputChannel = new MatchHubDebugOutputChannel(_output, ref buffer);
-        var dispatcher = new MatchHubsDispatcher(outputChannel);
-        var hub = await interactor.CreateAsync(options);
+        var dispatcher = new MatchHubsDispatcher(outputChannel, storage);
+        var hub = await interactor.CreateAsync(options, Guid.NewGuid());
 
         // act
         dispatcher.AddToTracking(hub);
@@ -83,7 +83,7 @@ public class MatchHubDispatcherTests
         // arrange
         var config = new GameConfiguration()
         {
-            MaxPlayers = 2,
+            MaxPlayers = 3,
         };
 
         var options = new MatchHubOptions()
@@ -97,14 +97,14 @@ public class MatchHubDispatcherTests
         var storage = new MatchHubsInMemoryStorage();
         var interactor = new MatchHubsInteractor(storage);
         var outputChannel = new MatchHubDebugOutputChannel(_output, ref buffer);
-        var dispatcher = new MatchHubsDispatcher(outputChannel);
-        var hub = await interactor.CreateAsync(options);
+        var dispatcher = new MatchHubsDispatcher(outputChannel, storage);
+        var hub = await interactor.CreateAsync(options, Guid.NewGuid());
         var roomId = hub.Rooms.First().Id;
 
         // act
         dispatcher.AddToTracking(hub);
-        await interactor.JoinMember(Guid.NewGuid(),hub.Id, roomId);
-        await interactor.JoinMember(Guid.NewGuid(),hub.Id, roomId);
+        await interactor.JoinMember(Guid.NewGuid(), hub.Id, roomId);
+        await interactor.JoinMember(Guid.NewGuid(), hub.Id, roomId);
         await Task.Delay(1_000);
 
         // assert

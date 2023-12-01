@@ -1,18 +1,11 @@
 ﻿using Windetta.Main.Core.MatchHub.Dtos;
 using Windetta.Main.MatchHub;
 
-namespace Windetta.MainTests.Mocks;
+namespace Windetta.Main.Infrastructure.Data.Fake;
 
-internal class MatchHubsInMemoryStorage : IMatchHubs
+public class FakeMatchHubsRepository : IMatchHubs
 {
-    public int Count => _hubs.Count;
-
-    private readonly List<IMatchHub> _hubs;
-
-    public MatchHubsInMemoryStorage()
-    {
-        _hubs = new();
-    }
+    private readonly List<IMatchHub> _hubs = new();
 
     public Task AddAsync(IMatchHub hub)
     {
@@ -22,10 +15,16 @@ internal class MatchHubsInMemoryStorage : IMatchHubs
     }
 
     public Task<IEnumerable<MatchHubDto>> GetAllAsync()
-        => Task.FromResult(_hubs.Select(h => new MatchHubDto(h)));
+    {
+        return Task.FromResult(_hubs
+            .Select(h => h is TournamentMatchHub ? new TournamentMatchHubDto(h) : new MatchHubDto(h))
+            .AsEnumerable());
+    }
 
     public Task<IMatchHub> GetAsync(Guid hubId)
-        => Task.FromResult(_hubs.First(x => x.Id == hubId));
+    {
+        return Task.FromResult(_hubs.First(x => x.Id == hubId));
+    }
 
     public Task RemoveAsync(Guid hubId)
     {

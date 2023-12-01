@@ -9,6 +9,7 @@ public static class Errors
         public const string MemberNotInRoom = "member_not_in_room";
         public const string MaxMembersInRoomReached = "maxmembers_in_room_reached";
         public const string JoinFilterValidationFail = "join_filter_validation_fail";
+        public const string CannotCreateMoreThanOneHub = "cannot_create_more_than_one_hub";
         #endregion
     }
 

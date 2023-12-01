@@ -27,9 +27,10 @@ public class AutoStrategiesTests
 
         var interactor = new MatchHubsInteractor(new Mock<IMatchHubs>().Object);
 
-        IMatchHub hub = await interactor.CreateAsync(options);
-
         var member1Id = Guid.NewGuid();
+
+        IMatchHub hub = await interactor.CreateAsync(options, member1Id);
+
         var member2Id = Guid.NewGuid();
         var roomId = hub.Rooms.First().Id;
 
@@ -45,8 +46,7 @@ public class AutoStrategiesTests
         hub.Ready += callback;
 
         // act
-        interactor.JoinMember(member1Id, hub, roomId);
-        interactor.JoinMember(member2Id, hub, roomId);
+        await interactor.JoinMember(member2Id, hub, roomId);
 
         await tcs.Task;
 
@@ -74,9 +74,8 @@ public class AutoStrategiesTests
         };
 
         var interactor = new MatchHubsInteractor(new Mock<IMatchHubs>().Object);
-
-        IMatchHub hub = await interactor.CreateAsync(options);
-
+        var userId = Guid.NewGuid();
+        IMatchHub hub = await interactor.CreateAsync(options, userId);
         bool autoStrategyWorkedOut = false;
         var tcs = new TaskCompletionSource<bool>();
 
@@ -86,7 +85,9 @@ public class AutoStrategiesTests
             autoStrategyWorkedOut = true;
         };
 
+
         hub.Disposed += callback;
+        await interactor.LeaveMember(userId, hub);
 
         // act
         await tcs.Task;

@@ -13,7 +13,7 @@ public class MatchHubInteractorTests
         var interactor = new MatchHubsInteractor(storage);
 
         // act
-        await interactor.CreateAsync(new MatchHubOptions());
+        await interactor.CreateAsync(new MatchHubOptions(), Guid.NewGuid());
 
         // assert
         storage.Count.ShouldBe(1);
@@ -27,7 +27,7 @@ public class MatchHubInteractorTests
         var interactor = new MatchHubsInteractor(storage);
 
         // act
-        var hub = await interactor.CreateAsync(new MatchHubOptions());
+        var hub = await interactor.CreateAsync(new MatchHubOptions(), Guid.NewGuid());
         await interactor.DeleteAsync(hub.Id);
 
         // assert

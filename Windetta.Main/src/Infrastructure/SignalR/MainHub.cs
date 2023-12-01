@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.SignalR;
 using Windetta.Main.Games;
 using Windetta.Main.MatchHub;
 
 namespace Windetta.Main.Infrastructure.SignalR;
 
+[Authorize(Policy = "NeedRealtimeScope")]
 internal class MainHub : Hub
 {
     private readonly ILogger<MainHub> _logger;
@@ -28,7 +30,7 @@ internal class MainHub : Hub
 
         if (game is null)
         {
-            await Clients.Caller.SendCoreAsync("onError", new[] { "A game with this id does not exist" });
+            await Clients.Caller.SendCoreAsync("onOccuredError", new[] { "A game with this id does not exist" });
 
             return;
         }
@@ -42,11 +44,9 @@ internal class MainHub : Hub
 
         var userId = Guid.Parse(Context.UserIdentifier ?? Guid.NewGuid().ToString());
 
-        var hub = await _interactor.CreateAsync(options);
+        var hub = await _interactor.CreateAsync(options, userId);
 
         _dispatcher.AddToTracking(hub);
-
-        await _interactor.JoinMember(userId, hub);
 
         await Groups.AddToGroupAsync(Context.ConnectionId, hub.Id.ToString());
     }
@@ -55,20 +55,28 @@ internal class MainHub : Hub
     {
         var hubs = await _interactor.GetAllAsync();
 
-        await Clients.Caller.SendCoreAsync("onReceiveMatchHubs", hubs.ToArray());
+        await Clients.Caller.SendCoreAsync("onReceivedMatchHubs", hubs.ToArray());
     }
 
-    public override Task OnConnectedAsync()
+    public override async Task OnConnectedAsync()
     {
         _logger.LogInformation($"Connected: {Context.ConnectionId} \n UserId: {Context.UserIdentifier}");
 
-        return base.OnConnectedAsync();
+        var userId = new Guid(Context.UserIdentifier!);
+        var hubId = await _interactor.GetHubIdByUserId(userId);
+
+        if (hubId.HasValue == true)
+            await Groups.AddToGroupAsync(Context.ConnectionId, hubId.Value.ToString());
     }
 
-    public override Task OnDisconnectedAsync(Exception? exception)
+    public override async Task OnDisconnectedAsync(Exception? exception)
     {
         _logger.LogInformation($"Disconnected: {Context.ConnectionId} \n UserId: {Context.UserIdentifier}");
 
-        return base.OnDisconnectedAsync(exception);
+        var userId = new Guid(Context.UserIdentifier!);
+        var hubId = await _interactor.GetHubIdByUserId(userId);
+
+        if (hubId.HasValue == true)
+            await _interactor.LeaveMember(userId, hubId.Value);
     }
 }

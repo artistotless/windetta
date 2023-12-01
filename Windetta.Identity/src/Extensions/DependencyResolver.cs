@@ -57,10 +57,12 @@ public static class DependencyResolver
         using var provider = services.BuildServiceProvider();
 
         var authBuilder = services.AddAuthentication();
+
         var configuration = provider.GetRequiredService<IConfiguration>();
+
         authBuilder.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
          {
-             options.Authority = "https://localhost:5001";
+             options.Authority = "https://localhost:7159";
              options.TokenValidationParameters = new TokenValidationParameters
              {
                  ValidateAudience = false

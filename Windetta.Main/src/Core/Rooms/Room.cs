@@ -25,10 +25,15 @@ public class Room : IDisposable
     /// <param name="maxMembers">0 - unlimit</param>
     public Room(uint maxMembers = 0) : this(Guid.NewGuid(), maxMembers) { }
 
-    public Room(Guid id, uint maxMembers = 0)
+    public Room(Guid id, uint maxMembers = 0, IEnumerable<RoomMember>? members = null)
     {
         Id = id;
-        _members = new List<RoomMember>((int)maxMembers);
+
+        if (members is not null)
+            _members = members.ToList();
+        else
+            _members = new List<RoomMember>((int)maxMembers);
+
         MaxMembers = maxMembers;
     }
 

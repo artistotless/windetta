@@ -1,0 +1,33 @@
+﻿using System.Collections.Concurrent;
+
+namespace Windetta.Main.Core.MatchHub;
+
+public class InMemoryMatchHubUsersAssociations : IMatchHubUsersAssociations
+{
+    private readonly ConcurrentDictionary<Guid, Guid> _store;
+
+    public InMemoryMatchHubUsersAssociations()
+    {
+        _store = new();
+    }
+
+    public Guid? GetHubId(Guid userId)
+    {
+        Guid? result = null;
+
+        if (_store.TryGetValue(userId, out Guid value))
+            result = value;
+
+        return result;
+    }
+
+    public void Set(Guid hubId, Guid userId)
+    {
+        _store.TryAdd(userId, hubId);
+    }
+
+    public void Remove(Guid userId)
+    {
+        _store.TryRemove(userId, out _);
+    }
+}

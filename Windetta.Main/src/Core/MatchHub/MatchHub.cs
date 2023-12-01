@@ -15,6 +15,8 @@ internal class MatchHub : IMatchHub
     public IReadOnlyCollection<string>? JoinFilters { get; init; }
     public IEnumerable<Room> Rooms => _rooms.Values;
 
+    public MatchHubState State { get; set; }
+
     //Events
     public event EventHandler Updated;
     public event EventHandler Disposed;
@@ -30,6 +32,7 @@ internal class MatchHub : IMatchHub
     public MatchHub(MatchHubOptions options)
     {
         Id = Guid.NewGuid();
+        State = MatchHubState.Awaiting;
         Created = DateTimeOffset.UtcNow;
         IsPublic = !options.Private;
         Configuration = options.GameConfiguration;
@@ -107,6 +110,7 @@ internal class MatchHub : IMatchHub
 
     void IHubReadyListener.OnHubAutoReady()
     {
+        State = MatchHubState.Ready;
         Ready?.Invoke(this, null);
     }
 
