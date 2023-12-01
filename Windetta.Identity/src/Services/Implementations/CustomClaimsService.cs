@@ -33,6 +33,9 @@ internal sealed class CustomClaimsService : DefaultClaimsService
         var baseClaims = await base.GetAccessTokenClaimsAsync(subject, resourceResult, request);
         var claims = new List<Claim>(baseClaims);
 
+        if (subject is null)
+            return claims;
+
         var roleScope = baseClaims.FirstOrDefault(
             x => x.Type.Equals("scope") && x.Value.Equals(JwtClaimTypes.Role));
 

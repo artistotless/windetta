@@ -1,6 +1,6 @@
 ﻿using Windetta.Main.Games;
 
-namespace Windetta.Main.Infrastructure.Data;
+namespace Windetta.Main.Infrastructure.Data.Fake;
 
 public class FakeGamesRepository : IGames
 {

@@ -18,17 +18,18 @@ public class HubFiltersTests
             GameConfiguration = new() { MaxPlayers = 2, },
             JoinFilters = new[] { filter.Name }
         };
-        var interactor = new MatchHubsInteractor(new Mock<IMatchHubs>().Object, new[] { filter });
-        var userId = Guid.NewGuid();
-        var hub = await interactor.CreateAsync(options);
+        var interactor = new MatchHubsInteractor(new Mock<IMatchHubs>().Object, null, new[] { filter });
+        var initiatorId = Guid.NewGuid();
+        var memberId = Guid.NewGuid();
+        var hub = await interactor.CreateAsync(options, initiatorId);
         var room = hub.Rooms.First();
 
         // act
         var exception = await Should.ThrowAsync<WindettaException>(
-            () => interactor.JoinMember(userId, hub, room.Id));
+            () => interactor.JoinMember(memberId, hub, room.Id));
 
         // assert
-        room.MembersCount.ShouldBe(0);
+        room.MembersCount.ShouldBe(1);
         exception.ErrorCode.ShouldMatch(Errors.Main.JoinFilterValidationFail);
         exception.Message.ShouldMatch("join rejected");
     }

@@ -1,5 +1,4 @@
 using IdentityServer4.Services;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Windetta.Common.IdentityServer;
@@ -7,29 +6,22 @@ using Windetta.Identity.Models;
 
 namespace IdentityServerHost.Quickstart.UI
 {
-    //[SecurityHeaders]
-    //[AllowAnonymous]
-    //[Authorize(Roles = Roles.ADMIN)]
     [Authorize(AuthenticationSchemes = BearerCookies.Scheme)]
     [Route("[controller]/[action]")]
     public class HomeController : Controller
     {
         private readonly IIdentityServerInteractionService _interaction;
         private readonly IWebHostEnvironment _environment;
-        private readonly IAuthenticationSchemeProvider _a;
 
-        public HomeController(IIdentityServerInteractionService interaction, IWebHostEnvironment environment, IAuthenticationSchemeProvider a)
+        public HomeController(IIdentityServerInteractionService interaction, IWebHostEnvironment environment)
         {
             _interaction = interaction;
             _environment = environment;
-            _a = a;
         }
 
-        [Authorize(Roles = "admin")]
+        //[Authorize(Roles = "admin")]
         public IActionResult Index()
         {
-            var u = User;
-
             if (_environment.IsDevelopment())
             {
                 // only show in development

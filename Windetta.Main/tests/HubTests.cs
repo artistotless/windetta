@@ -26,7 +26,7 @@ public class HubTests
         // act
         var interactor = new MatchHubsInteractor(new Mock<IMatchHubs>().Object);
 
-        IMatchHub hub = await interactor.CreateAsync(options);
+        IMatchHub hub = await interactor.CreateAsync(options, Guid.NewGuid());
 
         // assert
         hub.Rooms.Count().ShouldBe((int)config.MaxTeams);
@@ -49,13 +49,11 @@ public class HubTests
         };
 
         var interactor = new MatchHubsInteractor(new Mock<IMatchHubs>().Object);
-
-        IMatchHub hub = await interactor.CreateAsync(options);
         var userId = Guid.NewGuid();
-        var room = hub.Rooms.First();
 
         // act
-        interactor.JoinMember(userId, hub, room.Id);
+        IMatchHub hub = await interactor.CreateAsync(options, userId);
+        var room = hub.Rooms.First();
 
         // assert
         room.Members.ShouldContain(x => x.Id == userId);
@@ -79,7 +77,7 @@ public class HubTests
 
         var interactor = new MatchHubsInteractor(new Mock<IMatchHubs>().Object);
 
-        IMatchHub hub = await interactor.CreateAsync(options);
+        IMatchHub hub = await interactor.CreateAsync(options, Guid.NewGuid());
         var memberId = Guid.NewGuid();
         var roomId = hub.Rooms.First().Id;
         bool updateEventRaised = false;
@@ -94,7 +92,7 @@ public class HubTests
         hub.Updated += callback;
 
         // act
-        interactor.JoinMember(memberId, hub, roomId);
+        await interactor.JoinMember(memberId, hub, roomId);
 
         // assert
         updateEventRaised.ShouldBeTrue();
@@ -118,7 +116,7 @@ public class HubTests
 
         var interactor = new MatchHubsInteractor(new Mock<IMatchHubs>().Object);
 
-        IMatchHub hub = await interactor.CreateAsync(options);
+        IMatchHub hub = await interactor.CreateAsync(options, Guid.NewGuid());
         var memberId = Guid.NewGuid();
         var roomId = hub.Rooms.First().Id;
         bool updateEventRaised = false;
@@ -131,9 +129,9 @@ public class HubTests
         };
 
         // act
-        interactor.JoinMember(memberId, hub, roomId);
+        await interactor.JoinMember(memberId, hub, roomId);
         hub.Updated += callback;
-        interactor.LeaveMember(memberId, hub);
+        await interactor.LeaveMember(memberId, hub);
 
         // assert
         updateEventRaised.ShouldBeTrue();

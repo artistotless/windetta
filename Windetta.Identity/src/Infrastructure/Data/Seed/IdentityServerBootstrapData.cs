@@ -1,6 +1,5 @@
 ﻿using IdentityServer4;
 using IdentityServer4.Models;
-using IdentityServer4.Services;
 using System.Security.Claims;
 
 namespace Windetta.Identity.Infrastructure.Data.Seed;
@@ -13,7 +12,9 @@ public static class IdentityServerBootstrapData
         new IdentityResources.OpenId(),
         new IdentityResources.Profile(),
         new IdentityResources.Email(),
-        new IdentityResource("role",new[]{ClaimTypes.Role}){Emphasize = true}
+        new IdentityResource("role","Your role", new[]{ClaimTypes.Role}){
+            Emphasize = true
+        }
     };
 
     public static IEnumerable<ApiResource> ApiResources =>
@@ -25,7 +26,10 @@ public static class IdentityServerBootstrapData
     public static IEnumerable<ApiScope> ApiScopes =>
         new ApiScope[]
         {
-            new ApiScope("api1")
+            new ApiScope("realtime","Realtime")
+            {
+                Description = "Manage lobbies: create, join, leave"
+            },
         };
 
     public static IEnumerable<Client> Clients =>
@@ -37,21 +41,22 @@ public static class IdentityServerBootstrapData
             ClientId = "windetta.web",
             ClientSecrets = { new Secret("secret".Sha256()) },
             AllowedGrantTypes = GrantTypes.CodeAndClientCredentials,
-
+            RequireConsent = true,
+            Properties = new Dictionary<string,string>(){
+               {"verified", "true"}
+            },
             // where to redirect to after login
-            RedirectUris = { "https://localhost:7129/signin-oidc" },
-
+            RedirectUris = { "https://localhost:7084/signin-oidc" },
             // where to redirect to after logout
-            PostLogoutRedirectUris = { "https://localhost:7129/signout-callback-oidc" },
+            PostLogoutRedirectUris = { "https://localhost:7084/signout-callback-oidc" },
             AllowOfflineAccess = true,
-
             AllowedScopes = new List<string>
             {
                 IdentityServerConstants.StandardScopes.OpenId,
                 IdentityServerConstants.StandardScopes.Profile,
                 IdentityServerConstants.StandardScopes.Email,
                 IdentityServerConstants.StandardScopes.Address,
-                "api1"
+                "realtime","role"
             }
         },
          //JavaScript Client
@@ -66,7 +71,6 @@ public static class IdentityServerBootstrapData
             PostLogoutRedirectUris = { "https://localhost:5003/index.html" },
             AllowedCorsOrigins =     { "https://localhost:5003" },
             RequireConsent = true,
-            Claims = new[]{ new ClientClaim("verified", "true") },
 
             AllowedScopes =
             {
@@ -74,7 +78,7 @@ public static class IdentityServerBootstrapData
                 IdentityServerConstants.StandardScopes.Profile,
                 IdentityServerConstants.StandardScopes.Email,
                 "role",
-                "api1"
+                "realtime"
             }
         }
     };

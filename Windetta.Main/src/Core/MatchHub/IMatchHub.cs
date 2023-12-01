@@ -6,6 +6,8 @@ public interface IMatchHub : IHubDisposeListener, IHubReadyListener, IDisposable
 {
     Guid Id { get; }
 
+    MatchHubState State { get; protected set; }
+
     event EventHandler Updated;
     event EventHandler Disposed;
     event EventHandler Ready;

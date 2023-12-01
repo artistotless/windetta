@@ -13,7 +13,7 @@ public class DateDisposeStrategy : AutoDisposeStrategy
 
     protected override bool CheckDisposed()
     {
-        if ((DateTimeOffset.UtcNow - _created).TotalSeconds > 5 && Hub.Rooms.Sum(x => x.MembersCount) <= 0)
+        if ((DateTimeOffset.UtcNow - _created).TotalSeconds > 2 && Hub.Rooms.Sum(x => x.MembersCount) <= 0)
             return true;
         else return false;
     }

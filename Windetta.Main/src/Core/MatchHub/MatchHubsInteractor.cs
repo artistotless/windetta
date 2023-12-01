@@ -1,5 +1,7 @@
 ﻿using Windetta.Common.Constants;
 using Windetta.Common.Types;
+using Windetta.Main.Core.MatchHub;
+using Windetta.Main.Core.MatchHub.Dtos;
 using Windetta.Main.MatchHub.Filters;
 using Windetta.Main.Rooms;
 
@@ -8,22 +10,38 @@ namespace Windetta.Main.MatchHub;
 public class MatchHubsInteractor : IScopedService
 {
     private readonly IMatchHubs _hubs;
+    private readonly IMatchHubUsersAssociations _matchHubsUsersSets;
     private readonly IEnumerable<IJoinFilter>? _filters;
 
-    public MatchHubsInteractor(IMatchHubs hubs, IEnumerable<IJoinFilter>? filters = null)
+    public MatchHubsInteractor(IMatchHubs hubs,
+        IMatchHubUsersAssociations? matchHubsUsersSets = null,
+        IEnumerable<IJoinFilter>? filters = null)
     {
         _hubs = hubs;
         _filters = filters;
+        _matchHubsUsersSets = matchHubsUsersSets?? new InMemoryMatchHubUsersAssociations();
     }
 
-    public async Task<IEnumerable<IMatchHub>> GetAllAsync()
+    public async Task<Guid?> GetHubIdByUserId(Guid userId)
+        => _matchHubsUsersSets.GetHubId(userId);
+
+    public async Task<IEnumerable<MatchHubDto>> GetAllAsync()
     {
         return await _hubs.GetAllAsync();
     }
 
-    public async Task<IMatchHub> CreateAsync(MatchHubOptions options)
+    public async Task<IMatchHub> CreateAsync(MatchHubOptions options, Guid initiatorId)
     {
+        var hubId = await GetHubIdByUserId(initiatorId);
+
+        if (hubId.HasValue)
+            throw new WindettaException(Errors.Main.CannotCreateMoreThanOneHub);
+
         IMatchHub hub = new MatchHub(options);
+
+        var initiator = new RoomMember(initiatorId);
+
+        hub.Add(initiator, hub.Rooms.First().Id);
 
         await _hubs.AddAsync(hub);
 
@@ -43,10 +61,11 @@ public class MatchHubsInteractor : IScopedService
     {
         var hub = await _hubs.GetAsync(hubId);
 
-        await _hubs.RemoveAsync(hub);
+        await _hubs.RemoveAsync(hub.Id);
 
         hub.Dispose();
     }
+
     public async Task JoinMember(Guid userId, Guid hubId)
     {
         var hub = await _hubs.GetAsync(hubId);
@@ -79,18 +98,22 @@ public class MatchHubsInteractor : IScopedService
         var member = new RoomMember(userId);
 
         hub.Add(member, roomId);
+
+        _matchHubsUsersSets.Set(hub.Id, userId);
     }
 
     public async Task LeaveMember(Guid userId, Guid hubId)
     {
         var hub = await _hubs.GetAsync(hubId);
 
-        LeaveMember(userId, hub);
+        await LeaveMember(userId, hub);
     }
 
-    public void LeaveMember(Guid userId, IMatchHub hub)
+    public async Task LeaveMember(Guid userId, IMatchHub hub)
     {
         hub.Remove(userId);
+
+        _matchHubsUsersSets.Remove(userId);
     }
 
     private async Task ExecuteJoinFilters(Guid userId, IReadOnlyCollection<string> joinFilters)
