@@ -4,12 +4,20 @@ public static class Errors
 {
     public static class Main
     {
-        #region Room
-        public const string MemberAlreadyJoined = "member_already_joined";
+        #region MatchHub
+        public const string MemberAlreadyJoinedRoom = "member_already_joined_room";
         public const string MemberNotInRoom = "member_not_in_room";
         public const string MaxMembersInRoomReached = "maxmembers_in_room_reached";
         public const string JoinFilterValidationFail = "join_filter_validation_fail";
-        public const string CannotCreateMoreThanOneHub = "cannot_create_more_than_one_hub";
+        public const string BetValidationFail = "bet_validation_fail";
+        public const string AlreadyMemberOfHub = "already_member_of_hub";
+        public const string MatchHubNotFound = "matchhub_notfound";
+        public const string BetIsLessMinimumAllowed = "bet_is_less_minimum_allowed";
+        public const string InvalidPluginId = "invalid_plugin_id";
+        #endregion
+
+        #region Game
+        public const string GameConfigurationsNotFound = "game_configurations_notfound";
         #endregion
     }
 

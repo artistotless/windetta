@@ -1,5 +1,5 @@
-﻿using Windetta.Main.Core.MatchHub.Dtos;
-using Windetta.Main.MatchHub;
+﻿using Windetta.Main.Core.MatchHubs.Dtos;
+using Windetta.Main.MatchHubs;
 
 namespace Windetta.Main.Infrastructure.Data.EFCore;
 
@@ -8,9 +8,11 @@ public class MatchHubDbModel
     private string _instanceId;
 
     public Guid Id { get; set; }
+    public Guid GameId { get; set; }
     public MatchHubState State { get; set; }
 
     public DateTimeOffset Created { get; set; }
+    public DateTimeOffset Updated { get; set; }
     public Bet Bet { get; set; }
     public IEnumerable<string>? JoinFilters { get; set; }
     public IEnumerable<RoomDbModel> Rooms { get; set; }
@@ -27,7 +29,9 @@ public class MatchHubDbModel
         return new MatchHubDbModel()
         {
             Bet = matchHub.Bet,
-            Created = matchHub.Created,
+            GameId = matchHub.GameId,
+            Created = matchHub.CreatedAt,
+            Updated = matchHub.UpdatedAt,
             State = matchHub.State,
             Id = matchHub.Id,
             JoinFilters = matchHub.JoinFilters,
@@ -47,9 +51,11 @@ public class MatchHubDbModel
                 OrganizerId = dbModel.OrganizerId.Value,
                 Description = dbModel.Description,
                 State = dbModel.State,
+                GameId = dbModel.GameId,
                 Site = dbModel.Site,
                 Bet = dbModel.Bet,
                 Created = dbModel.Created,
+                Updated = dbModel.Updated,
                 Id = dbModel.Id,
                 JoinFilters = dbModel.JoinFilters,
                 Rooms = dbModel.Rooms.Select(RoomDbModel.MapTo),
@@ -61,7 +67,9 @@ public class MatchHubDbModel
             {
                 Bet = dbModel.Bet,
                 State = dbModel.State,
+                GameId = dbModel.GameId,
                 Created = dbModel.Created,
+                Updated = dbModel.Updated,
                 Id = dbModel.Id,
                 JoinFilters = dbModel.JoinFilters,
                 Rooms = dbModel.Rooms.Select(RoomDbModel.MapTo)

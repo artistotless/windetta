@@ -3,14 +3,14 @@ using Windetta.Common.Types;
 
 namespace Windetta.Main.Infrastructure.Services;
 
-[ExcludeFromAutoInject]
+[AutoInjectExclude]
 public class DefaultInstanceIdProvider : IInstanceIdProvider
 {
-    private readonly string? _instanceIdValue;
+    private string? _instanceId;
 
     public DefaultInstanceIdProvider(string? instanceId = null)
     {
-        _instanceIdValue = instanceId;
+        _instanceId = instanceId;
     }
 
     public string GetId()
@@ -23,10 +23,13 @@ public class DefaultInstanceIdProvider : IInstanceIdProvider
             return template(new Guid(envValue));
 
         // Get value from configuration
-        if (!string.IsNullOrEmpty(_instanceIdValue))
-            return template(new Guid(_instanceIdValue));
+        if (!string.IsNullOrEmpty(_instanceId))
+            return template(new Guid(_instanceId));
 
         // Fallback - generate new id
-        return template(Guid.NewGuid());
+        var generatedId = Guid.NewGuid();
+        _instanceId = generatedId.ToString();
+
+        return template(generatedId);
     }
 }

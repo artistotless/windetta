@@ -24,7 +24,7 @@ public static class Extensions
         var implementationServices = allTypes
             .Where(x => x.IsClass)
             .Where(x => !x.CustomAttributes.Any(
-                x => x.AttributeType == typeof(ExcludeFromAutoInjectAttribute)))
+                x => x.AttributeType == typeof(AutoInjectExcludeAttribute)))
             .Where(x => x.IsAssignableTo(typeof(IServiceLifetime)))
             .Where(x => x.IsAbstract == false)
             .ToList();
@@ -65,6 +65,19 @@ public static class Extensions
         Type implementationType,
         Type serviceType)
     {
+        var serviceTypeAttr = implementationType
+            .GetCustomAttribute(typeof(AutoInjectServiceTypeAttribute<>));
+
+        if (serviceTypeAttr is not null)
+        {
+            var serviceTypeReplacement = serviceTypeAttr
+                .GetType()
+                .GetProperty(AutoInjectServiceTypeAttribute<object>.NameOfProperty)?
+                .GetValue(serviceTypeAttr);
+
+            serviceType = (Type)serviceTypeReplacement!;
+        }
+
         var registered = builder
             .RegisterType(implementationType);
 

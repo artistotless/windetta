@@ -1,11 +1,11 @@
 ﻿using System.Collections.Concurrent;
 using Windetta.Common.Types;
-using Windetta.Main.Core.MatchHub.Dtos;
-using Windetta.Main.MatchHub;
+using Windetta.Main.Core.MatchHubs.Dtos;
+using Windetta.Main.MatchHubs;
 
 namespace Windetta.Main.Infrastructure.Data;
 
-[ExcludeFromAutoInject]
+[AutoInjectExclude]
 public class HubsFromMemoryDecorator : IMatchHubs
 {
     private readonly IMatchHubs _decoratee;

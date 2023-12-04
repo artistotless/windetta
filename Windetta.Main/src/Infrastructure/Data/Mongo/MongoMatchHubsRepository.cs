@@ -1,7 +1,7 @@
 ﻿using MongoDB.Driver;
-using Windetta.Main.Core.MatchHub.Dtos;
+using Windetta.Main.Core.MatchHubs.Dtos;
 using Windetta.Main.Infrastructure.Services;
-using Windetta.Main.MatchHub;
+using Windetta.Main.MatchHubs;
 
 namespace Windetta.Main.Infrastructure.Data.Mongo;
 
@@ -46,9 +46,12 @@ public class MongoMatchHubsRepository : IMatchHubs
 
     public async Task UpdateAsync(IMatchHub hub)
     {
-        await _context.MatchHubsCollections.ReplaceOneAsync(
-              filter: h => h.Id == hub.Id && h.InstanceId == _idProvider.GetId(),
-              replacement: MatchHubDbModel.MapFrom(hub),
-              options: new ReplaceOptions() { IsUpsert = true });
+        var updated = MatchHubDbModel.MapFrom(hub);
+        updated.InstanceId = _idProvider.GetId();
+
+        var result = await _context.MatchHubsCollections.ReplaceOneAsync(
+                filter: h => h.Id == hub.Id && h.InstanceId == _idProvider.GetId(),
+                replacement: updated,
+                options: new ReplaceOptions() { IsUpsert = true });
     }
 }

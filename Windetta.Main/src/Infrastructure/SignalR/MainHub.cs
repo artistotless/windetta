@@ -1,68 +1,71 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
-using Windetta.Main.Games;
-using Windetta.Main.MatchHub;
+using Windetta.Main.Core.MatchHubs.Dtos;
+using Windetta.Main.MatchHubs;
 
 namespace Windetta.Main.Infrastructure.SignalR;
 
 [Authorize(Policy = "NeedRealtimeScope")]
 internal class MainHub : Hub
 {
-    private readonly ILogger<MainHub> _logger;
-    private readonly IGames _games;
     private readonly MatchHubsInteractor _interactor;
     private readonly MatchHubsDispatcher _dispatcher;
 
-    public MainHub(IGames games,
-        MatchHubsInteractor interactor,
-        MatchHubsDispatcher dispatcher,
-        ILogger<MainHub> logger)
+    public MainHub(MatchHubsInteractor interactor, MatchHubsDispatcher dispatcher)
     {
-        _games = games;
         _interactor = interactor;
         _dispatcher = dispatcher;
-        _logger = logger;
     }
 
     public async Task CreateMatchHub(Guid gameId, Bet bet, bool privateHub = false)
     {
-        var game = await _games.GetAsync(gameId);
+        var userId = Guid.Parse(Context.UserIdentifier!);
 
-        if (game is null)
-        {
-            await Clients.Caller.SendCoreAsync("onOccuredError", new[] { "A game with this id does not exist" });
-
-            return;
-        }
-
-        var options = new MatchHubOptions()
+        var createRequest = new CreateMatchHubRequest()
         {
             Bet = bet,
+            InitiatorId = userId,
+            GameId = gameId,
             Private = privateHub,
-            GameConfiguration = game.Configuration
         };
 
-        var userId = Guid.Parse(Context.UserIdentifier ?? Guid.NewGuid().ToString());
-
-        var hub = await _interactor.CreateAsync(options, userId);
+        var hub = await _interactor.CreateAsync(createRequest);
 
         _dispatcher.AddToTracking(hub);
 
         await Groups.AddToGroupAsync(Context.ConnectionId, hub.Id.ToString());
+
+        await Clients.All.SendAsync("onAddedMatchHub", new MatchHubDto(hub));
+    }
+
+    public async Task JoinHub(Guid hubId, Guid roomId)
+    {
+        var userId = Guid.Parse(Context.UserIdentifier!);
+
+        await _interactor.JoinMember(userId, hubId, roomId);
+
+        await Groups.AddToGroupAsync(Context.ConnectionId, hubId.ToString());
+    }
+
+    public async Task LeaveHub(Guid hubId)
+    {
+        var userId = Guid.Parse(Context.UserIdentifier!);
+
+        await _interactor.LeaveMember(userId, hubId);
+
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, hubId.ToString());
     }
 
     public async Task GetMatchHubs()
     {
         var hubs = await _interactor.GetAllAsync();
 
-        await Clients.Caller.SendCoreAsync("onReceivedMatchHubs", hubs.ToArray());
+        await Clients.Caller.SendAsync("onReceivedMatchHubs", hubs.ToArray());
     }
 
     public override async Task OnConnectedAsync()
     {
-        _logger.LogInformation($"Connected: {Context.ConnectionId} \n UserId: {Context.UserIdentifier}");
-
-        var userId = new Guid(Context.UserIdentifier!);
+        var userId = Guid.Parse(Context.UserIdentifier!);
         var hubId = await _interactor.GetHubIdByUserId(userId);
 
         if (hubId.HasValue == true)
@@ -71,9 +74,7 @@ internal class MainHub : Hub
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        _logger.LogInformation($"Disconnected: {Context.ConnectionId} \n UserId: {Context.UserIdentifier}");
-
-        var userId = new Guid(Context.UserIdentifier!);
+        var userId = Guid.Parse(Context.UserIdentifier!);
         var hubId = await _interactor.GetHubIdByUserId(userId);
 
         if (hubId.HasValue == true)

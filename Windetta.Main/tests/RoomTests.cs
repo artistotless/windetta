@@ -41,7 +41,7 @@ public class RoomTests
 
         // assert
         exception.ShouldNotBeNull();
-        exception.ErrorCode.ShouldBe(Errors.Main.MemberAlreadyJoined);
+        exception.ErrorCode.ShouldBe(Errors.Main.MemberAlreadyJoinedRoom);
     }
 
     [Fact]

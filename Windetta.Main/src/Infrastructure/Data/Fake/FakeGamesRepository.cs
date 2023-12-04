@@ -1,4 +1,5 @@
-﻿using Windetta.Main.Games;
+﻿using Windetta.Main.Core.Exceptions;
+using Windetta.Main.Games;
 
 namespace Windetta.Main.Infrastructure.Data.Fake;
 
@@ -31,11 +32,11 @@ public class FakeGamesRepository : IGames
         return Task.CompletedTask;
     }
 
-    public async Task<Game> GetAsync(Guid id)
+    public Task<Game?> GetAsync(Guid id)
     {
         var game = _games.FirstOrDefault(x => x.Id == id);
 
-        return await Task.FromResult(game);
+        return Task.FromResult(game);
     }
 
     public Task RemoveAsync(Game game)
@@ -48,5 +49,18 @@ public class FakeGamesRepository : IGames
     public Task UpdateAsync(Game game)
     {
         return Task.CompletedTask;
+    }
+
+    public Task<(GameConfiguration, IEnumerable<SupportedCurrency>)> GetConfigurationsAsync(Guid id)
+    {
+        var configurations = _games
+            .Where(g => g.Id == id)
+            .Select(g => (g.Configuration, g.SupportedCurrencies))
+            .FirstOrDefault();
+
+        if (configurations.SupportedCurrencies is null)
+            throw GameConfigurationException.NotFound;
+
+        return Task.FromResult(configurations);
     }
 }

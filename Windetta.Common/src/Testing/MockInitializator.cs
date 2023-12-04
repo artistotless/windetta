@@ -4,13 +4,28 @@ namespace Windetta.Common.Testing;
 
 public abstract class MockInitializator<TMockable> where TMockable : class
 {
-    public Mock<TMockable> Mock { get; private set; }
+    protected bool isSetup { get; private set; }
+
+    private Mock<TMockable> _mock;
+    public Mock<TMockable> Mock
+    {
+        get
+        {
+            if (!isSetup)
+                Setup(_mock);
+
+            isSetup = true;
+            return _mock;
+        }
+        private set
+        {
+            _mock = value;
+        }
+    }
 
     protected MockInitializator()
     {
         Mock = new Mock<TMockable>();
-
-        Setup(Mock);
     }
 
     protected abstract void Setup(Mock<TMockable> mock);

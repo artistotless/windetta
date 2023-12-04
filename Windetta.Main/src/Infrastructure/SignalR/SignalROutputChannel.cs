@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR;
-using Windetta.Main.Core.MatchHub.Dtos;
+using Windetta.Main.Core.MatchHubs.Dtos;
 using Windetta.Main.Infrastructure.SignalR;
-using Windetta.Main.MatchHub;
+using Windetta.Main.MatchHubs;
 
 namespace Windetta.Main.Infrastructure.MatchHub;
 

@@ -1,5 +1,4 @@
-﻿using Windetta.Common.Constants;
-using Windetta.Common.Types;
+﻿using Windetta.Main.Core.Exceptions;
 
 namespace Windetta.Main.Rooms;
 
@@ -40,11 +39,10 @@ public class Room : IDisposable
     internal void Add(RoomMember member)
     {
         if (MaxMembers != 0 && MembersCount == MaxMembers)
-            throw new WindettaException(
-                Errors.Main.MaxMembersInRoomReached);
+            throw RoomException.MaxMembersInRoomReached;
 
         if (Members.Contains(member))
-            throw new WindettaException(Errors.Main.MemberAlreadyJoined);
+            throw RoomException.MemberAlreadyJoinedRoom;
 
         _members.Add(member);
 
@@ -54,7 +52,7 @@ public class Room : IDisposable
     internal void Remove(RoomMember member)
     {
         if (!Members.Contains(member))
-            throw new WindettaException(Errors.Main.MemberNotInRoom);
+            throw RoomException.MemberNotInRoom;
 
         _members.Remove(member);
 

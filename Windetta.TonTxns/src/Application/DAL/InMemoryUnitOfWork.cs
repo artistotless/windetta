@@ -3,7 +3,7 @@ using Windetta.Common.Types;
 
 namespace Windetta.TonTxns.Application.DAL;
 
-[ExcludeFromAutoInject]
+[AutoInjectExclude]
 public partial class InMemoryUnitOfWork : IUnitOfWork
 {
     public IWithdrawalsRepository Withdrawals { get; set; }

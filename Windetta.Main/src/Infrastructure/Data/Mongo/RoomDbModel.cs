@@ -1,14 +1,9 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Bson;
-using Windetta.Main.Rooms;
-using MongoDB.Bson.Serialization.Serializers;
+﻿using Windetta.Main.Rooms;
 
 namespace Windetta.Main.Infrastructure.Data.Mongo;
 
 public class RoomDbModel
 {
-    [BsonSerializer(SerializerType = typeof(GuidSerializer))]
-    [BsonGuidRepresentation(GuidRepresentation.Standard)]
     public Guid Id { get; set; }
     public IEnumerable<RoomMember> Members { get; set; }
     public uint MaxMembers { get; set; }

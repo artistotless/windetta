@@ -1,4 +1,4 @@
-﻿using Windetta.Main.MatchHub.Strategies;
+﻿using Windetta.Main.MatchHubs.Strategies;
 
 namespace Windetta.MainTests.Mocks;
 
@@ -6,7 +6,7 @@ public class DateDisposeStrategy : AutoDisposeStrategy
 {
     private readonly DateTimeOffset _created;
 
-    public DateDisposeStrategy(TimeSpan checkInterval) : base(checkInterval)
+    public DateDisposeStrategy(TimeSpan? checkInterval = null) : base(checkInterval)
     {
         _created = DateTimeOffset.UtcNow;
     }

@@ -8,9 +8,8 @@ public class MongoDbContext : ISingletonService
 {
     public readonly IMongoCollection<MatchHubDbModel> MatchHubsCollections;
 
-    public MongoDbContext(IOptions<MongoDbOptions> options)
+    public MongoDbContext(IOptions<MongoDbOptions> options, IMongoClient client)
     {
-        var client = new MongoClient(options.Value.ConnectionURI);
         var db = client.GetDatabase(options.Value.DbName);
 
         MatchHubsCollections = db.GetCollection<MatchHubDbModel>("matchhubs");

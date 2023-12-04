@@ -1,7 +1,9 @@
-﻿using Windetta.Common.Testing;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Windetta.Common.Testing;
 using Windetta.Main.Games;
-using Windetta.Main.MatchHub;
+using Windetta.Main.MatchHubs;
 using Windetta.MainTests.Mocks;
+using Windetta.MainTests.Shared;
 using Xunit.Abstractions;
 
 namespace Windetta.MainTests;
@@ -18,27 +20,25 @@ public class MatchHubDispatcherTests
     public async Task UpdateMatchHubState_ShouldCausePrintingIntoOutputChannel()
     {
         // arrange
-        var config = new GameConfiguration()
+        var request = new CreateMatchHubRequest()
         {
-            MaxPlayers = 2,
-        };
-
-        var options = new MatchHubOptions()
-        {
-            GameConfiguration = config,
-            Bet = new Bet(currencyId: 1, bet: 100)
+            GameId = IdExamples.GameId,
+            InitiatorId = IdExamples.UserId,
+            Bet = new Bet(currencyId: 1, bet: 100),
         };
 
         var buffer = new Queue<string>();
-        var interactor = new MatchHubsInteractor(new Mock<IMatchHubs>().Object);
+        var interactor = SharedServiceProvider.GetInstance()
+            .GetRequiredService<MatchHubsInteractor>();
         var outputChannel = new MatchHubDebugOutputChannel(_output, ref buffer);
         var dispatcher = new MatchHubsDispatcher(outputChannel, new Mock<IMatchHubs>().Object);
-        var hub = await interactor.CreateAsync(options, Guid.NewGuid());
+        var hub = await interactor.CreateAsync(request);
         var roomId = hub.Rooms.First().Id;
 
         // act
         dispatcher.AddToTracking(hub);
-        await interactor.JoinMember(Guid.NewGuid(), hub, roomId);
+        await interactor.LeaveMember(request.InitiatorId, hub.Id);
+        await interactor.JoinMember(request.InitiatorId, hub.Id, roomId);
 
         // assert
         var text = $"Hub updated: {hub.Id}";
@@ -49,23 +49,20 @@ public class MatchHubDispatcherTests
     public async Task DisposeMatchHub_ShouldCausePrintingIntoOutputChannel()
     {
         // arrange
-        var config = new GameConfiguration()
+        var provider = SharedServiceProvider.GetInstance();
+        var request = new CreateMatchHubRequest()
         {
-            MaxPlayers = 2,
-        };
-
-        var options = new MatchHubOptions()
-        {
-            GameConfiguration = config,
-            Bet = new Bet(currencyId: 1, bet: 100)
+            Bet = new Bet(1, 1000),
+            GameId = IdExamples.GameId,
+            InitiatorId = IdExamples.UserId
         };
 
         var buffer = new Queue<string>();
-        var storage = new MatchHubsInMemoryStorage();
-        var interactor = new MatchHubsInteractor(storage);
+        var storage = provider.GetRequiredService<IMatchHubs>();
+        var interactor = provider.GetRequiredService<MatchHubsInteractor>();
         var outputChannel = new MatchHubDebugOutputChannel(_output, ref buffer);
         var dispatcher = new MatchHubsDispatcher(outputChannel, storage);
-        var hub = await interactor.CreateAsync(options, Guid.NewGuid());
+        var hub = await interactor.CreateAsync(request);
 
         // act
         dispatcher.AddToTracking(hub);
@@ -73,7 +70,7 @@ public class MatchHubDispatcherTests
 
         // assert
         var text = $"Hub deleted: {hub.Id}";
-        storage.Count.ShouldBe(0);
+        (await storage.GetAllAsync()).Count().ShouldBe(0);
         buffer.Dequeue().ShouldBe(text);
     }
 
@@ -81,31 +78,44 @@ public class MatchHubDispatcherTests
     public async Task ReadyMatchHub_ShouldCausePrintingIntoOutputChannel()
     {
         // arrange
-        var config = new GameConfiguration()
+        var gameCfg = new GameConfiguration()
         {
             MaxPlayers = 3,
         };
 
-        var options = new MatchHubOptions()
+        var sc = new[] { new SupportedCurrency(1, 1, 100000) };
+
+        var provider = SharedServiceProvider.GetInstance((services) =>
         {
-            GameConfiguration = config,
+            services.AddSingleton((p) => new GamesRepositoryMock(gameCfg, sc).Mock.Object);
+        });
+
+        var request = new CreateMatchHubRequest()
+        {
+            GameId = IdExamples.GameId,
+            InitiatorId = IdExamples.UserId,
             Bet = new Bet(currencyId: 1, bet: 100),
-            AutoReadyStrategy = new FullRoomsReadyStrategy(TimeSpan.FromSeconds(1)),
+            AutoReadyStrategy = nameof(FullRoomsReadyStrategy),
         };
 
         var buffer = new Queue<string>();
-        var storage = new MatchHubsInMemoryStorage();
-        var interactor = new MatchHubsInteractor(storage);
+        var storage = provider.GetRequiredService<IMatchHubs>();
+        var interactor = provider.GetRequiredService<MatchHubsInteractor>();
         var outputChannel = new MatchHubDebugOutputChannel(_output, ref buffer);
         var dispatcher = new MatchHubsDispatcher(outputChannel, storage);
-        var hub = await interactor.CreateAsync(options, Guid.NewGuid());
+        var hub = await interactor.CreateAsync(request);
         var roomId = hub.Rooms.First().Id;
 
         // act
         dispatcher.AddToTracking(hub);
         await interactor.JoinMember(Guid.NewGuid(), hub.Id, roomId);
         await interactor.JoinMember(Guid.NewGuid(), hub.Id, roomId);
-        await Task.Delay(1_000);
+
+        while (buffer.Count < 3 && new CancellationTokenSource
+            (TimeSpan.FromSeconds(6)).IsCancellationRequested == false)
+        {
+            await Task.Delay(100);
+        }
 
         // assert
         var text = $"Hub ready: {hub.Id}";

@@ -1,8 +1,10 @@
-﻿using Windetta.Main.Core.MatchHub.Dtos;
-using Windetta.Main.MatchHub;
+﻿using Windetta.Common.Types;
+using Windetta.Main.Core.MatchHubs.Dtos;
+using Windetta.Main.MatchHubs;
 
 namespace Windetta.Main.Infrastructure.Data.Fake;
 
+[AutoInjectExclude]
 public class FakeMatchHubsRepository : IMatchHubs
 {
     private readonly List<IMatchHub> _hubs = new();

@@ -1,46 +1,48 @@
 ﻿using Autofac;
 using Autofac.Extensions.DependencyInjection;
-using MongoDB.Bson.Serialization.Serializers;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson;
-using System.Reflection;
+using Microsoft.AspNetCore.SignalR;
 using Windetta.Common.Mongo;
 using Windetta.Common.Types;
-using Windetta.Main.Games;
 using Windetta.Main.Infrastructure;
-using Windetta.Main.Infrastructure.Authentication;
-using Windetta.Main.Infrastructure.Authorization;
 using Windetta.Main.Infrastructure.Data;
+using Windetta.Main.Infrastructure.Security;
 using Windetta.Main.Infrastructure.SignalR;
-using Windetta.Main.MatchHub;
+using Windetta.Main.MatchHubs;
 
-var builder = WebApplication.CreateBuilder(args);
-var services = builder.Services;
-var configuration = builder.Configuration;
-var assembly = Assembly.GetExecutingAssembly();
+var appBuilder = WebApplication.CreateBuilder(args);
+var services = appBuilder.Services;
 
 services.AddDefaultInstanceIdProvider();
 services.ConfigureAddAuthentication();
 services.ConfigureAddAuthorization();
-services.AddMongoOptions();
-services.AddSignalR();
+services.AddHttpContextAccessor();
+services.ConfigureAddCors();
+services.AddMatchHubUseCases();
+services.AddMatchHubPlugins();
+services.AddMongo();
 
-builder.Host.UseServiceProviderFactory(
-    new AutofacServiceProviderFactory(builder =>
-    {
-        builder.RegisterDecorator<HubsFromMemoryDecorator, IMatchHubs>();
-        builder.ResolveDependenciesFromAssembly();
-    }));
+services.AddSignalR(hubOptions =>
+{
+    hubOptions.AddFilter<SignalRExceptionFilter>();
+});
 
-var app = builder.Build();
+services.AddSingleton<SignalRExceptionFilter>();
 
+var autoFac = new AutofacServiceProviderFactory(builder =>
+{
+    builder.RegisterDecorator<HubsFromMemoryDecorator, IMatchHubs>();
+    builder.ResolveDependenciesFromAssembly();
+});
+
+appBuilder.Host.UseServiceProviderFactory(autoFac);
+
+var app = appBuilder.Build();
+
+app.UseCors("allow_any_origins");
 app.UseAuthentication();
 app.UseAuthorization();
 
-BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
-
 app.MapGet("/", () => "Windetta");
-
 app.MapHub<MainHub>("/mainHub");
 
 app.Run();
