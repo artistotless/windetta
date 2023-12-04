@@ -1,5 +1,4 @@
 using Autofac.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using System.Reflection;
 using Windetta.Common.Constants;
 using Windetta.Common.Database;
@@ -7,6 +6,7 @@ using Windetta.Common.MassTransit;
 using Windetta.Common.Redis;
 using Windetta.Common.Types;
 using Windetta.Identity.Extensions;
+using Windetta.Identity.Infrastructure.Data;
 using Windetta.Identity.Infrastructure.Data.Seed;
 using Windetta.Identity.Mvc;
 
@@ -28,7 +28,8 @@ services.AddRedis();
 services.AddAuthenticationMethods(); // Adding vk, google .. external auth providers
 services.ConfigureCustomViewsRouting();
 
-builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory(builder =>
+builder.Host.UseServiceProviderFactory(
+    new AutofacServiceProviderFactory(builder =>
 {
     builder.ResolveDependenciesFromAssembly();
 }));

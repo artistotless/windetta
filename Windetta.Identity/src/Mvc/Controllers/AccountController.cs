@@ -19,26 +19,11 @@ public class AccountController : BaseController
 {
     private readonly IRequestDispatcher _dispatcher;
     private readonly UserManager<User> _userManager;
-    private readonly IPublishEndpoint _bus;
 
-    public AccountController(IRequestDispatcher dispatcher, UserManager<User> userManager, IPublishEndpoint bus)
+    public AccountController(IRequestDispatcher dispatcher, UserManager<User> userManager)
     {
         _dispatcher = dispatcher;
         _userManager = userManager;
-        _bus = bus;
-    }
-
-    [HttpGet]
-    [Route("event")]
-    public async Task<IActionResult> Event()
-    {
-        return NoContent(async () => await _bus.Publish<UserCreated>(new
-        {
-            Email = "test@email.com",
-            Id = Guid.NewGuid(),
-            Role = "user",
-            UserName = "userName",
-        }));
     }
 
     /// <summary>

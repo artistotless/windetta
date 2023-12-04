@@ -1,6 +1,8 @@
-﻿using Windetta.Main.Games;
-using Windetta.Main.MatchHub;
-using Windetta.Main.Services;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Windetta.Main.Games;
+using Windetta.Main.MatchHubs;
+using Windetta.MainTests.Mocks;
+using Windetta.MainTests.Shared;
 
 namespace Windetta.MainTests;
 public class HubTests
@@ -9,77 +11,78 @@ public class HubTests
     public async Task ShouldCreatesRoomsAccordingGameConfig()
     {
         // arrange
-        var config = new GameConfiguration()
+        var gameCfg = new GameConfiguration()
         {
             MinPlayers = 1,
-            MaxPlayers = 100,
+            MaxPlayers = (uint)Random.Shared.Next(10, 1000),
             MinTeams = 1,
-            MaxTeams = 100,
+            MaxTeams = (uint)Random.Shared.Next(1, 1000)
         };
 
-        var options = new MatchHubOptions()
+        var sc = new[] { new SupportedCurrency(1, 1, 100000) };
+
+        var provider = SharedServiceProvider.GetInstance((services) =>
         {
-            GameConfiguration = config,
+            services.AddSingleton((p) => new GamesRepositoryMock(gameCfg, sc).Mock.Object);
+        });
+
+        var request = new CreateMatchHubRequest()
+        {
+            GameId = IdExamples.GameId,
+            InitiatorId = IdExamples.UserId,
             Bet = new Bet(currencyId: 1, bet: 100)
         };
 
         // act
-        var interactor = new MatchHubsInteractor(new Mock<IMatchHubs>().Object);
+        var interactor = provider.GetRequiredService<MatchHubsInteractor>();
 
-        IMatchHub hub = await interactor.CreateAsync(options);
+        IMatchHub hub = await interactor.CreateAsync(request);
 
         // assert
-        hub.Rooms.Count().ShouldBe((int)config.MaxTeams);
+        hub.Rooms.Count().ShouldBe((int)gameCfg.MaxTeams);
+        hub.Rooms.First().MaxMembers.ShouldBe((uint)gameCfg.MaxPlayers);
     }
 
     [Fact]
     public async void ShouldAddMemberToSelectedRoom()
     {
         // arrange
-        var config = new GameConfiguration()
+        var request = new CreateMatchHubRequest()
         {
-            MinPlayers = 1,
-            MaxPlayers = 100,
-        };
-
-        var options = new MatchHubOptions()
-        {
-            GameConfiguration = config,
+            GameId = IdExamples.GameId,
+            InitiatorId = IdExamples.UserId,
             Bet = new Bet(currencyId: 1, bet: 100)
         };
 
-        var interactor = new MatchHubsInteractor(new Mock<IMatchHubs>().Object);
+        var interactor = SharedServiceProvider.GetInstance()
+            .GetRequiredService<MatchHubsInteractor>();
 
-        IMatchHub hub = await interactor.CreateAsync(options);
-        var userId = Guid.NewGuid();
-        var room = hub.Rooms.First();
+        var memberId = Guid.NewGuid();
 
         // act
-        interactor.JoinMember(userId, hub, room.Id);
+        IMatchHub hub = await interactor.CreateAsync(request);
+        var room = hub.Rooms.First();
+        await interactor.JoinMember(memberId, hub.Id, room.Id);
 
         // assert
-        room.Members.ShouldContain(x => x.Id == userId);
+        room.Members.ShouldContain(x => x.Id == memberId);
     }
 
     [Fact]
     public async void JoinMemberShouldCauseUpdateEvent()
     {
         // arrange
-        var config = new GameConfiguration()
+        var request = new CreateMatchHubRequest()
         {
-            MinPlayers = 1,
-            MaxPlayers = 100,
-        };
-
-        var options = new MatchHubOptions()
-        {
-            GameConfiguration = config,
+            GameId = IdExamples.GameId,
+            InitiatorId = IdExamples.UserId,
             Bet = new Bet(currencyId: 1, bet: 100)
         };
 
-        var interactor = new MatchHubsInteractor(new Mock<IMatchHubs>().Object);
+        var interactor = SharedServiceProvider.GetInstance()
+            .GetRequiredService<MatchHubsInteractor>();
 
-        IMatchHub hub = await interactor.CreateAsync(options);
+        IMatchHub hub = await interactor.CreateAsync(request);
         var memberId = Guid.NewGuid();
         var roomId = hub.Rooms.First().Id;
         bool updateEventRaised = false;
@@ -94,7 +97,7 @@ public class HubTests
         hub.Updated += callback;
 
         // act
-        interactor.JoinMember(memberId, hub, roomId);
+        await interactor.JoinMember(memberId, hub.Id, roomId);
 
         // assert
         updateEventRaised.ShouldBeTrue();
@@ -104,21 +107,17 @@ public class HubTests
     public async void LeaveMemberShouldCauseUpdateEvent()
     {
         // arrange
-        var config = new GameConfiguration()
+        var request = new CreateMatchHubRequest()
         {
-            MinPlayers = 1,
-            MaxPlayers = 100,
-        };
-
-        var options = new MatchHubOptions()
-        {
-            GameConfiguration = config,
+            GameId = IdExamples.GameId,
+            InitiatorId = IdExamples.UserId,
             Bet = new Bet(currencyId: 1, bet: 100)
         };
 
-        var interactor = new MatchHubsInteractor(new Mock<IMatchHubs>().Object);
+        var interactor = SharedServiceProvider.GetInstance()
+            .GetRequiredService<MatchHubsInteractor>();
 
-        IMatchHub hub = await interactor.CreateAsync(options);
+        IMatchHub hub = await interactor.CreateAsync(request);
         var memberId = Guid.NewGuid();
         var roomId = hub.Rooms.First().Id;
         bool updateEventRaised = false;
@@ -131,49 +130,11 @@ public class HubTests
         };
 
         // act
-        interactor.JoinMember(memberId, hub, roomId);
+        await interactor.JoinMember(memberId, hub.Id, roomId);
         hub.Updated += callback;
-        interactor.LeaveMember(memberId, hub);
+        await interactor.LeaveMember(memberId, hub.Id);
 
         // assert
         updateEventRaised.ShouldBeTrue();
     }
-
-    #region Helpers
-    private IWalletService GetWalletService()
-    {
-        var walletMock = new Mock<IWalletService>();
-
-        walletMock
-            .Setup(x => x.HoldBalance(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<ulong>()))
-            .Returns(Task.CompletedTask);
-        walletMock
-            .Setup(x => x.UnHoldBalance(It.IsAny<Guid>(), It.IsAny<int>()))
-            .Returns(Task.CompletedTask);
-        walletMock
-            .Setup(x => x.GetBalance(It.IsAny<Guid>(), It.IsAny<int>()))
-            .ReturnsAsync(new UserBalance()
-            {
-                Amount = 100,
-                HeldAmount = 0
-            });
-
-        return walletMock.Object;
-    }
-
-    private IGames GetGamesService(GameConfiguration config)
-    {
-        var gamesMock = new Mock<IGames>();
-
-        gamesMock
-        .Setup(x => x.Get(It.IsAny<Guid>()))
-        .ReturnsAsync((Guid id) => new Fixture()
-        .Build<Game>()
-        .With(x => x.Id, id)
-        .With(x => x.Configuration, config)
-        .Create());
-
-        return gamesMock.Object;
-    }
-    #endregion
 }

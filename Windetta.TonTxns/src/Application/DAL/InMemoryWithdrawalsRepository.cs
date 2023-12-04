@@ -3,7 +3,7 @@ using Windetta.TonTxns.Domain;
 
 namespace Windetta.TonTxns.Application.DAL;
 
-[ExcludeFromAutoInject]
+[AutoInjectExclude]
 public class InMemoryWithdrawalsRepository : IWithdrawalsRepository
 {
     private readonly List<Withdrawal> _storage;

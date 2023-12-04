@@ -28,6 +28,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Windetta.Common\src\Windetta.Common.csproj" />
+    <ProjectReference Include="..\..\Windetta.Wallet\src\Windetta.Wallet.csproj" />
     <ProjectReference Include="..\src\Windetta.Main.csproj" />
   </ItemGroup>
 

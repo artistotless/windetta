@@ -18,31 +18,64 @@ public static class IdentityServerConfigurationSeeder
         dbContext.Database.Migrate();
         persisteddbContext.Database.Migrate();
 
-        if (!dbContext.IdentityResources.Any())
+        #region IdentityResources
+        var identityResources = dbContext.IdentityResources.ToList();
+
+        if (identityResources.Count > 0)
         {
-            foreach (var resource in IdentityServerBootstrapData.IdentityResources)
-            {
-                dbContext.IdentityResources.Add(resource.ToEntity());
-            }
+            dbContext.IdentityResources.RemoveRange(identityResources);
             dbContext.SaveChanges();
         }
 
-        if (!dbContext.Clients.Any())
+        foreach (var resource in IdentityServerBootstrapData.IdentityResources)
+            dbContext.IdentityResources.Add(resource.ToEntity());
+
+        dbContext.SaveChanges();
+        #endregion
+
+        #region Clients
+        var clients = dbContext.Clients.ToList();
+
+        if (clients.Count > 0)
         {
-            foreach (var client in IdentityServerBootstrapData.Clients)
-            {
-                dbContext.Clients.Add(client.ToEntity());
-            }
+            dbContext.Clients.RemoveRange(clients);
             dbContext.SaveChanges();
         }
 
-        if (!dbContext.ApiScopes.Any())
+        foreach (var client in IdentityServerBootstrapData.Clients)
+            dbContext.Clients.Add(client.ToEntity());
+
+        dbContext.SaveChanges();
+        #endregion
+
+        #region ApiScopes
+        var apiScopes = dbContext.ApiScopes.ToList();
+
+        if (apiScopes.Count > 0)
         {
-            foreach (var resource in IdentityServerBootstrapData.ApiScopes)
-            {
-                dbContext.ApiScopes.Add(resource.ToEntity());
-            }
+            dbContext.ApiScopes.RemoveRange(apiScopes);
             dbContext.SaveChanges();
         }
+
+        foreach (var resource in IdentityServerBootstrapData.ApiScopes)
+            dbContext.ApiScopes.Add(resource.ToEntity());
+
+        dbContext.SaveChanges();
+        #endregion
+
+        #region ApiResources
+        var apiResources = dbContext.ApiResources.ToList();
+
+        if (apiResources.Count > 0)
+        {
+            dbContext.ApiResources.RemoveRange(apiResources);
+            dbContext.SaveChanges();
+        }
+
+        foreach (var resource in IdentityServerBootstrapData.ApiResources)
+            dbContext.ApiResources.Add(resource.ToEntity());
+
+        dbContext.SaveChanges();
+        #endregion
     }
 }

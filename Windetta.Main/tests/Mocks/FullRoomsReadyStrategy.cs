@@ -1,10 +1,10 @@
-﻿using Windetta.Main.MatchHub.Strategies;
+﻿using Windetta.Main.MatchHubs.Strategies;
 
 namespace Windetta.MainTests.Mocks;
 
 public class FullRoomsReadyStrategy : AutoReadyStrategy
 {
-    public FullRoomsReadyStrategy(TimeSpan checkInterval) : base(checkInterval)
+    public FullRoomsReadyStrategy(TimeSpan? checkInterval = null) : base(checkInterval)
     {
     }
 

@@ -1,6 +1,8 @@
-﻿using Windetta.Main.Games;
-using Windetta.Main.MatchHub;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Windetta.Main.MatchHubs;
 using Windetta.MainTests.Mocks;
+using Windetta.MainTests.Shared;
+using FullRoomsReadyStrategy = Windetta.MainTests.Mocks.FullRoomsReadyStrategy;
 
 namespace Windetta.MainTests;
 
@@ -10,26 +12,19 @@ public class AutoStrategiesTests
     public async Task TestFullRoomsReadyStrategy()
     {
         // arrange
-        var config = new GameConfiguration()
+        var request = new CreateMatchHubRequest()
         {
-            MinPlayers = 1,
-            MaxPlayers = 2,
-        };
-
-        var options = new MatchHubOptions()
-        {
-            GameConfiguration = config,
             Bet = new Bet(1, 1000),
-            Private = false,
-            AutoReadyStrategy = new FullRoomsReadyStrategy(
-                checkInterval: TimeSpan.FromSeconds(1))
+            AutoReadyStrategy = nameof(FullRoomsReadyStrategy),
+            GameId = IdExamples.GameId,
+            InitiatorId = IdExamples.UserId
         };
 
-        var interactor = new MatchHubsInteractor(new Mock<IMatchHubs>().Object);
+        var interactor = SharedServiceProvider.GetInstance()
+            .GetRequiredService<MatchHubsInteractor>();
 
-        IMatchHub hub = await interactor.CreateAsync(options);
+        IMatchHub hub = await interactor.CreateAsync(request);
 
-        var member1Id = Guid.NewGuid();
         var member2Id = Guid.NewGuid();
         var roomId = hub.Rooms.First().Id;
 
@@ -45,8 +40,7 @@ public class AutoStrategiesTests
         hub.Ready += callback;
 
         // act
-        interactor.JoinMember(member1Id, hub, roomId);
-        interactor.JoinMember(member2Id, hub, roomId);
+        await interactor.JoinMember(member2Id, hub.Id, roomId);
 
         await tcs.Task;
 
@@ -58,25 +52,18 @@ public class AutoStrategiesTests
     public async Task TestAutoDisposeStrategy()
     {
         // arrange
-        var config = new GameConfiguration()
+        var request = new CreateMatchHubRequest()
         {
-            MinPlayers = 1,
-            MaxPlayers = 2,
+            Bet = new Bet(1, 800),
+            AutoDisposeStrategy = nameof(DateDisposeStrategy),
+            GameId = IdExamples.GameId,
+            InitiatorId = IdExamples.UserId
         };
 
-        var options = new MatchHubOptions()
-        {
-            GameConfiguration = config,
-            Bet = new Bet(1, 1000),
-            Private = false,
-            AutoDisposeStrategy = new DateDisposeStrategy(
-                checkInterval: TimeSpan.FromSeconds(1))
-        };
+        var interactor = SharedServiceProvider.GetInstance()
+            .GetRequiredService<MatchHubsInteractor>();
 
-        var interactor = new MatchHubsInteractor(new Mock<IMatchHubs>().Object);
-
-        IMatchHub hub = await interactor.CreateAsync(options);
-
+        IMatchHub hub = await interactor.CreateAsync(request);
         bool autoStrategyWorkedOut = false;
         var tcs = new TaskCompletionSource<bool>();
 
@@ -86,7 +73,9 @@ public class AutoStrategiesTests
             autoStrategyWorkedOut = true;
         };
 
+
         hub.Disposed += callback;
+        await interactor.LeaveMember(request.InitiatorId, hub.Id);
 
         // act
         await tcs.Task;
