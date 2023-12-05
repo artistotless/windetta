@@ -5,12 +5,12 @@ using Windetta.Main.MatchHubs;
 
 namespace Windetta.Main.Infrastructure.MatchHub;
 
-internal class SignalROutputChannel : IMatchHubDispatcherOutputChannel
+internal class SignalROutput : IMatchHubObserverOutput
 {
-    private readonly ILogger<SignalROutputChannel> _logger;
+    private readonly ILogger<SignalROutput> _logger;
     private readonly IHubContext<MainHub> _context;
 
-    public SignalROutputChannel(ILogger<SignalROutputChannel> logger, IHubContext<MainHub> context)
+    public SignalROutput(ILogger<SignalROutput> logger, IHubContext<MainHub> context)
     {
         _logger = logger;
         _context = context;

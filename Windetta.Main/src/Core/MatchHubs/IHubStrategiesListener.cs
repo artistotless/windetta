@@ -16,12 +16,12 @@ public interface IHubStrategiesListener
 
 public interface IHubReadyListener : IHubStrategiesListener
 {
-    void SetAutoReadyStrategy(AutoReadyStrategy strategy);
-    void OnHubAutoReady();
+    internal void SetAutoReadyStrategy(IAutoReadyStrategy strategy);
+    internal void OnHubAutoReady();
 }
 
 public interface IHubDisposeListener : IHubStrategiesListener
 {
-    void SetDisposeStrategy(AutoDisposeStrategy strategy);
-    void OnHubAutoDisposed();
+    internal void SetDisposeStrategy(IAutoDisposeStrategy strategy);
+    internal void OnHubAutoDisposed();
 }

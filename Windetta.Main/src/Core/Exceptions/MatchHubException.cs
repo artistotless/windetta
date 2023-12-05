@@ -10,9 +10,6 @@ public class MatchHubException : WindettaException
     public static MatchHubException AlreadyMemberOfHub
         => new MatchHubException(Errors.Main.AlreadyMemberOfHub);
 
-    public static MatchHubException JoinFilterValidationFail
-        => new MatchHubException(Errors.Main.JoinFilterValidationFail);
-
     public static MatchHubException BetValidationFail
         => new MatchHubException(Errors.Main.BetValidationFail);
 
@@ -21,9 +18,6 @@ public class MatchHubException : WindettaException
 
     public static MatchHubException BetIsLessMinimumAllowed
         => new MatchHubException(Errors.Main.BetIsLessMinimumAllowed);
-
-    public static MatchHubException InvalidPluginId
-        => new MatchHubException(Errors.Main.InvalidPluginId);
 
     private MatchHubException(string errorCode) : base(errorCode) { }
 }

@@ -1,29 +1,36 @@
-﻿using Windetta.Main.MatchHubs.Filters;
+﻿using Windetta.Main.Core.MatchHubs.Plugins;
+using Windetta.Main.MatchHubs.Filters;
 
 namespace Windetta.Main.Infrastructure.MatchHubPlugins;
 
-public class RoleJoinFilter : IJoinFilter<string>
+public class RoleJoinFilter : JoinFilterConfigurable
 {
     private readonly IHttpContextAccessor _contextAccessor;
 
     public RoleJoinFilter(IHttpContextAccessor contextAccessor)
     {
         _contextAccessor = contextAccessor;
-        Data = "admin";
     }
 
-    public string Data { get; set; }
-
-    public ValueTask<(bool isValid, string? error)> ValidateAsync(Guid userId, CancellationToken token)
+    protected override RequirementsDefinition SetupRequirements(RequirementsDefinitionBuilder builder)
     {
+        return builder
+            .Add<string>("role")
+            .Build();
+    }
+
+    public override ValueTask<(bool isValid, string? error)> ExecuteAsync(Guid userId, CancellationToken token)
+    {
+        var roleValue = GetRequirementValue<string>("role");
+
         if (_contextAccessor.HttpContext is null)
             return ValueTask.FromResult<(bool, string?)>((false, "HttpContext is not available"));
 
-        if (_contextAccessor.HttpContext.User.IsInRole(Data))
+        if (_contextAccessor.HttpContext.User.IsInRole(roleValue))
         {
             return ValueTask.FromResult<(bool, string?)>((true, null));
         }
 
-        return ValueTask.FromResult<(bool, string?)>((false, $"Use is not in Role - {Data}"));
+        return ValueTask.FromResult<(bool, string?)>((false, $"Use is not in Role - {roleValue}"));
     }
 }

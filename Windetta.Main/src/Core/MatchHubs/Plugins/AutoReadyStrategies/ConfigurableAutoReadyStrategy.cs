@@ -1,13 +1,15 @@
-﻿namespace Windetta.Main.MatchHubs.Strategies;
+﻿using Windetta.Main.Core.MatchHubs.Plugins;
 
-public abstract class AutoReadyStrategy : IAutoReadyStrategy
+namespace Windetta.Main.MatchHubs.Strategies;
+
+public abstract class ConfigurableAutoReadyStrategy : ConfigurableMatchHubPlugin, IAutoReadyStrategy
 {
     public IHubReadyListener Hub { get; private set; }
 
     private Timer _timer;
     private readonly TimeSpan _checkInterval;
 
-    protected AutoReadyStrategy(TimeSpan? checkInterval = null)
+    protected ConfigurableAutoReadyStrategy(TimeSpan? checkInterval = null)
     {
         _checkInterval = checkInterval ?? TimeSpan.FromSeconds(3);
     }

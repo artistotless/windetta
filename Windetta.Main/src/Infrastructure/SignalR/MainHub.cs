@@ -9,9 +9,9 @@ namespace Windetta.Main.Infrastructure.SignalR;
 internal class MainHub : Hub
 {
     private readonly MatchHubsInteractor _interactor;
-    private readonly MatchHubsDispatcher _dispatcher;
+    private readonly MatchHubObserver _dispatcher;
 
-    public MainHub(MatchHubsInteractor interactor, MatchHubsDispatcher dispatcher)
+    public MainHub(MatchHubsInteractor interactor, MatchHubObserver dispatcher)
     {
         _interactor = interactor;
         _dispatcher = dispatcher;
@@ -27,6 +27,7 @@ internal class MainHub : Hub
             InitiatorId = userId,
             GameId = gameId,
             Private = privateHub,
+            JoinFilters = new[] { new PluginSetDto("RoleJoinFilter") }
         };
 
         var hub = await _interactor.CreateAsync(createRequest);

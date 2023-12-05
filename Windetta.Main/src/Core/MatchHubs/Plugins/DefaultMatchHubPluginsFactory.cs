@@ -1,4 +1,5 @@
 ﻿using Windetta.Main.Core.Exceptions;
+using Windetta.Main.Core.MatchHubs.Plugins;
 
 namespace Windetta.Main.Core.MatchHubs;
 
@@ -11,43 +12,62 @@ public sealed class DefaultMatchHubPluginsFactory : IMatchHubPluginsFactory
         _plugins = plugins;
     }
 
-    public IMatchHubPlugin Get(string typeName)
-    {
-        if (typeName is null)
-            throw new ArgumentNullException(nameof(typeName));
-
-        var plugin = _plugins.Where(p => p.GetType().Name == typeName)
-            .FirstOrDefault();
-
-        if (plugin is null)
-            throw MatchHubException.InvalidPluginId;
-
-        return plugin;
-    }
-
-    public T GetOrDefaultImplementation<T>(string? typeName) where T : IMatchHubPlugin
+    public T Get<T>(string pluginName,
+        Dictionary<string, string>? requirementsValues)
+        where T : IMatchHubPlugin
     {
         IMatchHubPlugin? plugin;
 
-        if (typeName is null)
-        {
-            plugin = _plugins
-                .Where(p => p.GetType().Name.Contains("Default"))
-                .Where(p => p.GetType().IsAssignableTo(typeof(T)))
-                .Where(p => p.GetType().IsAbstract == false)
-                .Where(p => p.GetType().IsClass)
-                .FirstOrDefault();
+        if (pluginName is null)
+            throw new ArgumentNullException(nameof(pluginName));
 
-            if (plugin is null)
-                throw new Exception("Default implementation does not exist");
-        }
-
-        plugin = _plugins.Where(p => p.GetType().Name == typeName)
+        plugin = FindPluginsByType<T>()
+           .Where(p => p.GetType().Name == pluginName)
            .FirstOrDefault();
 
         if (plugin is null)
-            throw MatchHubException.InvalidPluginId;
+            throw MatchHubPluginException.InvalidPluginName;
+
+        if (plugin is ConfigurableMatchHubPlugin configurable)
+        {
+            if (requirementsValues is null)
+                throw MatchHubPluginException.RequiredValuesNotProvided;
+
+            return (T)(configurable.WithValues(requirementsValues) as IMatchHubPlugin);
+        }
 
         return (T)plugin;
+    }
+
+    public T GetOrDefaultImplementation<T>(string? pluginName) where T : IMatchHubPlugin
+    {
+        IMatchHubPlugin? plugin;
+
+        var plugins = FindPluginsByType<T>();
+
+        if (pluginName is null)
+        {
+            var defaultPlugin = plugins
+                .FirstOrDefault(x => x.GetType().Name.Contains("Default"));
+
+            if (defaultPlugin is null)
+                throw new Exception("Default implementation does not exist");
+        }
+
+        plugin = _plugins.Where(p => p.GetType().Name == pluginName)
+           .FirstOrDefault();
+
+        if (plugin is null)
+            throw MatchHubPluginException.InvalidPluginName;
+
+        return (T)plugin;
+    }
+
+    private IEnumerable<IMatchHubPlugin> FindPluginsByType<T>()
+    {
+        return _plugins
+              .Where(p => p.GetType().IsAssignableTo(typeof(T)))
+              .Where(p => p.GetType().IsAbstract == false)
+              .Where(p => p.GetType().IsClass);
     }
 }

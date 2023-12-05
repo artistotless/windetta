@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Windetta.Main.Core.MatchHubs.Dtos;
 using Windetta.Main.MatchHubs;
 using Windetta.MainTests.Mocks;
 using Windetta.MainTests.Shared;
@@ -15,7 +16,7 @@ public class AutoStrategiesTests
         var request = new CreateMatchHubRequest()
         {
             Bet = new Bet(1, 1000),
-            AutoReadyStrategy = nameof(FullRoomsReadyStrategy),
+            AutoReadyStrategy = new PluginSetDto(nameof(FullRoomsReadyStrategy)),
             GameId = IdExamples.GameId,
             InitiatorId = IdExamples.UserId
         };
@@ -55,7 +56,7 @@ public class AutoStrategiesTests
         var request = new CreateMatchHubRequest()
         {
             Bet = new Bet(1, 800),
-            AutoDisposeStrategy = nameof(DateDisposeStrategy),
+            AutoDisposeStrategy = new PluginSetDto(nameof(DateDisposeStrategy)),
             GameId = IdExamples.GameId,
             InitiatorId = IdExamples.UserId
         };

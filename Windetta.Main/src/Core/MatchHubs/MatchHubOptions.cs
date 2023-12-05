@@ -11,8 +11,8 @@ public record MatchHubOptions
     public Bet Bet { get; init; }
     public GameConfiguration GameConfiguration { get; init; }
     public bool Private { get; init; }
-    public AutoReadyStrategy? AutoReadyStrategy { get; init; }
-    public AutoDisposeStrategy? AutoDisposeStrategy { get; init; }
-    public IEnumerable<IJoinFilter>? JoinFilters { get; init; }
+    internal IAutoReadyStrategy? AutoReadyStrategy { get; init; }
+    internal IAutoDisposeStrategy? AutoDisposeStrategy { get; init; }
+    internal IEnumerable<IJoinFilter>? JoinFilters { get; init; }
 }
 

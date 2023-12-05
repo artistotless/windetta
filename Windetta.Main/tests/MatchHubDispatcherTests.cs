@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Windetta.Common.Testing;
+using Windetta.Main.Core.MatchHubs.Dtos;
 using Windetta.Main.Games;
 using Windetta.Main.MatchHubs;
 using Windetta.MainTests.Mocks;
@@ -30,8 +31,8 @@ public class MatchHubDispatcherTests
         var buffer = new Queue<string>();
         var interactor = SharedServiceProvider.GetInstance()
             .GetRequiredService<MatchHubsInteractor>();
-        var outputChannel = new MatchHubDebugOutputChannel(_output, ref buffer);
-        var dispatcher = new MatchHubsDispatcher(outputChannel, new Mock<IMatchHubs>().Object);
+        var outputChannel = new MatchHubDebugOutput(_output, ref buffer);
+        var dispatcher = new MatchHubObserver(outputChannel, new Mock<IMatchHubs>().Object);
         var hub = await interactor.CreateAsync(request);
         var roomId = hub.Rooms.First().Id;
 
@@ -60,8 +61,8 @@ public class MatchHubDispatcherTests
         var buffer = new Queue<string>();
         var storage = provider.GetRequiredService<IMatchHubs>();
         var interactor = provider.GetRequiredService<MatchHubsInteractor>();
-        var outputChannel = new MatchHubDebugOutputChannel(_output, ref buffer);
-        var dispatcher = new MatchHubsDispatcher(outputChannel, storage);
+        var outputChannel = new MatchHubDebugOutput(_output, ref buffer);
+        var dispatcher = new MatchHubObserver(outputChannel, storage);
         var hub = await interactor.CreateAsync(request);
 
         // act
@@ -95,14 +96,14 @@ public class MatchHubDispatcherTests
             GameId = IdExamples.GameId,
             InitiatorId = IdExamples.UserId,
             Bet = new Bet(currencyId: 1, bet: 100),
-            AutoReadyStrategy = nameof(FullRoomsReadyStrategy),
+            AutoReadyStrategy = new PluginSetDto(nameof(FullRoomsReadyStrategy)),
         };
 
         var buffer = new Queue<string>();
         var storage = provider.GetRequiredService<IMatchHubs>();
         var interactor = provider.GetRequiredService<MatchHubsInteractor>();
-        var outputChannel = new MatchHubDebugOutputChannel(_output, ref buffer);
-        var dispatcher = new MatchHubsDispatcher(outputChannel, storage);
+        var outputChannel = new MatchHubDebugOutput(_output, ref buffer);
+        var dispatcher = new MatchHubObserver(outputChannel, storage);
         var hub = await interactor.CreateAsync(request);
         var roomId = hub.Rooms.First().Id;
 

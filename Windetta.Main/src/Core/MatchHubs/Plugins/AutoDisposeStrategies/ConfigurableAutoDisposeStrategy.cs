@@ -1,13 +1,15 @@
-﻿namespace Windetta.Main.MatchHubs.Strategies;
+﻿using Windetta.Main.Core.MatchHubs.Plugins;
 
-public abstract class AutoDisposeStrategy : IAutoDisposeStrategy
+namespace Windetta.Main.MatchHubs.Strategies;
+
+public abstract class ConfigurableAutoDisposeStrategy : ConfigurableMatchHubPlugin, IAutoDisposeStrategy
 {
     public IHubDisposeListener Hub { get; private set; }
 
     private Timer _timer;
     private readonly TimeSpan _checkInterval;
 
-    protected AutoDisposeStrategy(TimeSpan? checkInterval = null)
+    protected ConfigurableAutoDisposeStrategy(TimeSpan? checkInterval = null)
     {
         _checkInterval = checkInterval ?? TimeSpan.FromSeconds(3);
     }

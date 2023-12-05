@@ -8,12 +8,18 @@ public static class Errors
         public const string MemberAlreadyJoinedRoom = "member_already_joined_room";
         public const string MemberNotInRoom = "member_not_in_room";
         public const string MaxMembersInRoomReached = "maxmembers_in_room_reached";
-        public const string JoinFilterValidationFail = "join_filter_validation_fail";
         public const string BetValidationFail = "bet_validation_fail";
         public const string AlreadyMemberOfHub = "already_member_of_hub";
         public const string MatchHubNotFound = "matchhub_notfound";
         public const string BetIsLessMinimumAllowed = "bet_is_less_minimum_allowed";
-        public const string InvalidPluginId = "invalid_plugin_id";
+        #endregion
+
+        #region MatchHubPlugin
+        public const string InvalidPluginName = "invalid_plugin_name";
+        public const string RequirementTypeNotAllowed = "requirement_type_not_allowed";
+        public const string JoinFilterValidationFail = "join_filter_validation_fail";
+        public const string RequiredValuesNotProvided = "required_values_not_provided";
+        public const string RequirementValueInvalid = "requirement_value_invalid";
         #endregion
 
         #region Game

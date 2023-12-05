@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Windetta.Common.Constants;
 using Windetta.Main.Core.Exceptions;
+using Windetta.Main.Core.MatchHubs.Dtos;
 using Windetta.Main.MatchHubs;
 using Windetta.MainTests.Mocks;
 using Windetta.MainTests.Shared;
@@ -18,7 +19,7 @@ public class HubFiltersTests
             GameId = IdExamples.GameId,
             InitiatorId = IdExamples.UserId,
             Bet = new Bet(1, 100),
-            JoinFilters = new[] { nameof(AlwaysFalseJoinFilter) }
+            JoinFilters = new[] { new PluginSetDto(nameof(AlwaysFalseJoinFilter)) }
         };
 
         var interactor = SharedServiceProvider.GetInstance()
@@ -29,7 +30,7 @@ public class HubFiltersTests
         var room = hub.Rooms.First();
 
         // act
-        var exception = await Should.ThrowAsync<MatchHubException>(
+        var exception = await Should.ThrowAsync<MatchHubPluginException>(
             () => interactor.JoinMember(memberId, hub.Id, room.Id));
 
         // assert

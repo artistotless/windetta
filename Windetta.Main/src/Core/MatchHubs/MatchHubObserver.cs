@@ -2,12 +2,12 @@
 
 namespace Windetta.Main.MatchHubs;
 
-public class MatchHubsDispatcher : ISingletonService
+public class MatchHubObserver : ISingletonService
 {
-    private readonly IMatchHubDispatcherOutputChannel _output;
+    private readonly IMatchHubObserverOutput _output;
     private readonly IMatchHubs _hubs;
 
-    public MatchHubsDispatcher(IMatchHubDispatcherOutputChannel output, IMatchHubs hubs)
+    public MatchHubObserver(IMatchHubObserverOutput output, IMatchHubs hubs)
     {
         _output = output;
         _hubs = hubs;

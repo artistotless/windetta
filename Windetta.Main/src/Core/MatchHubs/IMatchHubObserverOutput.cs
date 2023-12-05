@@ -2,7 +2,7 @@
 
 namespace Windetta.Main.MatchHubs;
 
-public interface IMatchHubDispatcherOutputChannel : ISingletonService
+public interface IMatchHubObserverOutput : ISingletonService
 {
     Task WriteHubDeleted(IMatchHub hub);
     Task WriteHubReady(IMatchHub hub);

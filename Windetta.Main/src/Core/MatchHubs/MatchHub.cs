@@ -16,7 +16,8 @@ internal class MatchHub : IMatchHub
     public Bet Bet { get; init; }
     public Guid InitiatorId { get; init; }
     public GameConfiguration Configuration { get; init; }
-    public IEnumerable<string>? JoinFilters => _joinFilters?.Select(filter => filter.GetType().Name);
+    public IEnumerable<string>? JoinFilters => _joinFilters?
+        .Select(filter => filter.GetType().Name);
     public string? AutoReadyStrategy => _readyStrategy?.GetType().Name;
     public string? AutoDisposeStrategy => _disposeStrategy?.GetType().Name;
     public IEnumerable<Room> Rooms => _rooms.Values;
@@ -28,8 +29,8 @@ internal class MatchHub : IMatchHub
     public event EventHandler? Ready;
 
     // Plugins
-    private AutoReadyStrategy? _readyStrategy;
-    private AutoDisposeStrategy? _disposeStrategy;
+    private IAutoReadyStrategy? _readyStrategy;
+    private IAutoDisposeStrategy? _disposeStrategy;
     private IEnumerable<IJoinFilter>? _joinFilters;
 
     private IReadOnlyDictionary<Guid, Room> _rooms;
@@ -57,7 +58,7 @@ internal class MatchHub : IMatchHub
         _joinFilters = options.JoinFilters;
     }
 
-    public void SetAutoReadyStrategy(AutoReadyStrategy strategy)
+    public void SetAutoReadyStrategy(IAutoReadyStrategy strategy)
     {
         if (_readyStrategy is not null)
             _readyStrategy.Dispose();
@@ -68,7 +69,7 @@ internal class MatchHub : IMatchHub
         OnUpdated();
     }
 
-    public void SetDisposeStrategy(AutoDisposeStrategy strategy)
+    public void SetDisposeStrategy(IAutoDisposeStrategy strategy)
     {
         if (_disposeStrategy is not null)
             _disposeStrategy.Dispose();
