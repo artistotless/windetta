@@ -1,7 +1,7 @@
 ﻿using MongoDB.Driver;
+using Windetta.Main.Core.MatchHubs;
 using Windetta.Main.Core.MatchHubs.Dtos;
 using Windetta.Main.Infrastructure.Services;
-using Windetta.Main.MatchHubs;
 
 namespace Windetta.Main.Infrastructure.Data.Mongo;
 

@@ -79,14 +79,15 @@ public abstract class ConfigurableMatchHubPlugin : IMatchHubPlugin
 
         value = type switch
         {
-            Type t when t.Equals(typeof(string)) => () => untypedValue,
-            Type t when t.Equals(typeof(int)) => () => int.Parse(untypedValue),
-            Type t when t.Equals(typeof(decimal)) => () => decimal.Parse(untypedValue),
-            Type t when t.Equals(typeof(float)) => () => float.Parse(untypedValue),
-            Type t when t.Equals(typeof(bool)) => () => bool.Parse(untypedValue),
-            Type t when t.Equals(typeof(DateTime)) => () => DateTime.Parse(untypedValue),
-            Type t when t.Equals(typeof(DateTimeOffset)) => () => DateTimeOffset.Parse(untypedValue),
-            Type t when t.Equals(typeof(Guid)) => () => Guid.Parse(untypedValue),
+            Type t when t.Equals(typeof(string)) => untypedValue,
+            Type t when t.Equals(typeof(ulong)) => ulong.Parse(untypedValue),
+            Type t when t.Equals(typeof(int)) => int.Parse(untypedValue),
+            Type t when t.Equals(typeof(decimal)) => decimal.Parse(untypedValue),
+            Type t when t.Equals(typeof(float)) => float.Parse(untypedValue),
+            Type t when t.Equals(typeof(bool)) => bool.Parse(untypedValue),
+            Type t when t.Equals(typeof(DateTime)) => DateTime.Parse(untypedValue),
+            Type t when t.Equals(typeof(DateTimeOffset)) => DateTimeOffset.Parse(untypedValue),
+            Type t when t.Equals(typeof(Guid)) => Guid.Parse(untypedValue),
             _ => null
         };
 

@@ -1,7 +1,6 @@
 ﻿using Windetta.Main.Core.MatchHubs.Plugins;
-using Windetta.Main.MatchHubs.Filters;
 
-namespace Windetta.Main.Infrastructure.MatchHubPlugins;
+namespace Windetta.Main.Infrastructure.MatchHub.Plugins;
 
 public class RoleJoinFilter : JoinFilterConfigurable
 {

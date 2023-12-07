@@ -1,8 +1,8 @@
-﻿using Windetta.Main.Games;
-using Windetta.Main.MatchHubs.Filters;
-using Windetta.Main.MatchHubs.Strategies;
+﻿using Windetta.Main.Core.Games;
+using Windetta.Main.Core.MatchHubs.Plugins;
+using Windetta.Main.Core.Rooms;
 
-namespace Windetta.Main.MatchHubs;
+namespace Windetta.Main.Core.MatchHubs;
 
 public record MatchHubOptions
 {

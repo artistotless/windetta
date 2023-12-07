@@ -1,6 +1,6 @@
 ﻿using Windetta.Common.Types;
 
-namespace Windetta.Main.MatchHubs;
+namespace Windetta.Main.Core.MatchHubs;
 
 public class MatchHubObserver : ISingletonService
 {

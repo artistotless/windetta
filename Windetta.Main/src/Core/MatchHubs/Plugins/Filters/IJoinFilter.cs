@@ -1,6 +1,4 @@
-﻿using Windetta.Main.Core.MatchHubs;
-
-namespace Windetta.Main.MatchHubs.Filters;
+﻿namespace Windetta.Main.Core.MatchHubs.Plugins;
 
 internal interface IJoinFilter : IMatchHubPlugin
 {

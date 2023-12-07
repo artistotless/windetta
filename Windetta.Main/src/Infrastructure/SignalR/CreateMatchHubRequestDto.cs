@@ -1,10 +1,10 @@
-﻿using Windetta.Main.Core.MatchHubs.Dtos;
+﻿using Windetta.Main.Core.MatchHubs;
+using Windetta.Main.Core.MatchHubs.Dtos;
 
-namespace Windetta.Main.Core.MatchHubs;
+namespace Windetta.Main.Infrastructure.SignalR;
 
-public class CreateMatchHubRequest
+public class CreateMatchHubRequestDto
 {
-    public Guid InitiatorId { get; set; }
     public Guid GameId { get; init; }
     public Bet Bet { get; init; }
     public bool Private { get; init; }

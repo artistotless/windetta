@@ -1,7 +1,7 @@
 ﻿using Windetta.Common.Constants;
 using Windetta.Common.Types;
 
-namespace Windetta.Main.Rooms;
+namespace Windetta.Main.Core.Rooms;
 
 public sealed class RoomMember
 {

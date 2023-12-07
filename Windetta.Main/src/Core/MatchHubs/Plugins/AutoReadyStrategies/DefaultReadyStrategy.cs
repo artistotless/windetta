@@ -1,4 +1,4 @@
-﻿namespace Windetta.Main.MatchHubs.Strategies;
+﻿namespace Windetta.Main.Core.MatchHubs.Plugins;
 
 public class DefaultReadyStrategy : AutoReadyStrategy
 {
@@ -8,13 +8,6 @@ public class DefaultReadyStrategy : AutoReadyStrategy
 
     protected override bool CheckReady()
     {
-        var count = Hub.Rooms.Select(x => x.MembersCount).Sum();
-
-        if (count >= Hub.Configuration.MaxPlayers)
-        {
-            return true;
-        }
-
-        return false;
+        return Hub.MembersCount >= Hub.Configuration.MaxPlayers;
     }
 }

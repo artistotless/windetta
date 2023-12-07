@@ -1,9 +1,8 @@
 ﻿using Windetta.Main.Core.MatchHubs.Dtos;
-using Windetta.Main.MatchHubs;
 
 namespace Windetta.MainTests.Mocks;
 
-internal class InMemoryMatchHubsStorage : IMatchHubs
+public class InMemoryMatchHubsStorage : IMatchHubs
 {
     public int Count => _hubs.Count;
 

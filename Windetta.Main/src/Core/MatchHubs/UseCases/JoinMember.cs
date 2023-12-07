@@ -1,8 +1,7 @@
 ﻿using Windetta.Main.Core.Exceptions;
-using Windetta.Main.MatchHubs;
-using Windetta.Main.MatchHubs.Filters;
-using Windetta.Main.Rooms;
-using Windetta.Main.Services;
+using Windetta.Main.Core.MatchHubs.Plugins;
+using Windetta.Main.Core.Rooms;
+using Windetta.Main.Core.Services;
 
 namespace Windetta.Main.Core.MatchHubs.UseCases;
 

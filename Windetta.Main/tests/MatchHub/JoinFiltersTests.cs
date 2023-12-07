@@ -2,13 +2,11 @@
 using Windetta.Common.Constants;
 using Windetta.Main.Core.Exceptions;
 using Windetta.Main.Core.MatchHubs.Dtos;
-using Windetta.Main.MatchHubs;
 using Windetta.MainTests.Mocks;
-using Windetta.MainTests.Shared;
 
-namespace Windetta.MainTests;
+namespace Windetta.MainTests.MatchHub;
 
-public class HubFiltersTests
+public class JoinFiltersTests
 {
     [Fact]
     public async Task JoinShouldBeRejected_IfFilterDoesNotAllowToJoin()
@@ -38,4 +36,7 @@ public class HubFiltersTests
         exception.ErrorCode.ShouldMatch(Errors.Main.JoinFilterValidationFail);
         exception.Message!.ShouldMatch("join rejected");
     }
+
+    //[Fact]
+    //public async Joi
 }

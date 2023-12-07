@@ -1,4 +1,4 @@
-﻿namespace Windetta.Main.MatchHubs.Strategies;
+﻿namespace Windetta.Main.Core.MatchHubs.Plugins;
 
 public abstract class AutoDisposeStrategy : IAutoDisposeStrategy
 {
@@ -17,19 +17,19 @@ public abstract class AutoDisposeStrategy : IAutoDisposeStrategy
         Hub = hub;
 
         if (_timer is null)
-            _timer = new Timer(Update, null, TimeSpan.Zero, _checkInterval);
+            _timer = new Timer(Update, null, _checkInterval, _checkInterval);
     }
 
     private void Update(object? state)
     {
-        if (CheckDisposed())
+        if (CheckDispose())
         {
             _timer.Dispose();
             Hub.OnHubAutoDisposed();
         }
     }
 
-    protected abstract bool CheckDisposed();
+    protected abstract bool CheckDispose();
 
     public void Dispose()
     {

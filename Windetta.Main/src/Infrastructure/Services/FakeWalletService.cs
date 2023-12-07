@@ -1,4 +1,4 @@
-﻿using Windetta.Main.Services;
+﻿using Windetta.Main.Core.Services;
 
 namespace Windetta.Main.Infrastructure.Services;
 

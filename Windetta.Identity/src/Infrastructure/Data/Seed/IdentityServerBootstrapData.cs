@@ -4,6 +4,17 @@ using System.Security.Claims;
 
 namespace Windetta.Identity.Infrastructure.Data.Seed;
 
+public class IdentityRole : IdentityResource
+{
+    public IdentityRole()
+    {
+        Name = "role";
+        DisplayName = "Your role";
+        Emphasize = true;
+        UserClaims = new[] { "role" };
+    }
+}
+
 public static class IdentityServerBootstrapData
 {
     public static IEnumerable<IdentityResource> IdentityResources =>
@@ -12,10 +23,8 @@ public static class IdentityServerBootstrapData
         new IdentityResources.OpenId(),
         new IdentityResources.Profile(),
         new IdentityResources.Email(),
-        new IdentityResource("role","Your role", new[]{ClaimTypes.Role}){
-            Emphasize = true
-        }
-    };
+        new IdentityRole()
+    }; 
 
     public static IEnumerable<ApiResource> ApiResources =>
       new ApiResource[]
@@ -32,25 +41,27 @@ public static class IdentityServerBootstrapData
             },
         };
 
-    public static IEnumerable<Client> Clients =>
-        new Client[]{
-        // interactive ASP.NET Core MVC client
-        new Client
+    public static IEnumerable<Client> Clients
+    {
+        get
         {
-            Description= "Official windetta web appliccation",
-            ClientId = "windetta.web",
-            ClientSecrets = { new Secret("secret".Sha256()) },
-            AllowedGrantTypes = GrantTypes.CodeAndClientCredentials,
-            RequireConsent = true,
-            Properties = new Dictionary<string,string>(){
+            // interactive ASP.NET Core MVC client
+            var client1 = new Client
+            {
+                Description = "Official windetta web appliccation",
+                ClientId = "windetta.web",
+                ClientSecrets = { new Secret("secret".Sha256()) },
+                AllowedGrantTypes = GrantTypes.CodeAndClientCredentials,
+                RequireConsent = true,
+                Properties = new Dictionary<string, string>(){
                {"verified", "true"}
             },
-            // where to redirect to after login
-            RedirectUris = { "https://localhost:7084/signin-oidc" },
-            // where to redirect to after logout
-            PostLogoutRedirectUris = { "https://localhost:7084/signout-callback-oidc" },
-            AllowOfflineAccess = true,
-            AllowedScopes = new List<string>
+                // where to redirect to after login
+                RedirectUris = { "https://localhost:7084/signin-oidc" },
+                // where to redirect to after logout
+                PostLogoutRedirectUris = { "https://localhost:7084/signout-callback-oidc" },
+                AllowOfflineAccess = true,
+                AllowedScopes = new List<string>
             {
                 IdentityServerConstants.StandardScopes.OpenId,
                 IdentityServerConstants.StandardScopes.Profile,
@@ -58,28 +69,35 @@ public static class IdentityServerBootstrapData
                 IdentityServerConstants.StandardScopes.Address,
                 "realtime","role"
             }
-        },
-         //JavaScript Client
-           new Client
-        {
-            Description="JavaScript Client",
-            ClientId = "js",
-            ClientName = "JavaScript Client",
-            AllowedGrantTypes = GrantTypes.Code,
-            RequireClientSecret = false,
-            RedirectUris =           { "https://localhost:5003/callback.html" },
-            PostLogoutRedirectUris = { "https://localhost:5003/index.html" },
-            AllowedCorsOrigins =     { "https://localhost:5003" },
-            RequireConsent = true,
+            };
 
-            AllowedScopes =
+            //JavaScript Client
+            var client2 = new Client
             {
-                IdentityServerConstants.StandardScopes.OpenId,
-                IdentityServerConstants.StandardScopes.Profile,
-                IdentityServerConstants.StandardScopes.Email,
-                "role",
-                "realtime"
-            }
+                Description = "JavaScript Client",
+                ClientId = "js",
+                ClientName = "JavaScript Client",
+                AllowedGrantTypes = GrantTypes.Code,
+                RequireClientSecret = false,
+                RedirectUris = { "https://localhost:5003/callback.html" },
+                PostLogoutRedirectUris = { "https://localhost:5003/index.html" },
+                AllowedCorsOrigins = { "https://localhost:5003" },
+                RequireConsent = true,
+
+                AllowedScopes =
+                {
+                    IdentityServerConstants.StandardScopes.OpenId,
+                    IdentityServerConstants.StandardScopes.Profile,
+                    IdentityServerConstants.StandardScopes.Email,
+                    "role",
+                    "realtime"
+                }
+            };
+
+            client1.AllowedCorsOrigins.Add("https://hoppscotch.io");
+
+            return new Client[] { client1, client2 };
         }
-    };
+    }
+
 }

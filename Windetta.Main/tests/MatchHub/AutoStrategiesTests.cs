@@ -1,11 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Windetta.Main.Core.MatchHubs.Dtos;
-using Windetta.Main.MatchHubs;
 using Windetta.MainTests.Mocks;
-using Windetta.MainTests.Shared;
 using FullRoomsReadyStrategy = Windetta.MainTests.Mocks.FullRoomsReadyStrategy;
 
-namespace Windetta.MainTests;
+namespace Windetta.MainTests.MatchHub;
 
 public class AutoStrategiesTests
 {

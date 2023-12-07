@@ -1,4 +1,4 @@
-﻿namespace Windetta.Main.Games;
+﻿namespace Windetta.Main.Core.Games;
 
 public class Game
 {

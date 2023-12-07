@@ -92,8 +92,6 @@ public class ExternalLoginHandler : IRequestHandler<ExternalLoginRequest, Author
 
         var claims = new List<Claim>()
         {
-            new(JwtClaimTypes.Email, identity.Email),
-            new(JwtClaimTypes.GivenName, identity.DisplayName),
             new(JwtClaimTypes.Picture, identity.ImageUrl),
         };
 

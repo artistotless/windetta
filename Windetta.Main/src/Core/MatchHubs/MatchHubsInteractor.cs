@@ -1,13 +1,11 @@
 ﻿using Windetta.Common.Types;
 using Windetta.Main.Core.Exceptions;
-using Windetta.Main.Core.MatchHubs;
+using Windetta.Main.Core.Games;
 using Windetta.Main.Core.MatchHubs.Dtos;
+using Windetta.Main.Core.MatchHubs.Plugins;
 using Windetta.Main.Core.MatchHubs.UseCases;
-using Windetta.Main.Games;
-using Windetta.Main.MatchHubs.Filters;
-using Windetta.Main.MatchHubs.Strategies;
 
-namespace Windetta.Main.MatchHubs;
+namespace Windetta.Main.Core.MatchHubs;
 
 public class MatchHubsInteractor : IScopedService
 {
@@ -48,12 +46,21 @@ public class MatchHubsInteractor : IScopedService
 
     public async Task<IMatchHub> CreateAsync(CreateMatchHubRequest request)
     {
+        var isTournament = request is CreateTournamentMatchHubRequest;
+
+        if (!isTournament)
+        {
+            if (_matchHubsUsersSets.GetHubId(request.InitiatorId).HasValue)
+                throw MatchHubException.AlreadyMemberOfHub;
+        }
+
         var options = await BuildMatchHubOptions(request);
 
         var hub = await _useCasesFactory.Get<ICreateMatchHubUseCase>()
              .ExecuteAsync(options);
 
-        _matchHubsUsersSets.Set(hub.Id, request.InitiatorId);
+        if (!isTournament)
+            _matchHubsUsersSets.Set(hub.Id, request.InitiatorId);
 
         return hub;
     }
@@ -89,11 +96,11 @@ public class MatchHubsInteractor : IScopedService
         {
             options = new TournamentMatchHubOptions()
             {
-                Private = request.Private,
-                GameId = request.GameId,
-                GameConfiguration = configurations.cfg,
-                Bet = request.Bet,
                 InitiatorId = request.InitiatorId,
+                GameId = request.GameId,
+                Bet = request.Bet,
+                GameConfiguration = configurations.cfg,
+                Private = request.Private,
 
                 AutoDisposeStrategy = request.AutoDisposeStrategy is null ? null :
                 _pluginsFactory.Get<IAutoDisposeStrategy>(
@@ -125,16 +132,18 @@ public class MatchHubsInteractor : IScopedService
                 InitiatorId = request.InitiatorId,
 
                 AutoDisposeStrategy = request.AutoDisposeStrategy is null ? null :
-                _pluginsFactory.GetOrDefaultImplementation<IAutoDisposeStrategy>(
-                    request.AutoDisposeStrategy.Name),
+                _pluginsFactory.Get<IAutoDisposeStrategy>(
+                    request.AutoDisposeStrategy.Name,
+                    request.AutoDisposeStrategy.RequirementsValues),
 
                 AutoReadyStrategy = request.AutoReadyStrategy is null ? null :
-                _pluginsFactory.GetOrDefaultImplementation<IAutoReadyStrategy>(
-                    request.AutoReadyStrategy.Name),
+                _pluginsFactory.Get<IAutoReadyStrategy>(
+                    request.AutoReadyStrategy.Name,
+                    request.AutoReadyStrategy.RequirementsValues),
 
                 JoinFilters = request.JoinFilters is null ? null :
                 request.JoinFilters.Select(f => _pluginsFactory
-                .GetOrDefaultImplementation<IJoinFilter>(f.Name)),
+                .Get<IJoinFilter>(f.Name, f.RequirementsValues)),
             };
         }
 

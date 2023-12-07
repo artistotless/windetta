@@ -24,4 +24,8 @@
     <ProjectReference Include="..\..\Windetta.Common\src\Windetta.Common.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Core\Temp\" />
+  </ItemGroup>
+
 </Project>

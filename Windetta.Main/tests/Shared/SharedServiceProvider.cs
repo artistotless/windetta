@@ -1,9 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Windetta.Main.Core.MatchHubs;
-using Windetta.Main.Core.MatchHubs.UseCases;
-using Windetta.Main.Games;
-using Windetta.Main.MatchHubs;
 using Windetta.MainTests.Mocks;
 
 namespace Windetta.MainTests.Shared;
@@ -25,12 +21,12 @@ public static class SharedServiceProvider
         services.TryAddSingleton<IMatchHubUsersAssociations, InMemoryMatchHubUsersAssociations>();
 
         // plugins
-        services.AddIfNotAddedScoped<IMatchHubPlugin, FullRoomsReadyStrategy>(provider);
+        services.AddIfNotAddedScoped<IMatchHubPlugin, MinUserBalanceJoinFilter>(provider);
         services.AddIfNotAddedScoped<IMatchHubPlugin, AlwaysFalseJoinFilter>(provider);
+        services.AddIfNotAddedScoped<IMatchHubPlugin, FullRoomsReadyStrategy>(provider);
         services.AddIfNotAddedScoped<IMatchHubPlugin, DateDisposeStrategy>(provider);
 
         // use cases
-        services.AddIfNotAddedScoped<IGetMatchHubIdByUserIdUseCase, GetHubIdByUserId>(provider);
         services.AddIfNotAddedScoped<IMatchHubUseCase, GetHubIdByUserId>(provider);
         services.AddIfNotAddedScoped<IMatchHubUseCase, Create>(provider);
         services.AddIfNotAddedScoped<IMatchHubUseCase, Delete>(provider);
@@ -39,8 +35,8 @@ public static class SharedServiceProvider
         services.AddIfNotAddedScoped<IMatchHubUseCase, LeaveMember>(provider);
         services.AddIfNotAddedScoped<IMatchHubUseCase, JoinMember>(provider);
 
-        services.TryAddScoped<IMatchHubUseCasesFactory, DefaultMatchHubUseCaseFactory>();
         services.TryAddScoped<IMatchHubPluginsFactory, DefaultMatchHubPluginsFactory>();
+        services.TryAddScoped<IMatchHubUseCasesFactory, DefaultMatchHubsUseCaseFactory>();
 
         services.TryAddScoped<MatchHubsInteractor>();
 

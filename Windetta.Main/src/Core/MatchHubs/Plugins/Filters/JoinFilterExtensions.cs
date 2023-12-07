@@ -1,6 +1,6 @@
 ﻿using Windetta.Main.Core.Exceptions;
 
-namespace Windetta.Main.MatchHubs.Filters;
+namespace Windetta.Main.Core.MatchHubs.Plugins;
 
 internal static class JoinFilterExtensions
 {

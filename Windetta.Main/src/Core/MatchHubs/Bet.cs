@@ -1,4 +1,4 @@
-﻿namespace Windetta.Main.MatchHubs;
+﻿namespace Windetta.Main.Core.MatchHubs;
 
 public struct Bet
 {
@@ -7,7 +7,7 @@ public struct Bet
 
     public Bet(int currencyId, ulong bet)
     {
-        this.CurrencyId = currencyId;
-        this.Amount = bet;
+        CurrencyId = currencyId;
+        Amount = bet;
     }
 }

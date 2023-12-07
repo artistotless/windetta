@@ -1,4 +1,4 @@
-﻿namespace Windetta.Main.MatchHubs.Strategies;
+﻿namespace Windetta.Main.Core.MatchHubs.Plugins;
 
 public abstract class AutoReadyStrategy : IAutoReadyStrategy
 {
@@ -17,7 +17,7 @@ public abstract class AutoReadyStrategy : IAutoReadyStrategy
         Hub = hub;
 
         if (_timer is null)
-            _timer = new Timer(Update, null, TimeSpan.Zero, _checkInterval);
+            _timer = new Timer(Update, null, _checkInterval, _checkInterval);
     }
 
     private void Update(object? state)

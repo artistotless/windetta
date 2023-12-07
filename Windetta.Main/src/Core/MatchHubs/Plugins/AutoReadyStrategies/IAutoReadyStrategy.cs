@@ -1,8 +1,6 @@
-﻿using Windetta.Main.Core.MatchHubs;
+﻿namespace Windetta.Main.Core.MatchHubs.Plugins;
 
-namespace Windetta.Main.MatchHubs.Strategies;
-
-internal interface IAutoReadyStrategy : IMatchHubPlugin, IDisposable
+public interface IAutoReadyStrategy : IMatchHubPlugin, IDisposable
 {
     void Start(IHubReadyListener hub);
 }

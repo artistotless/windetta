@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using Windetta.Main.Core.MatchHubs;
 using Windetta.Main.Core.MatchHubs.Dtos;
-using Windetta.Main.MatchHubs;
 
 namespace Windetta.Main.Infrastructure.SignalR;
 
@@ -17,17 +17,17 @@ internal class MainHub : Hub
         _dispatcher = dispatcher;
     }
 
-    public async Task CreateMatchHub(Guid gameId, Bet bet, bool privateHub = false)
+    public async Task CreateMatchHub(CreateMatchHubRequestDto request)
     {
-        var userId = Guid.Parse(Context.UserIdentifier!);
-
         var createRequest = new CreateMatchHubRequest()
         {
-            Bet = bet,
-            InitiatorId = userId,
-            GameId = gameId,
-            Private = privateHub,
-            JoinFilters = new[] { new PluginSetDto("RoleJoinFilter") }
+            Bet = request.Bet,
+            InitiatorId = GetUserId(),
+            GameId = request.GameId,
+            Private = request.Private,
+            JoinFilters = request.JoinFilters,
+            AutoDisposeStrategy = request.AutoDisposeStrategy,
+            AutoReadyStrategy = request.AutoReadyStrategy,
         };
 
         var hub = await _interactor.CreateAsync(createRequest);
@@ -41,18 +41,14 @@ internal class MainHub : Hub
 
     public async Task JoinHub(Guid hubId, Guid roomId)
     {
-        var userId = Guid.Parse(Context.UserIdentifier!);
-
-        await _interactor.JoinMember(userId, hubId, roomId);
+        await _interactor.JoinMember(GetUserId(), hubId, roomId);
 
         await Groups.AddToGroupAsync(Context.ConnectionId, hubId.ToString());
     }
 
     public async Task LeaveHub(Guid hubId)
     {
-        var userId = Guid.Parse(Context.UserIdentifier!);
-
-        await _interactor.LeaveMember(userId, hubId);
+        await _interactor.LeaveMember(GetUserId(), hubId);
 
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, hubId.ToString());
     }
@@ -66,16 +62,26 @@ internal class MainHub : Hub
 
     public override async Task OnConnectedAsync()
     {
-        var userId = Guid.Parse(Context.UserIdentifier!);
-        var hubId = await _interactor.GetHubIdByUserId(userId);
+        var hubId = await _interactor.GetHubIdByUserId(GetUserId());
 
         if (hubId.HasValue == true)
             await Groups.AddToGroupAsync(Context.ConnectionId, hubId.Value.ToString());
+
+        // TODO: delete. test only
+        //Context.Items.Add("id", Guid.NewGuid());
+    }
+
+    private Guid GetUserId()
+    {
+        return Guid.Parse(Context.UserIdentifier!);
+
+        // TODO: delete. test only
+        //return Context.Items.TryGetValue("id", out var value) ? (Guid)value : Guid.Parse(Context.UserIdentifier!);
     }
 
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        var userId = Guid.Parse(Context.UserIdentifier!);
+        var userId = GetUserId();
         var hubId = await _interactor.GetHubIdByUserId(userId);
 
         if (hubId.HasValue == true)

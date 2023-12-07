@@ -1,13 +1,15 @@
-﻿namespace Windetta.Main.Core.MatchHubs.Dtos;
+﻿using System.Text.Json.Serialization;
+
+namespace Windetta.Main.Core.MatchHubs.Dtos;
 
 public class PluginSetDto
 {
-    public string Name { get; set; }
-    public Dictionary<string, string>? RequirementsValues { get; set; }
+    public string Name { get; init; }
+    public Dictionary<string, string>? RequirementsValues { get; init; }
 
-    public PluginSetDto(string filterName, Dictionary<string, string>? requirementsValues = null)
+    public PluginSetDto(string name, Dictionary<string, string>? requirementsValues = null)
     {
-        Name = filterName;
+        Name = name;
         RequirementsValues = requirementsValues;
     }
 }

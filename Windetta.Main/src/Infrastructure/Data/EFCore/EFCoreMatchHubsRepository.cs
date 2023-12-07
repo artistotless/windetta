@@ -1,8 +1,8 @@
 ﻿using MongoDB.Driver;
 using Windetta.Common.Types;
+using Windetta.Main.Core.MatchHubs;
 using Windetta.Main.Core.MatchHubs.Dtos;
 using Windetta.Main.Infrastructure.Data.DbContexts;
-using Windetta.Main.MatchHubs;
 
 namespace Windetta.Main.Infrastructure.Data.EFCore;
 

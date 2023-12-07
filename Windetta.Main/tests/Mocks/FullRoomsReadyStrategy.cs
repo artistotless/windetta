@@ -1,6 +1,4 @@
-﻿using Windetta.Main.MatchHubs.Strategies;
-
-namespace Windetta.MainTests.Mocks;
+﻿namespace Windetta.MainTests.Mocks;
 
 public class FullRoomsReadyStrategy : AutoReadyStrategy
 {

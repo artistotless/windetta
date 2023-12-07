@@ -1,6 +1,4 @@
-﻿using Windetta.Main.MatchHubs;
-
-namespace Windetta.Main.Core.MatchHubs.Dtos;
+﻿namespace Windetta.Main.Core.MatchHubs.Dtos;
 
 public class TournamentMatchHubDto : MatchHubDto
 {

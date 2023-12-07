@@ -1,7 +1,6 @@
 ﻿using Windetta.Main.Core.Exceptions;
-using Windetta.Main.Core.MatchHubs.Plugins;
 
-namespace Windetta.Main.Core.MatchHubs;
+namespace Windetta.Main.Core.MatchHubs.Plugins;
 
 public sealed class DefaultMatchHubPluginsFactory : IMatchHubPluginsFactory
 {
@@ -35,30 +34,6 @@ public sealed class DefaultMatchHubPluginsFactory : IMatchHubPluginsFactory
 
             return (T)(configurable.WithValues(requirementsValues) as IMatchHubPlugin);
         }
-
-        return (T)plugin;
-    }
-
-    public T GetOrDefaultImplementation<T>(string? pluginName) where T : IMatchHubPlugin
-    {
-        IMatchHubPlugin? plugin;
-
-        var plugins = FindPluginsByType<T>();
-
-        if (pluginName is null)
-        {
-            var defaultPlugin = plugins
-                .FirstOrDefault(x => x.GetType().Name.Contains("Default"));
-
-            if (defaultPlugin is null)
-                throw new Exception("Default implementation does not exist");
-        }
-
-        plugin = _plugins.Where(p => p.GetType().Name == pluginName)
-           .FirstOrDefault();
-
-        if (plugin is null)
-            throw MatchHubPluginException.InvalidPluginName;
 
         return (T)plugin;
     }

@@ -1,18 +1,18 @@
 ﻿using System.Collections.ObjectModel;
-using Windetta.Main.Games;
-using Windetta.Main.MatchHubs.Filters;
-using Windetta.Main.MatchHubs.Strategies;
-using Windetta.Main.Rooms;
+using Windetta.Main.Core.Games;
+using Windetta.Main.Core.MatchHubs.Plugins;
+using Windetta.Main.Core.Rooms;
 
-namespace Windetta.Main.MatchHubs;
+namespace Windetta.Main.Core.MatchHubs;
 
-internal class MatchHub : IMatchHub
+public class MatchHub : IMatchHub
 {
     public Guid Id { get; init; }
     public Guid GameId { get; init; }
     public bool IsPublic { get; init; }
     public DateTimeOffset CreatedAt { get; init; }
     public DateTimeOffset UpdatedAt { get; set; }
+    public int MembersCount { get; private set; }
     public Bet Bet { get; init; }
     public Guid InitiatorId { get; init; }
     public GameConfiguration Configuration { get; init; }
@@ -37,7 +37,7 @@ internal class MatchHub : IMatchHub
 
     private bool _disposed;
 
-    public MatchHub(MatchHubOptions options)
+    internal MatchHub(MatchHubOptions options)
     {
         Id = Guid.NewGuid();
         State = MatchHubState.Awaiting;
@@ -48,12 +48,6 @@ internal class MatchHub : IMatchHub
         Configuration = options.GameConfiguration;
         Bet = options.Bet;
         _rooms = CreateRooms();
-
-        if (options.AutoReadyStrategy is not null)
-            SetAutoReadyStrategy(options.AutoReadyStrategy);
-
-        if (options.AutoDisposeStrategy is not null)
-            SetDisposeStrategy(options.AutoDisposeStrategy);
 
         _joinFilters = options.JoinFilters;
     }
@@ -82,10 +76,12 @@ internal class MatchHub : IMatchHub
 
     public void Add(RoomMember member, Guid roomId)
     {
-        if (_rooms.TryGetValue(roomId, out Room room))
-        {
-            member.Join(room);
-        }
+        if (!_rooms.TryGetValue(roomId, out var room))
+            return;
+
+        member.Join(room);
+
+        MembersCount++;
 
         OnUpdated();
     }
@@ -93,14 +89,19 @@ internal class MatchHub : IMatchHub
     public void Remove(Guid memberId)
     {
         var room = _rooms.Values
-            .Where(x => x.Members.Any(x => x.Id == memberId))
+            .Where(x => x.Members
+            .Any(x => x.Id == memberId))
             .FirstOrDefault();
 
         if (room is null)
             return;
 
-        var member = room.Members.First(x => x.Id == memberId);
+        var member = room.Members
+            .First(x => x.Id == memberId);
+
         member.LeaveRoom();
+
+        MembersCount--;
 
         OnUpdated();
     }
@@ -116,6 +117,7 @@ internal class MatchHub : IMatchHub
         _readyStrategy = null;
         _disposeStrategy = null;
         _rooms = null;
+        MembersCount = 0;
 
         Disposed?.Invoke(this, null);
 
@@ -132,6 +134,8 @@ internal class MatchHub : IMatchHub
     {
         Dispose();
     }
+
+    IEnumerable<IJoinFilter>? IMatchHub.GetJoinFilters() => _joinFilters;
 
     private void OnUpdated()
     {
@@ -157,7 +161,4 @@ internal class MatchHub : IMatchHub
         return new ReadOnlyDictionary<Guid, Room>(
             new Dictionary<Guid, Room>(BuildKeyValuePairs()));
     }
-
-    public IEnumerable<IJoinFilter>? GetJoinFilters()
-        => _joinFilters;
 }

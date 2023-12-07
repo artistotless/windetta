@@ -1,6 +1,4 @@
-﻿using Windetta.Main.MatchHubs.Filters;
-
-namespace Windetta.MainTests.Mocks;
+﻿namespace Windetta.MainTests.Mocks;
 
 public class AlwaysFalseJoinFilter : JoinFilter
 {

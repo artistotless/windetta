@@ -1,4 +1,4 @@
-﻿namespace Windetta.Main.MatchHubs.Filters;
+﻿namespace Windetta.Main.Core.MatchHubs.Plugins;
 
 public abstract class JoinFilter : IJoinFilter
 {

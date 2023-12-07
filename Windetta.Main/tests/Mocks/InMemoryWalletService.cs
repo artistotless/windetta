@@ -1,11 +1,9 @@
-﻿using Windetta.Main.Services;
-using Windetta.MainTests.Shared;
-using Windetta.Wallet.Domain;
+﻿using Windetta.Main.Core.Services;
 
 namespace Windetta.MainTests.Mocks;
 public class InMemoryWalletService : IWalletService
 {
-    private readonly List<UserWallet> _wallets;
+    private readonly List<Wallet.Domain.UserWallet> _wallets;
 
     public InMemoryWalletService()
     {
@@ -17,7 +15,7 @@ public class InMemoryWalletService : IWalletService
 
         balance.Increase(1000);
 
-        var wallet = new UserWallet()
+        var wallet = new Wallet.Domain.UserWallet()
         {
             UserId = IdExamples.UserId,
             Balances = new() { balance },
@@ -29,12 +27,12 @@ public class InMemoryWalletService : IWalletService
         };
     }
 
-    public Task<Main.Services.UserBalance> GetBalance(Guid userId, int currencyId)
+    public Task<Main.Core.Services.UserBalance> GetBalance(Guid userId, int currencyId)
     {
         var wallet = _wallets.Find(w => w.UserId == userId);
         var balance = wallet.Balances.Find(b => b.CurrencyId == currencyId);
 
-        return Task.FromResult(new Main.Services.UserBalance() { Amount = balance.Amount, HeldAmount = balance.HeldAmount });
+        return Task.FromResult(new UserBalance() { Amount = balance.Amount, HeldAmount = balance.HeldAmount });
     }
 
     public Task HoldBalance(Guid userId, int currencyId, ulong amount)

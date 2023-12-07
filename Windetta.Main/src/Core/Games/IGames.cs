@@ -1,6 +1,6 @@
 ﻿using Windetta.Common.Types;
 
-namespace Windetta.Main.Games;
+namespace Windetta.Main.Core.Games;
 
 public interface IGames : IScopedService
 {

@@ -1,13 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Windetta.Common.Testing;
 using Windetta.Main.Core.MatchHubs.Dtos;
-using Windetta.Main.Games;
-using Windetta.Main.MatchHubs;
 using Windetta.MainTests.Mocks;
-using Windetta.MainTests.Shared;
 using Xunit.Abstractions;
 
-namespace Windetta.MainTests;
+namespace Windetta.MainTests.MatchHub;
 
 public class MatchHubDispatcherTests
 {
