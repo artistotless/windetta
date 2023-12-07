@@ -1,5 +1,4 @@
-﻿using Windetta.Main.MatchHubs;
-using Windetta.Main.Rooms;
+﻿using Windetta.Main.Core.Rooms;
 
 namespace Windetta.Main.Core.MatchHubs.Dtos;
 

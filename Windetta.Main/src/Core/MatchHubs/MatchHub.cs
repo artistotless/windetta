@@ -1,22 +1,23 @@
 ﻿using System.Collections.ObjectModel;
-using Windetta.Main.Games;
-using Windetta.Main.MatchHubs.Filters;
-using Windetta.Main.MatchHubs.Strategies;
-using Windetta.Main.Rooms;
+using Windetta.Main.Core.Games;
+using Windetta.Main.Core.MatchHubs.Plugins;
+using Windetta.Main.Core.Rooms;
 
-namespace Windetta.Main.MatchHubs;
+namespace Windetta.Main.Core.MatchHubs;
 
-internal class MatchHub : IMatchHub
+public class MatchHub : IMatchHub
 {
     public Guid Id { get; init; }
     public Guid GameId { get; init; }
     public bool IsPublic { get; init; }
     public DateTimeOffset CreatedAt { get; init; }
     public DateTimeOffset UpdatedAt { get; set; }
+    public int MembersCount { get; private set; }
     public Bet Bet { get; init; }
     public Guid InitiatorId { get; init; }
     public GameConfiguration Configuration { get; init; }
-    public IEnumerable<string>? JoinFilters => _joinFilters?.Select(filter => filter.GetType().Name);
+    public IEnumerable<string>? JoinFilters => _joinFilters?
+        .Select(filter => filter.GetType().Name);
     public string? AutoReadyStrategy => _readyStrategy?.GetType().Name;
     public string? AutoDisposeStrategy => _disposeStrategy?.GetType().Name;
     public IEnumerable<Room> Rooms => _rooms.Values;
@@ -28,15 +29,15 @@ internal class MatchHub : IMatchHub
     public event EventHandler? Ready;
 
     // Plugins
-    private AutoReadyStrategy? _readyStrategy;
-    private AutoDisposeStrategy? _disposeStrategy;
+    private IAutoReadyStrategy? _readyStrategy;
+    private IAutoDisposeStrategy? _disposeStrategy;
     private IEnumerable<IJoinFilter>? _joinFilters;
 
     private IReadOnlyDictionary<Guid, Room> _rooms;
 
     private bool _disposed;
 
-    public MatchHub(MatchHubOptions options)
+    internal MatchHub(MatchHubOptions options)
     {
         Id = Guid.NewGuid();
         State = MatchHubState.Awaiting;
@@ -48,16 +49,10 @@ internal class MatchHub : IMatchHub
         Bet = options.Bet;
         _rooms = CreateRooms();
 
-        if (options.AutoReadyStrategy is not null)
-            SetAutoReadyStrategy(options.AutoReadyStrategy);
-
-        if (options.AutoDisposeStrategy is not null)
-            SetDisposeStrategy(options.AutoDisposeStrategy);
-
         _joinFilters = options.JoinFilters;
     }
 
-    public void SetAutoReadyStrategy(AutoReadyStrategy strategy)
+    public void SetAutoReadyStrategy(IAutoReadyStrategy strategy)
     {
         if (_readyStrategy is not null)
             _readyStrategy.Dispose();
@@ -68,7 +63,7 @@ internal class MatchHub : IMatchHub
         OnUpdated();
     }
 
-    public void SetDisposeStrategy(AutoDisposeStrategy strategy)
+    public void SetDisposeStrategy(IAutoDisposeStrategy strategy)
     {
         if (_disposeStrategy is not null)
             _disposeStrategy.Dispose();
@@ -81,10 +76,12 @@ internal class MatchHub : IMatchHub
 
     public void Add(RoomMember member, Guid roomId)
     {
-        if (_rooms.TryGetValue(roomId, out Room room))
-        {
-            member.Join(room);
-        }
+        if (!_rooms.TryGetValue(roomId, out var room))
+            return;
+
+        member.Join(room);
+
+        MembersCount++;
 
         OnUpdated();
     }
@@ -92,14 +89,19 @@ internal class MatchHub : IMatchHub
     public void Remove(Guid memberId)
     {
         var room = _rooms.Values
-            .Where(x => x.Members.Any(x => x.Id == memberId))
+            .Where(x => x.Members
+            .Any(x => x.Id == memberId))
             .FirstOrDefault();
 
         if (room is null)
             return;
 
-        var member = room.Members.First(x => x.Id == memberId);
+        var member = room.Members
+            .First(x => x.Id == memberId);
+
         member.LeaveRoom();
+
+        MembersCount--;
 
         OnUpdated();
     }
@@ -115,6 +117,7 @@ internal class MatchHub : IMatchHub
         _readyStrategy = null;
         _disposeStrategy = null;
         _rooms = null;
+        MembersCount = 0;
 
         Disposed?.Invoke(this, null);
 
@@ -131,6 +134,8 @@ internal class MatchHub : IMatchHub
     {
         Dispose();
     }
+
+    IEnumerable<IJoinFilter>? IMatchHub.GetJoinFilters() => _joinFilters;
 
     private void OnUpdated()
     {
@@ -156,7 +161,4 @@ internal class MatchHub : IMatchHub
         return new ReadOnlyDictionary<Guid, Room>(
             new Dictionary<Guid, Room>(BuildKeyValuePairs()));
     }
-
-    public IEnumerable<IJoinFilter>? GetJoinFilters()
-        => _joinFilters;
 }

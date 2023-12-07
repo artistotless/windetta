@@ -1,4 +1,4 @@
-﻿namespace Windetta.Main.MatchHubs;
+﻿namespace Windetta.Main.Core.MatchHubs;
 
 public sealed record TournamentMatchHubOptions : MatchHubOptions
 {

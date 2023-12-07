@@ -1,14 +1,13 @@
 ﻿using Windetta.Common.Testing;
-using Windetta.Main.MatchHubs;
 
 namespace Windetta.MainTests.Mocks;
 
-public class MatchHubDebugOutputChannel : IMatchHubDispatcherOutputChannel
+public class MatchHubDebugOutput : IMatchHubObserverOutput
 {
     private readonly XUnitOutWrapper _output;
     private readonly Queue<string> _buffer;
 
-    public MatchHubDebugOutputChannel(XUnitOutWrapper output, ref Queue<string> buffer)
+    public MatchHubDebugOutput(XUnitOutWrapper output, ref Queue<string> buffer)
     {
         _output = output;
         _buffer = buffer;

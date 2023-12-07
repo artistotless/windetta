@@ -1,10 +1,8 @@
-﻿using Windetta.Main.MatchHubs.Filters;
+﻿namespace Windetta.MainTests.Mocks;
 
-namespace Windetta.MainTests.Mocks;
-
-public class AlwaysFalseJoinFilter : IJoinFilter
+public class AlwaysFalseJoinFilter : JoinFilter
 {
-    public async ValueTask<(bool, string?)> ValidateAsync(Guid userId, CancellationToken token)
+    public override async ValueTask<(bool isValid, string? error)> ExecuteAsync(Guid userId, CancellationToken token)
     {
         await Task.Delay(2_000);
 

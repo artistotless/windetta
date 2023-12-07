@@ -25,15 +25,13 @@ public static class AuthenticationExtensions
                 OnMessageReceived = context =>
                 {
                     var accessTokenFromQuery = context.Request.Query["access_token"].ToString();
-                    var accessTokenFromHeader = context.Request.Headers.Authorization.FirstOrDefault()?.Replace("Bearer ", string.Empty);
 
-                    var access_token = string.IsNullOrEmpty(accessTokenFromQuery) ? accessTokenFromHeader : accessTokenFromQuery;
-
-                    if (!string.IsNullOrEmpty(access_token))
+                    if (!string.IsNullOrEmpty(accessTokenFromQuery))
                     {
                         // Read the token out of the query string
-                        context.Token = access_token;
+                        context.Token = accessTokenFromQuery;
                     }
+
                     return Task.CompletedTask;
                 }
             };

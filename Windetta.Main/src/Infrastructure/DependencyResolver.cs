@@ -1,8 +1,7 @@
-﻿using Windetta.Main.Core.MatchHubs;
+﻿using Windetta.Main.Core.MatchHubs.Plugins;
 using Windetta.Main.Core.MatchHubs.UseCases;
-using Windetta.Main.Infrastructure.MatchHubPlugins;
+using Windetta.Main.Infrastructure.MatchHub.Plugins;
 using Windetta.Main.Infrastructure.Services;
-using Windetta.Main.MatchHubs.Strategies;
 
 namespace Windetta.Main.Infrastructure;
 
@@ -33,6 +32,7 @@ public static class DependencyResolver
 
     public static void AddMatchHubPlugins(this IServiceCollection services)
     {
+        services.AddScoped<IMatchHubPlugin, DefaultDisposeStrategy>();
         services.AddScoped<IMatchHubPlugin, DefaultReadyStrategy>();
         services.AddScoped<IMatchHubPlugin, RoleJoinFilter>();
         services.AddScoped<IMatchHubPlugin, DateReadyStrategy>();

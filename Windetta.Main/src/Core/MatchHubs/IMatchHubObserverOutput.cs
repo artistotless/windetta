@@ -1,8 +1,8 @@
 ﻿using Windetta.Common.Types;
 
-namespace Windetta.Main.MatchHubs;
+namespace Windetta.Main.Core.MatchHubs;
 
-public interface IMatchHubDispatcherOutputChannel : ISingletonService
+public interface IMatchHubObserverOutput : ISingletonService
 {
     Task WriteHubDeleted(IMatchHub hub);
     Task WriteHubReady(IMatchHub hub);

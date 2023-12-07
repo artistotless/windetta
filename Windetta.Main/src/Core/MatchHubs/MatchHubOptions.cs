@@ -1,8 +1,8 @@
-﻿using Windetta.Main.Games;
-using Windetta.Main.MatchHubs.Filters;
-using Windetta.Main.MatchHubs.Strategies;
+﻿using Windetta.Main.Core.Games;
+using Windetta.Main.Core.MatchHubs.Plugins;
+using Windetta.Main.Core.Rooms;
 
-namespace Windetta.Main.MatchHubs;
+namespace Windetta.Main.Core.MatchHubs;
 
 public record MatchHubOptions
 {
@@ -11,8 +11,8 @@ public record MatchHubOptions
     public Bet Bet { get; init; }
     public GameConfiguration GameConfiguration { get; init; }
     public bool Private { get; init; }
-    public AutoReadyStrategy? AutoReadyStrategy { get; init; }
-    public AutoDisposeStrategy? AutoDisposeStrategy { get; init; }
-    public IEnumerable<IJoinFilter>? JoinFilters { get; init; }
+    internal IAutoReadyStrategy? AutoReadyStrategy { get; init; }
+    internal IAutoDisposeStrategy? AutoDisposeStrategy { get; init; }
+    internal IEnumerable<IJoinFilter>? JoinFilters { get; init; }
 }
 

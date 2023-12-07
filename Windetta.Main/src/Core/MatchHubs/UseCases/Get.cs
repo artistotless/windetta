@@ -1,5 +1,5 @@
 ﻿using Windetta.Main.Core.Exceptions;
-using Windetta.Main.MatchHubs;
+using Windetta.Main.Core.MatchHubs;
 
 namespace Windetta.Main.Core.MatchHubs.UseCases;
 

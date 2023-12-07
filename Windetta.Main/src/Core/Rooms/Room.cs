@@ -1,6 +1,6 @@
 ﻿using Windetta.Main.Core.Exceptions;
 
-namespace Windetta.Main.Rooms;
+namespace Windetta.Main.Core.Rooms;
 
 public class Room : IDisposable
 {

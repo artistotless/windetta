@@ -1,4 +1,4 @@
-﻿namespace Windetta.Main.Rooms;
+﻿namespace Windetta.Main.Core.Rooms;
 
 public class RoomEventArg : EventArgs
 {

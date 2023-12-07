@@ -1,6 +1,6 @@
 using Windetta.Common.Constants;
 using Windetta.Common.Types;
-using Windetta.Main.Rooms;
+using Windetta.Main.Core.Rooms;
 
 namespace Windetta.MainTests;
 

@@ -1,6 +1,4 @@
-﻿using Windetta.Main.MatchHubs;
-
-namespace Windetta.Main.Core.MatchHubs.UseCases;
+﻿namespace Windetta.Main.Core.MatchHubs.UseCases;
 
 public interface IGetMatchHubUseCase : IMatchHubUseCase
 {

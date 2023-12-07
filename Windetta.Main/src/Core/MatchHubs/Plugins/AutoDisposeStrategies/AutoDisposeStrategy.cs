@@ -1,8 +1,6 @@
-﻿using Windetta.Main.Core.MatchHubs;
+﻿namespace Windetta.Main.Core.MatchHubs.Plugins;
 
-namespace Windetta.Main.MatchHubs.Strategies;
-
-public abstract class AutoDisposeStrategy : IDisposable, IMatchHubPlugin
+public abstract class AutoDisposeStrategy : IAutoDisposeStrategy
 {
     public IHubDisposeListener Hub { get; private set; }
 
@@ -19,19 +17,19 @@ public abstract class AutoDisposeStrategy : IDisposable, IMatchHubPlugin
         Hub = hub;
 
         if (_timer is null)
-            _timer = new Timer(Update, null, TimeSpan.Zero, _checkInterval);
+            _timer = new Timer(Update, null, _checkInterval, _checkInterval);
     }
 
     private void Update(object? state)
     {
-        if (CheckDisposed())
+        if (CheckDispose())
         {
             _timer.Dispose();
             Hub.OnHubAutoDisposed();
         }
     }
 
-    protected abstract bool CheckDisposed();
+    protected abstract bool CheckDispose();
 
     public void Dispose()
     {

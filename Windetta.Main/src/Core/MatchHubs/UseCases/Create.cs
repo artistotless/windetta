@@ -1,7 +1,7 @@
 ﻿using Windetta.Main.Core.Exceptions;
-using Windetta.Main.MatchHubs;
-using Windetta.Main.Rooms;
-using Windetta.Main.Services;
+using Windetta.Main.Core.MatchHubs.Plugins;
+using Windetta.Main.Core.Rooms;
+using Windetta.Main.Core.Services;
 
 namespace Windetta.Main.Core.MatchHubs.UseCases;
 
@@ -9,14 +9,9 @@ public class Create : ICreateMatchHubUseCase
 {
     private readonly IMatchHubs _hubs;
     private readonly IWalletService _walletService;
-    private readonly IGetMatchHubIdByUserIdUseCase _getHubIdByUserIdUseCase;
 
-    public Create(
-        IMatchHubs hubs,
-        IWalletService walletService,
-        IGetMatchHubIdByUserIdUseCase getHubIdByUserIdUseCase)
+    public Create(IMatchHubs hubs, IWalletService walletService)
     {
-        _getHubIdByUserIdUseCase = getHubIdByUserIdUseCase;
         _hubs = hubs;
         _walletService = walletService;
     }
@@ -29,19 +24,26 @@ public class Create : ICreateMatchHubUseCase
             throw WalletException.FundsNotEnough;
         }
 
+        IMatchHub hub;
+
         if (options is TournamentMatchHubOptions o)
-            return new TournamentMatchHub(o);
+        {
+            hub = new TournamentMatchHub(o);
+        }
+        else
+        {
+            hub = new MatchHub(options);
 
-        var hubId = await _getHubIdByUserIdUseCase.ExecuteAsync(options.InitiatorId); ;
+            var initiator = new RoomMember(options.InitiatorId);
 
-        if (hubId.HasValue)
-            throw MatchHubException.AlreadyMemberOfHub;
+            hub.Add(initiator, hub.Rooms.First().Id);
+        }
 
-        IMatchHub hub = new MatchHub(options);
+        hub.SetAutoReadyStrategy(options.AutoReadyStrategy ??
+            new DefaultReadyStrategy());
 
-        var initiator = new RoomMember(options.InitiatorId);
-
-        hub.Add(initiator, hub.Rooms.First().Id);
+        hub.SetDisposeStrategy(options.AutoDisposeStrategy ??
+            new DefaultDisposeStrategy());
 
         await _hubs.AddAsync(hub);
 

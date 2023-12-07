@@ -1,9 +1,8 @@
 ﻿using Windetta.Common.Types;
 
-namespace Windetta.Main.Core.MatchHubs;
+namespace Windetta.Main.Core.MatchHubs.Plugins;
 
 public interface IMatchHubPluginsFactory : IScopedService
 {
-    public IMatchHubPlugin Get(string typeName);
-    public T GetOrDefaultImplementation<T>(string? typeName) where T : IMatchHubPlugin;
+    public T Get<T>(string pluginName, Dictionary<string, string>? requirementsValues) where T : IMatchHubPlugin;
 }

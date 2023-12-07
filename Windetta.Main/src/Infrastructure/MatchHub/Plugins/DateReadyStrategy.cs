@@ -1,6 +1,6 @@
-﻿using Windetta.Main.MatchHubs.Strategies;
+﻿using Windetta.Main.Core.MatchHubs.Plugins;
 
-namespace Windetta.Main.Infrastructure.MatchHubPlugins;
+namespace Windetta.Main.Infrastructure.MatchHub.Plugins;
 
 public class DateReadyStrategy : AutoReadyStrategy
 {

@@ -1,6 +1,6 @@
 ﻿using Windetta.Common.Types;
 
-namespace Windetta.Main.Services;
+namespace Windetta.Main.Core.Services;
 
 public interface IWalletService : IScopedService
 {

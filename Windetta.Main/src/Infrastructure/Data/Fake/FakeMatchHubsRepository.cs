@@ -1,6 +1,6 @@
 ﻿using Windetta.Common.Types;
+using Windetta.Main.Core.MatchHubs;
 using Windetta.Main.Core.MatchHubs.Dtos;
-using Windetta.Main.MatchHubs;
 
 namespace Windetta.Main.Infrastructure.Data.Fake;
 

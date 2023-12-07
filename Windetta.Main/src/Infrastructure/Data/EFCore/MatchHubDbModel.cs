@@ -1,5 +1,5 @@
-﻿using Windetta.Main.Core.MatchHubs.Dtos;
-using Windetta.Main.MatchHubs;
+﻿using Windetta.Main.Core.MatchHubs;
+using Windetta.Main.Core.MatchHubs.Dtos;
 
 namespace Windetta.Main.Infrastructure.Data.EFCore;
 

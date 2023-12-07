@@ -31,6 +31,7 @@ internal sealed class CustomClaimsService : DefaultClaimsService
     public override async Task<IEnumerable<Claim>> GetAccessTokenClaimsAsync(ClaimsPrincipal subject, ResourceValidationResult resourceResult, ValidatedRequest request)
     {
         var baseClaims = await base.GetAccessTokenClaimsAsync(subject, resourceResult, request);
+
         var claims = new List<Claim>(baseClaims);
 
         if (subject is null)
@@ -44,6 +45,7 @@ internal sealed class CustomClaimsService : DefaultClaimsService
         if (roleScope is not null && roleClaim is not null)
         {
             var exist = await _roleManager.RoleExistsAsync(roleClaim.Value);
+
             if (exist is true)
                 claims.Add(roleClaim);
         }

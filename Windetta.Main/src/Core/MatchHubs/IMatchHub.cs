@@ -1,7 +1,7 @@
-﻿using Windetta.Main.MatchHubs.Filters;
-using Windetta.Main.Rooms;
+﻿using Windetta.Main.Core.MatchHubs.Plugins;
+using Windetta.Main.Core.Rooms;
 
-namespace Windetta.Main.MatchHubs;
+namespace Windetta.Main.Core.MatchHubs;
 
 public interface IMatchHub : IHubDisposeListener, IHubReadyListener, IDisposable
 {
@@ -9,7 +9,7 @@ public interface IMatchHub : IHubDisposeListener, IHubReadyListener, IDisposable
     Guid GameId { get; init; }
 
     Guid InitiatorId { get; init; }
-
+    new int MembersCount { get; }
     MatchHubState State { get; protected set; }
 
     // Events

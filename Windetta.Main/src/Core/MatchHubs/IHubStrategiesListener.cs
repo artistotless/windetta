@@ -1,8 +1,8 @@
-﻿using Windetta.Main.Games;
-using Windetta.Main.MatchHubs.Strategies;
-using Windetta.Main.Rooms;
+﻿using Windetta.Main.Core.Games;
+using Windetta.Main.Core.MatchHubs.Plugins;
+using Windetta.Main.Core.Rooms;
 
-namespace Windetta.Main.MatchHubs;
+namespace Windetta.Main.Core.MatchHubs;
 
 public interface IHubStrategiesListener
 {
@@ -12,16 +12,17 @@ public interface IHubStrategiesListener
     Bet Bet { get; init; }
     GameConfiguration Configuration { get; }
     IEnumerable<Room> Rooms { get; }
+    int MembersCount { get; }
 }
 
 public interface IHubReadyListener : IHubStrategiesListener
 {
-    void SetAutoReadyStrategy(AutoReadyStrategy strategy);
+    void SetAutoReadyStrategy(IAutoReadyStrategy strategy);
     void OnHubAutoReady();
 }
 
 public interface IHubDisposeListener : IHubStrategiesListener
 {
-    void SetDisposeStrategy(AutoDisposeStrategy strategy);
+    void SetDisposeStrategy(IAutoDisposeStrategy strategy);
     void OnHubAutoDisposed();
 }

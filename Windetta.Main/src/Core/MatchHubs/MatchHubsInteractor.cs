@@ -1,33 +1,31 @@
 ﻿using Windetta.Common.Types;
 using Windetta.Main.Core.Exceptions;
-using Windetta.Main.Core.MatchHubs;
+using Windetta.Main.Core.Games;
 using Windetta.Main.Core.MatchHubs.Dtos;
+using Windetta.Main.Core.MatchHubs.Plugins;
 using Windetta.Main.Core.MatchHubs.UseCases;
-using Windetta.Main.Games;
-using Windetta.Main.MatchHubs.Filters;
-using Windetta.Main.MatchHubs.Strategies;
 
-namespace Windetta.Main.MatchHubs;
+namespace Windetta.Main.Core.MatchHubs;
 
 public class MatchHubsInteractor : IScopedService
 {
-    private readonly IGames _games;
+    private readonly IGames _gamesRepository;
     private readonly IMatchHubUsersAssociations _matchHubsUsersSets;
     private readonly IMatchHubUseCasesFactory _useCasesFactory;
     private readonly IMatchHubPluginsFactory _pluginsFactory;
 
     public MatchHubsInteractor(
-        IGames games,
+        IGames gamesRepository,
         IMatchHubPluginsFactory pluginsFactory,
         IMatchHubUseCasesFactory useCaseFactory,
-        IMatchHubUsersAssociations? matchHubsUsersSets)
+        IMatchHubUsersAssociations? matchHubsUsersSets = null)
     {
         _matchHubsUsersSets = matchHubsUsersSets ??
             new InMemoryMatchHubUsersAssociations();
 
         _useCasesFactory = useCaseFactory;
         _pluginsFactory = pluginsFactory;
-        _games = games;
+        _gamesRepository = gamesRepository;
     }
 
     public Task<Guid?> GetHubIdByUserId(Guid userId)
@@ -48,12 +46,21 @@ public class MatchHubsInteractor : IScopedService
 
     public async Task<IMatchHub> CreateAsync(CreateMatchHubRequest request)
     {
+        var isTournament = request is CreateTournamentMatchHubRequest;
+
+        if (!isTournament)
+        {
+            if (_matchHubsUsersSets.GetHubId(request.InitiatorId).HasValue)
+                throw MatchHubException.AlreadyMemberOfHub;
+        }
+
         var options = await BuildMatchHubOptions(request);
 
         var hub = await _useCasesFactory.Get<ICreateMatchHubUseCase>()
              .ExecuteAsync(options);
 
-        _matchHubsUsersSets.Set(hub.Id, request.InitiatorId);
+        if (!isTournament)
+            _matchHubsUsersSets.Set(hub.Id, request.InitiatorId);
 
         return hub;
     }
@@ -74,11 +81,12 @@ public class MatchHubsInteractor : IScopedService
         _matchHubsUsersSets.Unset(userId);
     }
 
+    // TODO: refactor it, too big size of method & duplicated code
     private async Task<MatchHubOptions> BuildMatchHubOptions(CreateMatchHubRequest request)
     {
         (GameConfiguration cfg, IEnumerable<SupportedCurrency> sc) configurations;
 
-        configurations = await _games.GetConfigurationsAsync(request.GameId);
+        configurations = await _gamesRepository.GetConfigurationsAsync(request.GameId);
 
         ValidateBet(configurations.sc, request.Bet);
 
@@ -88,20 +96,25 @@ public class MatchHubsInteractor : IScopedService
         {
             options = new TournamentMatchHubOptions()
             {
-                Private = request.Private,
-                GameId = request.GameId,
-                GameConfiguration = configurations.cfg,
-                Bet = request.Bet,
                 InitiatorId = request.InitiatorId,
+                GameId = request.GameId,
+                Bet = request.Bet,
+                GameConfiguration = configurations.cfg,
+                Private = request.Private,
 
                 AutoDisposeStrategy = request.AutoDisposeStrategy is null ? null :
-                _pluginsFactory.Get(request.AutoDisposeStrategy) as AutoDisposeStrategy,
+                _pluginsFactory.Get<IAutoDisposeStrategy>(
+                    request.AutoDisposeStrategy.Name,
+                    request.AutoDisposeStrategy.RequirementsValues),
 
                 AutoReadyStrategy = request.AutoReadyStrategy is null ? null :
-                _pluginsFactory.Get(request.AutoReadyStrategy) as AutoReadyStrategy,
+                _pluginsFactory.Get<IAutoReadyStrategy>(
+                    request.AutoReadyStrategy.Name,
+                    request.AutoReadyStrategy.RequirementsValues),
 
                 JoinFilters = request.JoinFilters is null ? null :
-                request.JoinFilters.Select(f => (_pluginsFactory.Get(f) as IJoinFilter)!),
+                request.JoinFilters.Select(f =>
+                _pluginsFactory.Get<IJoinFilter>(f.Name, f.RequirementsValues)!),
 
                 Site = r.Site,
                 Description = r.Description,
@@ -119,13 +132,18 @@ public class MatchHubsInteractor : IScopedService
                 InitiatorId = request.InitiatorId,
 
                 AutoDisposeStrategy = request.AutoDisposeStrategy is null ? null :
-                _pluginsFactory.GetOrDefaultImplementation<AutoDisposeStrategy>(request.AutoDisposeStrategy),
+                _pluginsFactory.Get<IAutoDisposeStrategy>(
+                    request.AutoDisposeStrategy.Name,
+                    request.AutoDisposeStrategy.RequirementsValues),
 
                 AutoReadyStrategy = request.AutoReadyStrategy is null ? null :
-                _pluginsFactory.GetOrDefaultImplementation<AutoReadyStrategy>(request.AutoReadyStrategy),
+                _pluginsFactory.Get<IAutoReadyStrategy>(
+                    request.AutoReadyStrategy.Name,
+                    request.AutoReadyStrategy.RequirementsValues),
 
                 JoinFilters = request.JoinFilters is null ? null :
-                request.JoinFilters.Select(f => _pluginsFactory.GetOrDefaultImplementation<IJoinFilter>(f)),
+                request.JoinFilters.Select(f => _pluginsFactory
+                .Get<IJoinFilter>(f.Name, f.RequirementsValues)),
             };
         }
 

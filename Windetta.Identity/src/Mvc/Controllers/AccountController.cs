@@ -1,12 +1,10 @@
 ﻿using IdentityServer4.Models;
-using MassTransit;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Windetta.Identity.Domain.Entities;
 using Windetta.Identity.Extensions;
 using Windetta.Identity.Infrastructure.Exceptions;
-using Windetta.Identity.Messages.Events;
 using Windetta.Identity.Messages.Requests;
 using Windetta.Identity.Models;
 using Windetta.Identity.Services;

@@ -1,10 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Windetta.Main.Games;
-using Windetta.Main.MatchHubs;
 using Windetta.MainTests.Mocks;
-using Windetta.MainTests.Shared;
 
-namespace Windetta.MainTests;
+namespace Windetta.MainTests.MatchHub;
 public class HubTests
 {
     [Fact]
@@ -40,7 +37,7 @@ public class HubTests
 
         // assert
         hub.Rooms.Count().ShouldBe((int)gameCfg.MaxTeams);
-        hub.Rooms.First().MaxMembers.ShouldBe((uint)gameCfg.MaxPlayers);
+        hub.Rooms.First().MaxMembers.ShouldBe(gameCfg.MaxPlayers);
     }
 
     [Fact]
