@@ -6,7 +6,7 @@ Windetta stands as an innovative platform where the thrill of gaming intersects 
 
 Windetta was conceived with a clear mission: to empower players to transform their gaming passion into a source of income. Our games place skills at the forefront, allowing participants to win TON cryptocurrency.
 
-Windetta operates on a robust architecture where individual player balances are maintained, and replenishments are accompanied by transparent comments, ensuring seamless fund management. The entire game logic resides on our servers, eliminating any room for manipulation by cheaters.
+Windetta operates on a robust architecture where individual player balances are maintained, and replenishments are accompanied by transparent comments, ensuring seamless fund management. The entire game logic resides on project's servers, eliminating any room for manipulation by cheaters.
 
 Safety is a priority. Mandatory two-factor confirmation when withdrawing funds via email and Telegram is just one of the steps using to ensure the reliability and confidence of our players.
 
@@ -56,10 +56,12 @@ Windetta is not just a platform; it's a community of individuals united by a lov
 
 ---
 #### *Development Progress*
-- [x] MatchHub system
+- [x] OpenId authentication/authorization
+- [x] MatchHub core
 - [x] MatchHub plugins 
 - [x] TopUp, Withdraw TON
 - [x] SignalR integration
+- [x] Mongo integration
 - [x] Windetta.Wallet service
 - [x] Windetta.Operations service
 - [ ] 100% test coverage
