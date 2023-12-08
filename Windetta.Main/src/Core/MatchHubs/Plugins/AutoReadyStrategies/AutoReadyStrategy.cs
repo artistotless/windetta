@@ -6,7 +6,7 @@ public abstract class AutoReadyStrategy : IAutoReadyStrategy
 
     private Timer _timer;
     private readonly TimeSpan _checkInterval;
-
+     
     protected AutoReadyStrategy(TimeSpan? checkInterval = null)
     {
         _checkInterval = checkInterval ?? TimeSpan.FromSeconds(3);

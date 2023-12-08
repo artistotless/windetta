@@ -6,7 +6,7 @@ public class TournamentMatchHub : MatchHub
     public string? Description { get; init; }
     public string? Site { get; init; }
 
-    internal TournamentMatchHub(TournamentMatchHubOptions options) : base(options)
+    internal TournamentMatchHub(TournamentMatchHubOptions options, Guid? id = null) : base(options, id)
     {
         OrganizerId = options.OrganizerId;
         Description = options.Description;

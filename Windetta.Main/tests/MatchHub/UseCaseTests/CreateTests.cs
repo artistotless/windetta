@@ -4,7 +4,6 @@ using Windetta.Main.Core.Exceptions;
 using Windetta.MainTests.Mocks;
 
 namespace Windetta.MainTests.MatchHub.UseCaseTests;
-
 public class CreateTests
 {
     [Fact]

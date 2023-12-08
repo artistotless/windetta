@@ -11,6 +11,7 @@ public interface IMatchHub : IHubDisposeListener, IHubReadyListener, IDisposable
     Guid InitiatorId { get; init; }
     new int MembersCount { get; }
     MatchHubState State { get; protected set; }
+    bool IsDisposed { get; }
 
     // Events
     event EventHandler Updated;
@@ -22,7 +23,7 @@ public interface IMatchHub : IHubDisposeListener, IHubReadyListener, IDisposable
     public string? AutoReadyStrategy { get; }
     public string? AutoDisposeStrategy { get; }
 
-    internal void Add(RoomMember member, Guid roomId);
-    internal void Remove(Guid memberId);
-    internal IEnumerable<IJoinFilter>? GetJoinFilters();
+    public IEnumerable<IJoinFilter>? GetJoinFilters();
+    internal protected void Add(RoomMember member, Guid roomId);
+    internal protected void Remove(Guid memberId);
 }

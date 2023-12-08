@@ -20,8 +20,9 @@ public class MatchHub : IMatchHub
         .Select(filter => filter.GetType().Name);
     public string? AutoReadyStrategy => _readyStrategy?.GetType().Name;
     public string? AutoDisposeStrategy => _disposeStrategy?.GetType().Name;
-    public IEnumerable<Room> Rooms => _rooms.Values;
+    public IEnumerable<Room> Rooms => (IsDisposed ? null : _rooms.Values)!;
     public MatchHubState State { get; set; }
+    public bool IsDisposed { get; private set; }
 
     //Events
     public event EventHandler? Updated;
@@ -35,11 +36,10 @@ public class MatchHub : IMatchHub
 
     private IReadOnlyDictionary<Guid, Room> _rooms;
 
-    private bool _disposed;
 
-    internal MatchHub(MatchHubOptions options)
+    internal protected MatchHub(MatchHubOptions options, Guid? id = null)
     {
-        Id = Guid.NewGuid();
+        Id = id ?? Guid.NewGuid();
         State = MatchHubState.Awaiting;
         InitiatorId = options.InitiatorId;
         CreatedAt = DateTimeOffset.UtcNow;
@@ -108,7 +108,7 @@ public class MatchHub : IMatchHub
 
     public void Dispose()
     {
-        if (_disposed)
+        if (IsDisposed)
             return;
 
         _readyStrategy?.Dispose();
@@ -116,12 +116,14 @@ public class MatchHub : IMatchHub
 
         _readyStrategy = null;
         _disposeStrategy = null;
+
         _rooms = null;
+
         MembersCount = 0;
 
         Disposed?.Invoke(this, null);
 
-        _disposed = true;
+        IsDisposed = true;
     }
 
     void IHubReadyListener.OnHubAutoReady()
@@ -135,7 +137,7 @@ public class MatchHub : IMatchHub
         Dispose();
     }
 
-    IEnumerable<IJoinFilter>? IMatchHub.GetJoinFilters() => _joinFilters;
+    public virtual IEnumerable<IJoinFilter>? GetJoinFilters() => _joinFilters;
 
     private void OnUpdated()
     {

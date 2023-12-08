@@ -1,6 +1,6 @@
 ﻿namespace Windetta.Main.Core.MatchHubs.Plugins;
 
-internal interface IJoinFilter : IMatchHubPlugin
+public interface IJoinFilter : IMatchHubPlugin
 {
-    ValueTask<(bool isValid, string? error)> ExecuteAsync(Guid userId, CancellationToken token);
+    internal ValueTask<(bool isValid, string? error)> ExecuteAsync(Guid userId, CancellationToken token);
 }

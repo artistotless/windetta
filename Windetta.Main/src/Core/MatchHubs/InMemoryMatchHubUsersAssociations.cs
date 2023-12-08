@@ -2,7 +2,7 @@
 
 namespace Windetta.Main.Core.MatchHubs;
 
-public class InMemoryMatchHubUsersAssociations : IMatchHubUsersAssociations
+public sealed class InMemoryMatchHubUsersAssociations : IMatchHubUsersAssociations
 {
     private readonly ConcurrentDictionary<Guid, Guid> _store;
 

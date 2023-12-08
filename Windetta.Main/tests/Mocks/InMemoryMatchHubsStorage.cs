@@ -23,8 +23,8 @@ public class InMemoryMatchHubsStorage : IMatchHubs
     public Task<IEnumerable<MatchHubDto>> GetAllAsync()
         => Task.FromResult(_hubs.Select(h => new MatchHubDto(h)));
 
-    public Task<IMatchHub> GetAsync(Guid hubId)
-        => Task.FromResult(_hubs.First(x => x.Id == hubId));
+    public Task<IMatchHub?> GetAsync(Guid hubId)
+        => Task.FromResult(_hubs.FirstOrDefault(x => x.Id == hubId));
 
     public Task RemoveAsync(Guid hubId)
     {
