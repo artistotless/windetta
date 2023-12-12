@@ -5,7 +5,7 @@ using Windetta.Common.Types;
 using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
 
-namespace Windetta.Operations.Sagas;
+namespace Windetta.TonTxns.Infrastructure.Sagas;
 
 public class TonWithdrawFlow : SagaStateMachineInstance
 {
@@ -54,7 +54,7 @@ public class TonWithdrawFlowStateMachine : MassTransitStateMachine<TonWithdrawFl
                 .TransferTon()
                 .Schedule(ExpirationSchedule,
                 ctx => ctx.Init<ISendTonsConfirmationPeriodExpired>
-                (new { CorrelationId = ctx.Message.CorrelationId }))
+                (new { ctx.Message.CorrelationId }))
                 .TransitionTo(BalanceDeductedSuccess),
             When(BalanceDeductFailed)
                 .SaveError()
@@ -136,8 +136,8 @@ public static class BalanceWithdrawFlowStateMachineExtensions
             {
                 Amount = ctx.Message.Nanotons,
                 CurrencyId = (int)Currencies.Ton,
-                CorrelationId = ctx.Message.CorrelationId,
-                UserId = ctx.Message.UserId,
+                ctx.Message.CorrelationId,
+                ctx.Message.UserId,
             }));
     }
 
@@ -147,7 +147,7 @@ public static class BalanceWithdrawFlowStateMachineExtensions
         return binder.SendCommandAsync(Svc.Wallet,
             ctx => ctx.Init<IUnDeductBalance>(new
             {
-                CorrelationId = ctx.Saga.CorrelationId,
+                ctx.Saga.CorrelationId,
             }));
     }
 
@@ -157,9 +157,9 @@ public static class BalanceWithdrawFlowStateMachineExtensions
         return binder.SendCommandAsync(Svc.TonTxns,
             ctx => ctx.Init<ISendTons>(new
             {
-                CorrelationId = ctx.Saga.CorrelationId,
+                ctx.Saga.CorrelationId,
                 Destination = new TonAddress(ctx.Saga.Destination),
-                Nanotons = ctx.Saga.Nanotons,
+                ctx.Saga.Nanotons,
             }));
     }
 
@@ -189,10 +189,10 @@ public static class BalanceWithdrawFlowStateMachineExtensions
         return binder.SendCommandAsync(Svc.Notifications,
             ctx => ctx.Init<INotifyTonWithdrawalExpired>(new
             {
-                CorrelationId = ctx.Saga.CorrelationId,
-                Destination = ctx.Saga.Destination,
-                Nanotons = ctx.Saga.Nanotons,
-                UserId = ctx.Saga.UserId
+                ctx.Saga.CorrelationId,
+                ctx.Saga.Destination,
+                ctx.Saga.Nanotons,
+                ctx.Saga.UserId
             }));
     }
 
@@ -202,8 +202,8 @@ public static class BalanceWithdrawFlowStateMachineExtensions
         return binder.SendCommandAsync(Svc.Notifications,
             ctx => ctx.Init<INotifyUnDeductBalanceFailed>(new
             {
-                CorrelationId = ctx.Saga.CorrelationId,
-                UserId = ctx.Saga.UserId
+                ctx.Saga.CorrelationId,
+                ctx.Saga.UserId
             }));
     }
     #endregion

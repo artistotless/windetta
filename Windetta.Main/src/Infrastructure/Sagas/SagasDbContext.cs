@@ -1,17 +1,16 @@
 ﻿using MassTransit;
 using MassTransit.EntityFrameworkCoreIntegration;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Windetta.Operations.Sagas;
 
-namespace Windetta.Operations.Data;
+namespace Windetta.Main.Infrastructure.Sagas;
 
-public class UserRegistrationMap : SagaClassMap<NewUserFlow>
+public class MatchesMap : SagaClassMap<MatchFlow>
 {
-    protected override void Configure(EntityTypeBuilder<NewUserFlow> entity, ModelBuilder model)
+    protected override void Configure(EntityTypeBuilder<MatchFlow> entity, ModelBuilder model)
     {
         entity.Property(x => x.CurrentState).HasMaxLength(64);
-        entity.Property(x => x.UserId);
         entity.HasIndex(x => x.CorrelationId);
     }
 }
@@ -24,7 +23,7 @@ public class SagasDbContext : SagaDbContext
     {
         get
         {
-            yield return new UserRegistrationMap();
+            yield return new MatchesMap();
         }
     }
 }

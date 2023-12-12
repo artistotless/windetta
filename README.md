@@ -2,33 +2,33 @@
 
 ---
 
-Windetta stands as an innovative platform where the thrill of gaming intersects with the TON cryptocurrency. This project isn't just about delivering a gaming experience; it's about creating a unique space where players can compete and earn based on their skills.
+Windetta is an innovative platform where gaming and TON cryptocurrency intersect. Participants can compete and earn TON cryptocurrency based on their abilities.
 
-Windetta was conceived with a clear mission: to empower players to transform their gaming passion into a source of income. Our games place skills at the forefront, allowing participants to win TON cryptocurrency.
+Our mission is to empower players to transform their gaming passion into a source of income by placing skills at the forefront of our games.
 
-Windetta operates on a robust architecture where individual player balances are maintained, and replenishments are accompanied by transparent comments, ensuring seamless fund management. The entire game logic resides on project's servers, eliminating any room for manipulation by cheaters.
+Windetta operates on a secure architecture that maintains individual player balances and ensures seamless fund management through transparent comments accompanying replenishments. The game logic resides entirely on our servers, eliminating any possibility of manipulation by cheaters.
 
-Safety is a priority. Mandatory two-factor confirmation when withdrawing funds via email and Telegram is just one of the steps using to ensure the reliability and confidence of our players.
+Safety is our top priority, and we take steps such as requiring two-factor authentication when withdrawing funds via email and telegram to ensure the reliability and trust of our players.
 
-Building strong partnerships and deploying intelligent marketing strategies are key elements of our development plan. We aim to attract not only seasoned players but also new participants who share our passion for gaming.
+Building strong partnerships and employing smart marketing strategies are key elements of our development plan. seasoned players and new participants who share our passion for gaming.
 
 
 ### Details
 ---
 
-*MatchHubs: Revolutionizing Gaming Lobbies*
+*MatchHubs - Flexible lobbies*
 
-Introducing MatchHubs - dynamic lobbies with multiple clients for team-based play. Any user can create a MatchHub, specifying the game they want to play and the stakes involved. Another user joins, and the game kicks off.
+Introducing MatchHubs - dynamic lobbies for team-based play. Any user can create a MatchHub, specifying the game they want to play and the bets involved. Another user can join, and the game will begin.
 
 
 *Customizable MatchHubs with Plugin System*
 
-MatchHubs are highly customizable through our plugin system. Users can tailor filters for incoming players, ensuring they match specific criteria. Whether you want to play with particular individuals or set specific conditions, the MatchHub plugin system allows unparalleled flexibility.
+MatchHubs are highly customizable through our plugin system, allowing users to tailor filters for incoming players to ensure they meet specific criteria. The MatchHub plugin system offers unparalleled flexibility, allowing you to play with specific individuals or set particular conditions.
 
 
 *Advertiser Integration: Tournament MatchHubs*
 
-We don't overlook advertisers on Windetta. Advertisers can create Tournament MatchHubs, distinct from regular ones. These hubs can showcase project websites, descriptions, and banners, offering a unique promotional avenue.
+Advertisers on Windetta are not overlooked, as they can create Tournament MatchHubs that are distinct from regular ones. These hubs are a unique way to advertise, as they can display project websites, descriptions and banners.
 
 ![image](https://github.com/artistotless/windetta/assets/34582815/ab74e56f-de0c-41ab-989c-1dc830d7e1ad)
 
@@ -39,29 +39,27 @@ We don't overlook advertisers on Windetta. Advertisers can create Tournament Mat
 
 *How It Works*
 
-1. Any user can initiate a MatchHub, setting the game and wager.
-2. Initiator Tailor MatchHubs with plugins, defining filters and conditions (Optional)   
-3. Other users join to room in existing MatchHub.
-4. AutoReadyStrategy (if its defined) comes to play in order to decide when to set MatchHub state as "Ready"
-5. The game kicks off
+1. Any user can create a MatchHub, specifying the game and wager. The game is played.
+2. The initiator can customize the MatchHub with plugins, including filters and conditions (optional).   
+3. Other users can join the existing MatchHub room.
+4. If AutoReadyStrategy is defined, it will determine when to set the MatchHub state to 'Ready' for the game to begin. 
+5. The match begins.
 ---
 
 #### *Development Plans*
 
-It is planned to introduce real-time games in the future. The release of the project token will add unique features, including stickers for chat, the allocation of nicknames and privileges for participation in exclusive tournaments.
+Include the introduction of real-time games in the future. The project token release will unlock unique features such as chat stickers, nicknames, and privileges to participate in exclusive tournaments.
 
 #### *Conclusion*
 
-Windetta is not just a platform; it's a community of individuals united by a love for games and a desire to earn. Love to become the premier destination for those who appreciate the thrill, skills, and an innovative approach to pvp gaming. Join us, and let's collectively shape the future of pvp gaming on TON.
+Windetta is more than just a platform; it is a community of individuals united by their love for games and their desire to earn. Love to become the premier destination for those who appreciate the thrill, skill, and innovative approach to pvp gaming. Join us and help shape the future of PvP gaming on TON.
 
 ---
 #### *Development Progress*
-- [x] OpenId authentication/authorization
-- [x] MatchHub core
+- [x] MatchHub system
 - [x] MatchHub plugins 
 - [x] TopUp, Withdraw TON
 - [x] SignalR integration
-- [x] Mongo integration
 - [x] Windetta.Wallet service
 - [x] Windetta.Operations service
 - [ ] 100% test coverage

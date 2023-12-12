@@ -2,7 +2,7 @@
 using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
 
-namespace Windetta.Operations.Sagas;
+namespace Windetta.Identity.Infrastructure.Sagas;
 
 public class NewUserFlow : SagaStateMachineInstance
 {
@@ -58,7 +58,7 @@ public static class NewUserFlowStateMachineExtensions
     {
         return binder.SendAsync(context => context.Init<ICreateUserWallet>(new
         {
-            UserId = context.Saga.UserId,
+            context.Saga.UserId,
         }));
     }
 
@@ -67,8 +67,8 @@ public static class NewUserFlowStateMachineExtensions
     {
         return binder.SendAsync(context => context.Init<INotifyEmailConfirmation>(new
         {
-            UserId = context.Saga.UserId,
-            Email = context.Saga.Email,
+            context.Saga.UserId,
+            context.Saga.Email,
         }));
     }
 
@@ -78,8 +78,8 @@ public static class NewUserFlowStateMachineExtensions
         return binder.SendAsync(context => context.Init<INotifyUserCreated>(new
         {
             UserId = context.Message.Id,
-            Email = context.Message.Email,
-            TimeStamp = context.Message.TimeStamp
+            context.Message.Email,
+            context.Message.TimeStamp
         }));
     }
 }
