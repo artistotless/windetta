@@ -4,4 +4,4 @@ namespace Windetta.Common.Messages;
 
 // marker interface
 [ExcludeFromTopology]
-public interface ICommand : IMessage { } 
+public interface ICommand : IMessage { }

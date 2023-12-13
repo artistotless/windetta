@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using TonSdk.Contracts.Wallet;
+﻿using TonSdk.Contracts.Wallet;
 using TonSdk.Core;
 using TonSdk.Core.Block;
 using Windetta.TonTxns.Application.Models;

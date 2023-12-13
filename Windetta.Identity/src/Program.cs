@@ -1,4 +1,5 @@
 using Autofac.Extensions.DependencyInjection;
+using MassTransit;
 using System.Reflection;
 using Windetta.Common.Constants;
 using Windetta.Common.Database;
@@ -8,6 +9,7 @@ using Windetta.Common.Types;
 using Windetta.Identity.Extensions;
 using Windetta.Identity.Infrastructure.Data;
 using Windetta.Identity.Infrastructure.Data.Seed;
+using Windetta.Identity.Infrastructure.Sagas;
 using Windetta.Identity.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,7 +19,8 @@ IServiceCollection services = builder.Services;
 var assemby = Assembly.GetExecutingAssembly();
 
 services.AddReadyMassTransit(assemby, Svc.Identity);
-services.AddMysqlDbContext<IdentityDbContext>(Assembly.GetExecutingAssembly());
+services.AddMysqlDbContext<IdentityDbContext>(assemby);
+services.AddMysqlDbContext<SagasDbContext>(assemby);
 services.AddIdentityStore();
 services.AddControllersWithViews();
 services.AddIdentityServer4();
@@ -27,6 +30,15 @@ services.AddHttpContextAccessor();
 services.AddRedis();
 services.AddAuthenticationMethods(); // Adding vk, google .. external auth providers
 services.ConfigureCustomViewsRouting();
+
+services.AddReadyMassTransit(assemby, Svc.Identity, cfg =>
+{
+    cfg.SetEntityFrameworkSagaRepositoryProvider(x =>
+    {
+        x.ConcurrencyMode = ConcurrencyMode.Optimistic;
+        x.ExistingDbContext<SagasDbContext>();
+    });
+});
 
 builder.Host.UseServiceProviderFactory(
     new AutofacServiceProviderFactory(builder =>

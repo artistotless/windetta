@@ -1,5 +1,4 @@
-﻿using IdentityServer4.Models;
-using Windetta.Identity.Models;
+﻿using Windetta.Identity.Models;
 
 namespace Windetta.Identity.Messages.Responses;
 

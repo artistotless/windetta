@@ -9,7 +9,6 @@ namespace Windetta.Common.Database;
 
 public static class Extensions
 {
-    // Configure Db connection to storing users, roles, claims and so on.
     public static void AddMysqlDbContext<T>(this IServiceCollection services, Assembly assembly) where T : DbContext
     {
         using var provider = services.BuildServiceProvider();

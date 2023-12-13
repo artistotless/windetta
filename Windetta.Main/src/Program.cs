@@ -3,7 +3,7 @@ using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.SignalR;
 using Windetta.Common.Mongo;
 using Windetta.Common.Types;
-using Windetta.Main.Core.MatchHubs;
+using Windetta.Main.Core.Domain.MatchHubs;
 using Windetta.Main.Infrastructure;
 using Windetta.Main.Infrastructure.Data;
 using Windetta.Main.Infrastructure.Security;

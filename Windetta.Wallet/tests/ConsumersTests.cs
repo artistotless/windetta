@@ -12,7 +12,7 @@ using Windetta.WalletTests.Mocks;
 
 namespace Windetta.WalletTests.ConsumersTests;
 
-public class ConsumersTests : IHarnessConfiguration
+public class ConsumersTests : IUseHarness
 {
     private readonly ITestHarness _harness;
 

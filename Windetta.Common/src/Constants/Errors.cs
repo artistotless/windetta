@@ -25,6 +25,11 @@ public static class Errors
         #region Game
         public const string GameConfigurationsNotFound = "game_configurations_notfound";
         #endregion
+
+        #region LSPM
+        public const string LspmNotFound = "lspm_notfound";
+        public const string LspmOverload = "lspm_overload";
+        #endregion
     }
 
     public static class Identity

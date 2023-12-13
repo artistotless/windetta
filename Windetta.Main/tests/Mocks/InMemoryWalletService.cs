@@ -1,4 +1,4 @@
-﻿using Windetta.Main.Core.Services;
+﻿using Windetta.Main.Core.Services.Wallet;
 
 namespace Windetta.MainTests.Mocks;
 public class InMemoryWalletService : IWalletService
@@ -27,7 +27,7 @@ public class InMemoryWalletService : IWalletService
         };
     }
 
-    public Task<Main.Core.Services.UserBalance> GetBalance(Guid userId, int currencyId)
+    public Task<UserBalance> GetBalance(Guid userId, int currencyId)
     {
         var wallet = _wallets.Find(w => w.UserId == userId);
         var balance = wallet.Balances.Find(b => b.CurrencyId == currencyId);

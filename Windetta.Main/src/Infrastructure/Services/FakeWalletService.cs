@@ -1,4 +1,4 @@
-﻿using Windetta.Main.Core.Services;
+﻿using Windetta.Main.Core.Services.Wallet;
 
 namespace Windetta.Main.Infrastructure.Services;
 
