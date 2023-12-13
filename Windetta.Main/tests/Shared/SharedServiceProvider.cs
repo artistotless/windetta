@@ -6,7 +6,7 @@ namespace Windetta.MainTests.Shared;
 
 public static class SharedServiceProvider
 {
-    public static IServiceProvider GetInstance(Action<ServiceCollection>? configure = null)
+    public static ServiceProvider GetInstance(Action<ServiceCollection>? configure = null)
     {
         var services = new ServiceCollection();
 

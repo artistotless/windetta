@@ -5,5 +5,5 @@ namespace Windetta.Contracts.Events;
 
 public interface IMatchHubReady : CorrelatedBy<Guid>, IEvent
 {
-
+    public DateTimeOffset TimeStamp { get; set; }
 }

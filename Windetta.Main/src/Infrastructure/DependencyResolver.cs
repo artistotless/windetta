@@ -1,5 +1,5 @@
-﻿using Windetta.Main.Core.MatchHubs.Plugins;
-using Windetta.Main.Core.MatchHubs.UseCases;
+﻿using Windetta.Main.Core.Domain.MatchHubs.Plugins;
+using Windetta.Main.Core.Domain.MatchHubs.UseCases;
 using Windetta.Main.Infrastructure.MatchHub.Plugins;
 using Windetta.Main.Infrastructure.Services;
 

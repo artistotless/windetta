@@ -13,7 +13,7 @@ using Windetta.TonTxnsTests.Mocks;
 
 namespace Windetta.TonTxnsTests.ConsumersTests;
 
-public class SendTonsConsumerTests : IHarnessConfiguration
+public class SendTonsConsumerTests : IUseHarness
 {
     private const string _addr = "EQCBvjU7mYLJQCIEtJGOiUWxmW0NI1Gn-1zzyTJ5zRBtLoLV";
 

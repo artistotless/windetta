@@ -1,5 +1,5 @@
-﻿using Windetta.Main.Core.Exceptions;
-using Windetta.Main.Core.Games;
+﻿using Windetta.Main.Core.Domain.Games;
+using Windetta.Main.Core.Exceptions;
 
 namespace Windetta.Main.Infrastructure.Data.Fake;
 

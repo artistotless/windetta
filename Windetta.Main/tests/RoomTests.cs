@@ -1,9 +1,8 @@
 using Windetta.Common.Constants;
 using Windetta.Common.Types;
-using Windetta.Main.Core.Rooms;
+using Windetta.Main.Core.Domain.Rooms;
 
 namespace Windetta.MainTests;
-
 public class RoomTests
 {
     [Fact]

@@ -1,5 +1,5 @@
 ﻿using Windetta.Common.Testing;
-using Windetta.Main.Core.Services;
+using Windetta.Main.Core.Services.Wallet;
 
 namespace Windetta.MainTests.Mocks;
 

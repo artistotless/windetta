@@ -1,4 +1,4 @@
-﻿using Windetta.Main.Core.Rooms;
+﻿using Windetta.Main.Core.Domain.Rooms;
 
 namespace Windetta.Main.Infrastructure.Data.Mongo;
 

@@ -1,5 +1,4 @@
-﻿using System.Data;
-using Windetta.Common.Types;
+﻿using Windetta.Common.Types;
 
 namespace Windetta.TonTxns.Application.DAL;
 

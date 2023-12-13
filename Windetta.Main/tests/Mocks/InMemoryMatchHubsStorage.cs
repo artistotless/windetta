@@ -1,4 +1,4 @@
-﻿using Windetta.Main.Core.MatchHubs.Dtos;
+﻿using Windetta.Main.Core.Domain.MatchHubs.Dtos;
 
 namespace Windetta.MainTests.Mocks;
 

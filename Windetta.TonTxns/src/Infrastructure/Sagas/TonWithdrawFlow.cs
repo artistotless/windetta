@@ -12,7 +12,7 @@ public class TonWithdrawFlow : SagaStateMachineInstance
     public Guid UserId { get; set; }
     public ulong Nanotons { get; set; }
     public TonAddress Destination { get; set; }
-    public string CurrentState { get; set; }
+    public int CurrentState { get; set; }
     public Guid CorrelationId { get; set; }
     public string? FailReason { get; set; }
     public Guid? ExpirationTokenId { get; set; }

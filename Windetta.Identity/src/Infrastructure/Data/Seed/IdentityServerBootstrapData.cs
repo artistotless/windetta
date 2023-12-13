@@ -1,6 +1,5 @@
 ﻿using IdentityServer4;
 using IdentityServer4.Models;
-using System.Security.Claims;
 
 namespace Windetta.Identity.Infrastructure.Data.Seed;
 
@@ -24,7 +23,7 @@ public static class IdentityServerBootstrapData
         new IdentityResources.Profile(),
         new IdentityResources.Email(),
         new IdentityRole()
-    }; 
+    };
 
     public static IEnumerable<ApiResource> ApiResources =>
       new ApiResource[]
