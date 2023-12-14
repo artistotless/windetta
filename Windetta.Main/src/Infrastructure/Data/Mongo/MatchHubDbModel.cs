@@ -1,6 +1,6 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
-using Windetta.Main.Core.Domain.MatchHubs;
-using Windetta.Main.Core.Domain.MatchHubs.Dtos;
+using Windetta.Main.Core.MatchHubs;
+using Windetta.Main.Core.MatchHubs.Dtos;
 
 namespace Windetta.Main.Infrastructure.Data.Mongo;
 

@@ -1,4 +1,4 @@
-﻿using Windetta.Main.Core.Domain.Rooms;
+﻿using Windetta.Main.Core.Rooms;
 
 namespace Windetta.Main.Infrastructure.Data.EFCore;
 

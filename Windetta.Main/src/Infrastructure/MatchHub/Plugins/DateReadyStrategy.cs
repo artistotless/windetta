@@ -1,4 +1,4 @@
-﻿using Windetta.Main.Core.Domain.MatchHubs.Plugins;
+﻿using Windetta.Main.Core.MatchHubs.Plugins;
 
 namespace Windetta.Main.Infrastructure.MatchHub.Plugins;
 

@@ -1,5 +1,7 @@
-﻿using Windetta.Main.Core.Domain.MatchHubs.Plugins;
-using Windetta.Main.Core.Domain.MatchHubs.UseCases;
+﻿using Windetta.Main.Core.MatchHubs;
+using Windetta.Main.Core.MatchHubs.Plugins;
+using Windetta.Main.Core.MatchHubs.UseCases;
+using Windetta.Main.Core.Services.LSPM;
 using Windetta.Main.Infrastructure.MatchHub.Plugins;
 using Windetta.Main.Infrastructure.Services;
 
@@ -18,7 +20,7 @@ public static class DependencyResolver
         });
     }
 
-    public static void AddMatchHubUseCases(this IServiceCollection services)
+    public static void AddMatchHub(this IServiceCollection services)
     {
         services.AddScoped<IMatchHubUseCase, Create>();
         services.AddScoped<IMatchHubUseCase, Delete>();
@@ -36,5 +38,10 @@ public static class DependencyResolver
         services.AddScoped<IMatchHubPlugin, DefaultReadyStrategy>();
         services.AddScoped<IMatchHubPlugin, RoleJoinFilter>();
         services.AddScoped<IMatchHubPlugin, DateReadyStrategy>();
+    }
+
+    public static void AddInMemoryLspms(this IServiceCollection services)
+    {
+        services.AddScoped<ILspms, InMemoryLspms>();
     }
 }

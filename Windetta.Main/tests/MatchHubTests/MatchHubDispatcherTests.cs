@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Windetta.Common.Testing;
-using Windetta.Main.Core.Domain.MatchHubs.Dtos;
+using Windetta.Main.Core.Games;
+using Windetta.Main.Core.MatchHubs;
+using Windetta.Main.Core.MatchHubs.Dtos;
 using Windetta.MainTests.Mocks;
 using Xunit.Abstractions;
 
