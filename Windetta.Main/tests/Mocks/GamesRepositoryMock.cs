@@ -1,4 +1,5 @@
 ﻿using Windetta.Common.Testing;
+using Windetta.Main.Core.Games;
 
 namespace Windetta.MainTests.Mocks;
 

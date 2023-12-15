@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Windetta.Common.Constants;
 using Windetta.Main.Core.Exceptions;
+using Windetta.Main.Core.MatchHubs.UseCases;
 
 namespace Windetta.MainTests.MatchHubTest.UseCaseTests;
 

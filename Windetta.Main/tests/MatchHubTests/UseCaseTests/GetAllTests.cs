@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Windetta.Main.Core.MatchHubs.UseCases;
 using Windetta.MainTests.Mocks;
 
 namespace Windetta.MainTests.MatchHubTest.UseCaseTests;

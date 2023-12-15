@@ -1,6 +1,7 @@
 ﻿using MassTransit;
 using Polly;
 using Windetta.Common.Constants;
+using Windetta.Common.Types;
 using Windetta.Contracts.Events;
 using Windetta.TonTxns.Application.Services;
 
@@ -71,9 +72,7 @@ public class DepositPollerService : BackgroundService
         var batchEvents = result.Values.Select(x => new FundsAddedImpl()
         {
             UserId = x.UserId,
-            Amount = x.Amount,
-            CurrencyId = (int)Currencies.Ton,
-            CorrelationId = x.Id
+            Funds = new FundsInfo((int)Currencies.Ton, x.Amount)
         });
 
         if (batchEvents.Any())
@@ -102,7 +101,6 @@ public class DepositPollerService : BackgroundService
 public class FundsAddedImpl : IFundsAdded
 {
     public Guid UserId { get; set; }
-    public ulong Amount { get; set; }
-    public int CurrencyId { get; set; }
+    public FundsInfo Funds { get; set; }
     public Guid CorrelationId { get; set; }
 }

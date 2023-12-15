@@ -6,4 +6,5 @@ public interface IWallets
 {
     public Task AddAsync(UserWallet wallet);
     public Task<UserWallet?> GetAsync(Guid userId);
+    public Task<IEnumerable<UserWallet>> GetAllAsync(IEnumerable<Guid> userIds);
 }

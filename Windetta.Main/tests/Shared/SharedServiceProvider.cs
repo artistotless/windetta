@@ -1,5 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Windetta.Main.Core.Games;
+using Windetta.Main.Core.MatchHubs;
+using Windetta.Main.Core.MatchHubs.Plugins;
+using Windetta.Main.Core.MatchHubs.UseCases;
 using Windetta.MainTests.Mocks;
 
 namespace Windetta.MainTests.Shared;

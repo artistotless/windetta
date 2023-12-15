@@ -16,12 +16,12 @@ public class SendTonsConsumer : IConsumer<IPackedSendTons>
 
     private readonly IWithdrawService _tonService;
     private readonly IWalletCredentialSource _credentialSource;
-    private readonly IWithdrawalsService _txnService;
+    private readonly IWithdrawals _txnService;
 
     public SendTonsConsumer(
         IWithdrawService tonService,
         IWalletCredentialSource credentialSource,
-        IWithdrawalsService txnService)
+        IWithdrawals txnService)
     {
         _tonService = tonService;
         _credentialSource = credentialSource;

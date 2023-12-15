@@ -18,7 +18,7 @@ public class RequestingGameServerResult
     /// including port configuration.In this case, IsCompletedResponse will be set to false, 
     /// and "Info" will be delivered through a separate event called IReservedGameServerPrepared.
     /// </summary>
-    public bool IsCompletedResponse { get; set; }
+    public bool IsCompletedResponse => Info is not null;
     public GameServerInfo? Info { get; set; }
     public string? Error { get; set; }
 }

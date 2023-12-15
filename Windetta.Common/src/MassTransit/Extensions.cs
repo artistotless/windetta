@@ -76,6 +76,26 @@ public static class Extensions
         return source.Add(new SendActivity<TSaga, TData, TMessage>(_ => endpoint, MessageFactory<TMessage>.Create(messageFactory, callback)));
     }
 
+    public static async Task SendCommandAsync<TMessage>(this IBus bus,
+         string serviceName, object values)
+         where TMessage : class
+    {
+        var uri = MyEndpointNameFormatter.CommandUri<TMessage>(serviceName);
+        var endpoint = await bus.GetSendEndpoint(uri);
+
+        await endpoint.Send<TMessage>(values);
+    }
+
+    public static async Task SendCommandAsync<TMessage>(this ConsumeContext ctx,
+      string serviceName, object values)
+      where TMessage : class
+    {
+        var uri = MyEndpointNameFormatter.CommandUri<TMessage>(serviceName);
+        var endpoint = await ctx.GetSendEndpoint(uri);
+
+        await endpoint.Send<TMessage>(values);
+    }
+
     private class FormatterWrapper<T> : IFormatterWrapper where T : class, IConsumer
     {
         private IEndpointNameFormatter _formatter;

@@ -17,6 +17,15 @@ public class TonWithdrawFlow : SagaStateMachineInstance
     public string? FailReason { get; set; }
     public Guid? ExpirationTokenId { get; set; }
 }
+public enum TonWithdrawFlowState : int
+{
+    AwaitingDeduction = 3,
+    BalanceDeductedSuccess = 4,
+    BalanceDeductFail = 5,
+    BalanceUnDeductFail = 6,
+    SendTonsFail = 7,
+    Expired = 8
+}
 
 public class TonWithdrawFlowStateMachine : MassTransitStateMachine<TonWithdrawFlow>
 {

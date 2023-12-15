@@ -1,9 +1,10 @@
 ﻿using System.Collections.ObjectModel;
-using Windetta.Main.Core.Domain.Rooms;
+using Windetta.Main.Core.Games;
+using Windetta.Main.Core.MatchHubs;
+using Windetta.Main.Core.MatchHubs.Plugins;
+using Windetta.Main.Core.Rooms;
 
 namespace Windetta.MainTests.Mocks;
-
-
 
 public class ProxyMatchHub : IMatchHub
 {

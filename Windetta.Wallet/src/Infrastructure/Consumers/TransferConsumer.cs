@@ -16,11 +16,10 @@ public class TransferConsumer : IConsumer<ITransferBalance>
     public async Task Consume(ConsumeContext<ITransferBalance> context)
     {
         var userId = context.Message.InitiatorUserId;
-        var nanotons = context.Message.Amount;
+        var funds = context.Message.Funds;
         var destination = context.Message.DestinationUserId;
-        var currencyId = context.Message.CurrencyId;
 
-        await _walletService.TransferAsync(new(userId, currencyId, nanotons, destination)
+        await _walletService.TransferAsync(new(userId, funds, destination)
         {
             OperationId = context.Message.CorrelationId
         });

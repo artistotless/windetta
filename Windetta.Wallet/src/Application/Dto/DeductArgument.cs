@@ -1,8 +1,9 @@
-﻿using Windetta.Contracts;
+﻿using Windetta.Common.Types;
+using Windetta.Contracts;
 
 namespace Windetta.Wallet.Application.Dto;
 
-public record DeductArgument(Guid userId, int currencyId, ulong amount) : IHasOperationId
+public record DeductArgument(Guid userId, FundsInfo funds) : IHasOperationId
 {
     public Guid OperationId { get; init; }
 }

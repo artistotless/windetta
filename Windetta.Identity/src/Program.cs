@@ -18,7 +18,6 @@ IConfiguration configuration = builder.Configuration;
 IServiceCollection services = builder.Services;
 var assemby = Assembly.GetExecutingAssembly();
 
-services.AddReadyMassTransit(assemby, Svc.Identity);
 services.AddMysqlDbContext<IdentityDbContext>(assemby);
 services.AddMysqlDbContext<SagasDbContext>(assemby);
 services.AddIdentityStore();

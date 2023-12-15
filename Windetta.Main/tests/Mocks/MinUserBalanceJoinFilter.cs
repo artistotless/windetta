@@ -1,4 +1,5 @@
-﻿using Windetta.Main.Core.Services.Wallet;
+﻿using Windetta.Main.Core.MatchHubs.Plugins;
+using Windetta.Main.Core.Services.Wallet;
 
 namespace Windetta.MainTests.Mocks;
 

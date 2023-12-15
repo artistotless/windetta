@@ -3,7 +3,7 @@ using Windetta.TonTxns.Domain;
 
 namespace Windetta.TonTxns.Application.Services.Audit;
 
-public class WithdrawalsService : IWithdrawalsService
+public class WithdrawalsService : IWithdrawals
 {
     private readonly IUnitOfWork _uow;
 

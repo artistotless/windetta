@@ -8,7 +8,8 @@ public interface IUserWalletService : IScopedService
 {
     Task<UserBalance> GetBalance(Guid userId, int currencyId);
     Task CreateWalletAsync(Guid userId, IEnumerable<UserBalance>? initial = null);
-    Task HoldBalanceAsync(Guid userId, int currencyId, ulong amount);
+    Task HoldBalanceAsync(Guid userId, FundsInfo funds);
+    Task HoldBalanceAsync(IEnumerable<Guid> userIds, FundsInfo funds);
     Task UnHoldBalanceAsync(Guid userId, int currencyId);
     Task TransferAsync(TransferArgument arg);
     Task DeductAsync(DeductArgument arg);

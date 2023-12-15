@@ -1,7 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Windetta.Common.Constants;
-using Windetta.Main.Core.Domain.MatchHubs.Dtos;
 using Windetta.Main.Core.Exceptions;
+using Windetta.Main.Core.MatchHubs;
+using Windetta.Main.Core.MatchHubs.Dtos;
 using Windetta.MainTests.Mocks;
 
 namespace Windetta.MainTests.MatchHubTest;

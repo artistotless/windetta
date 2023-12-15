@@ -8,13 +8,13 @@ public class UserWallet
     public Guid UserId { get; init; }
     public List<UserBalance> Balances { get; set; }
 
-    public void TransferToWallet(UserWallet to, int currencyId, ulong amount)
+    public void TransferToWallet(UserWallet to, FundsInfo funds)
     {
-        var balanceFrom = GetBalance(currencyId);
-        var balanceTo = to.GetBalance(currencyId);
+        var balanceFrom = GetBalance(funds.CurrencyId);
+        var balanceTo = to.GetBalance(funds.CurrencyId);
 
-        balanceFrom?.Decrease(amount);
-        balanceTo?.Increase(amount);
+        balanceFrom?.Decrease(funds.Amount);
+        balanceTo?.Increase(funds.Amount);
     }
 
     public UserBalance GetBalance(int currencyId)

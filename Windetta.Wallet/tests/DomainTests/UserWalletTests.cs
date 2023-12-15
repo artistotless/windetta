@@ -58,7 +58,7 @@ public class UserWalletTests
 
         // act
         var exception = Should.Throw<WindettaException>(
-            () => walletSource.TransferToWallet(walletDestination, currencyId, 100));
+            () => walletSource.TransferToWallet(walletDestination, new FundsInfo(currencyId,100)));
 
         // assert
         exception.ShouldNotBeNull();
@@ -98,7 +98,7 @@ public class UserWalletTests
 
         // act
         var exception = Should.Throw<WindettaException>(
-            () => walletSource.TransferToWallet(walletDestination, currencyId, 100));
+            () => walletSource.TransferToWallet(walletDestination, new FundsInfo(currencyId, 100)));
 
         // assert
         exception.ShouldNotBeNull();

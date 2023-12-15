@@ -3,5 +3,5 @@
 public class GameServerInfo
 {
     public string? Endpoint { get; set; }
-    public Dictionary<Guid, string>? Tokens { get; set; }
+    public Dictionary<Guid, string>? Tickets { get; set; }
 }
