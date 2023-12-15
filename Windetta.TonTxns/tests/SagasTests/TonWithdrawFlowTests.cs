@@ -8,6 +8,7 @@ using Windetta.Common.Types;
 using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
 using Windetta.TonTxns.Infrastructure.Sagas;
+using Windetta.TonTxnsTests.ConsumersTests;
 using Xunit.Abstractions;
 
 namespace Windetta.TonTxnsTests.Sagas;
@@ -15,12 +16,15 @@ namespace Windetta.TonTxnsTests.Sagas;
 public class TonWithdrawFlowTests : IUseHarness
 {
     private readonly XUnitOutWrapper _output;
+    private readonly Guid correllationId;
 
     private const string _addr = "EQCBvjU7mYLJQCIEtJGOiUWxmW0NI1Gn-1zzyTJ5zRBtLoLV";
+    private const string correllationIdString = "3bac654b-64db-4914-8d8e-b531ae796d5c";
 
     public TonWithdrawFlowTests(ITestOutputHelper output)
     {
         _output = new XUnitOutWrapper(output);
+        correllationId = Guid.Parse(correllationIdString);
     }
 
     public Action<IBusRegistrationConfigurator> ConfigureHarness()
@@ -28,6 +32,18 @@ public class TonWithdrawFlowTests : IUseHarness
         return cfg =>
         {
             cfg.AddSagaStateMachine<TonWithdrawFlowStateMachine, TonWithdrawFlow>();
+        };
+    }
+
+    private TonWithdrawFlow CreateSagaWithState(TonWithdrawFlowState initialState)
+    {
+        return new TonWithdrawFlow
+        {
+            UserId = Guid.NewGuid(),
+            Destination = new TonAddress(_addr),
+            Nanotons = 1_000_000_000uL,
+            CurrentState = (int)initialState,
+            CorrelationId = correllationId,
         };
     }
 
@@ -39,8 +55,7 @@ public class TonWithdrawFlowTests : IUseHarness
             .ConfigureMassTransit(Svc.TonTxns, this)
             .BuildServiceProvider(true);
 
-        var harness = provider.GetTestHarness();
-
+        var harness = await provider.StartTestHarness();
         var argument = new
         {
             UserId = Guid.NewGuid(),
@@ -49,7 +64,6 @@ public class TonWithdrawFlowTests : IUseHarness
             Nanotons = 1_000_000_000uL
         };
 
-        await harness.Start();
         var sagaHarness = harness.GetSagaStateMachineHarness
             <TonWithdrawFlowStateMachine, TonWithdrawFlow>();
 
@@ -75,27 +89,18 @@ public class TonWithdrawFlowTests : IUseHarness
             .ConfigureMassTransit(Svc.TonTxns, this)
             .BuildServiceProvider(true);
 
-        var harness = provider.GetTestHarness();
+        var harness = await provider.StartTestHarness();
 
-        var argument = new
-        {
-            UserId = Guid.NewGuid(),
-            Destination = new TonAddress(_addr),
-            CorrelationId = Guid.NewGuid(),
-            Nanotons = 1_000_000_000uL
-        };
+        await provider.AddOrUpdateSaga(CreateSagaWithState
+            (TonWithdrawFlowState.AwaitingDeduction));
 
-        await harness.Start();
         var sagaHarness = harness.GetSagaStateMachineHarness
             <TonWithdrawFlowStateMachine, TonWithdrawFlow>();
-        await harness.Bus.Publish<IWithdrawTonRequested>(argument);
-        await harness.Consumed.Any<IWithdrawTonRequested>();
-        (await harness.Sent.Any<IDeductBalance>()).ShouldBeTrue();
 
         // act
         await harness.Bus.Publish<IBalanceDeducted>(new BalanceDeductedImpl()
         {
-            CorrelationId = argument.CorrelationId
+            CorrelationId = correllationId
         });
 
         // assert
@@ -103,7 +108,7 @@ public class TonWithdrawFlowTests : IUseHarness
         // check schedule
         (await harness.Sent.Any<ISendTons>())
             .ShouldBeTrue();
-        (await sagaHarness.Exists(argument.CorrelationId, s => s.BalanceDeductedSuccess))
+        (await sagaHarness.Exists(correllationId, s => s.BalanceDeductedSuccess))
             .HasValue.ShouldBeTrue();
     }
 
@@ -115,30 +120,23 @@ public class TonWithdrawFlowTests : IUseHarness
             .ConfigureMassTransit(Svc.TonTxns, this)
             .BuildServiceProvider(true);
 
-        var harness = provider.GetTestHarness();
+        var harness = await provider.StartTestHarness();
 
-        var argument = new
-        {
-            UserId = Guid.NewGuid(),
-            Destination = new TonAddress(_addr),
-            CorrelationId = Guid.NewGuid(),
-            Nanotons = 1_000_000_000uL
-        };
+        await provider.AddOrUpdateSaga(CreateSagaWithState
+            (TonWithdrawFlowState.AwaitingDeduction));
 
-        await harness.Start();
         var sagaHarness = harness.GetSagaStateMachineHarness
             <TonWithdrawFlowStateMachine, TonWithdrawFlow>();
-        await harness.Bus.Publish<IWithdrawTonRequested>(argument);
-        await harness.Consumed.Any<IWithdrawTonRequested>();
-        var msg = harness.Sent.Select<IDeductBalance>()
-            .FirstOrDefault()?.Context.Message;
 
         // act
-        await harness.Bus.Publish(new FaultEvent<IDeductBalance>() { Message = msg });
+        await harness.Bus.Publish(new FaultEvent<IDeductBalance>()
+        {
+            Message = new DeductBalanceImpl() { CorrelationId = correllationId, }
+        });
+        await sagaHarness.Consumed.Any<Fault<IBalanceDeducted>>();
 
         // assert
-        await sagaHarness.Consumed.Any<Fault<IBalanceDeducted>>();
-        (await sagaHarness.Exists(argument.CorrelationId, s => s.BalanceDeductFail))
+        (await sagaHarness.Exists(correllationId, s => s.BalanceDeductFail))
             .HasValue.ShouldBeTrue();
     }
 
@@ -150,38 +148,24 @@ public class TonWithdrawFlowTests : IUseHarness
             .ConfigureMassTransit(Svc.TonTxns, this)
             .BuildServiceProvider(true);
 
-        var harness = provider.GetTestHarness();
+        var harness = await provider.StartTestHarness();
 
-        var argument = new
-        {
-            UserId = Guid.NewGuid(),
-            Destination = new TonAddress(_addr),
-            CorrelationId = Guid.NewGuid(),
-            Nanotons = 1_000_000_000uL
-        };
+        await provider.AddOrUpdateSaga(CreateSagaWithState
+            (TonWithdrawFlowState.BalanceDeductedSuccess));
 
-        await harness.Start();
         var sagaHarness = harness.GetSagaStateMachineHarness
             <TonWithdrawFlowStateMachine, TonWithdrawFlow>();
-        await harness.Bus.Publish<IWithdrawTonRequested>(argument);
-        await sagaHarness.Consumed.Any<IWithdrawTonRequested>();
-        await harness.Bus.Publish<IBalanceDeducted>(new BalanceDeductedImpl()
-        {
-            CorrelationId = argument.CorrelationId
-        });
-        await sagaHarness.Consumed.Any<IBalanceDeducted>();
-        await harness.Sent.Any<ISendTons>();
 
         // act
         await harness.Bus.Publish<ISendTonsCompleted>(new SendTonsCompletedImpl()
         {
-            CorrelationId = argument.CorrelationId
+            CorrelationId = correllationId
         });
 
         // assert
         (await sagaHarness.Consumed.Any<ISendTonsCompleted>())
             .ShouldBeTrue();
-        (await sagaHarness.Exists(argument.CorrelationId, s => s.Final))
+        (await sagaHarness.Exists(correllationId, s => s.Final))
             .HasValue.ShouldBeTrue();
     }
 
@@ -193,38 +177,26 @@ public class TonWithdrawFlowTests : IUseHarness
             .ConfigureMassTransit(Svc.TonTxns, this)
             .BuildServiceProvider(true);
 
-        var harness = provider.GetTestHarness();
+        var harness = await provider.StartTestHarness();
 
-        var argument = new
-        {
-            UserId = Guid.NewGuid(),
-            Destination = new TonAddress(_addr),
-            CorrelationId = Guid.NewGuid(),
-            Nanotons = 1_000_000_000uL
-        };
+        await provider.AddOrUpdateSaga(CreateSagaWithState
+            (TonWithdrawFlowState.BalanceDeductedSuccess));
 
-        await harness.Start();
         var sagaHarness = harness.GetSagaStateMachineHarness
             <TonWithdrawFlowStateMachine, TonWithdrawFlow>();
-        await harness.Bus.Publish<IWithdrawTonRequested>(argument);
-        await sagaHarness.Consumed.Any<IWithdrawTonRequested>();
-        await harness.Bus.Publish<IBalanceDeducted>(new BalanceDeductedImpl()
-        {
-            CorrelationId = argument.CorrelationId
-        });
-        await sagaHarness.Consumed.Any<IBalanceDeducted>();
-        var msg = harness.Sent.Select<ISendTons>()
-            .FirstOrDefault()?.Context.Message;
 
         // act
-        await harness.Bus.Publish(new FaultEvent<ISendTons>() { Message = msg });
+        await harness.Bus.Publish(new FaultEvent<ISendTons>()
+        {
+            Message = new SendTonsImpl() { CorrelationId = correllationId }
+        });
 
         // assert
         (await sagaHarness.Consumed.Any<Fault<ISendTons>>())
             .ShouldBeTrue();
         (await harness.Sent.Any<IUnDeductBalance>())
             .ShouldBeTrue();
-        (await sagaHarness.Exists(argument.CorrelationId, s => s.SendTonsFail))
+        (await sagaHarness.Exists(correllationId, s => s.SendTonsFail))
             .HasValue.ShouldBeTrue();
     }
 
@@ -236,42 +208,23 @@ public class TonWithdrawFlowTests : IUseHarness
             .ConfigureMassTransit(Svc.TonTxns, this)
             .BuildServiceProvider(true);
 
-        var harness = provider.GetTestHarness();
+        var harness = await provider.StartTestHarness();
 
-        var argument = new
-        {
-            UserId = Guid.NewGuid(),
-            Destination = new TonAddress(_addr),
-            CorrelationId = Guid.NewGuid(),
-            Nanotons = 1_000_000_000uL
-        };
+        await provider.AddOrUpdateSaga(CreateSagaWithState
+            (TonWithdrawFlowState.SendTonsFail));
 
-        await harness.Start();
         var stateMachineHarness = harness.GetSagaStateMachineHarness
             <TonWithdrawFlowStateMachine, TonWithdrawFlow>();
-        await harness.Bus.Publish<IWithdrawTonRequested>(argument);
-        await stateMachineHarness.Consumed.Any<IWithdrawTonRequested>();
-        await harness.Bus.Publish<IBalanceDeducted>(new BalanceDeductedImpl()
-        {
-            CorrelationId = argument.CorrelationId
-        });
-        await stateMachineHarness.Consumed.Any<IBalanceDeducted>();
-        var msgSendTons = harness.Sent.Select<ISendTons>()
-            .FirstOrDefault()?.Context.Message;
-        await harness.Bus.Publish(new FaultEvent<ISendTons>() { Message = msgSendTons });
-        await stateMachineHarness.Consumed.Any<Fault<ISendTons>>();
-        var msgBalanceUnDeducted = harness.Sent.Select<IUnDeductBalance>()
-            .FirstOrDefault()?.Context.Message;
 
         // act
         await harness.Bus.Publish(new FaultEvent<IUnDeductBalance>()
         {
-            Message = msgBalanceUnDeducted
+            Message = new UnDeductBalanceImpl() { CorrelationId = correllationId },
         });
 
         // assert
         (await harness.Sent.Any<INotifyUnDeductBalanceFailed>()).ShouldBeTrue();
-        (await stateMachineHarness.Exists(argument.CorrelationId,
+        (await stateMachineHarness.Exists(correllationId,
              stateMachineHarness.StateMachine.BalanceUnDeductFail)).ShouldNotBeNull();
     }
 
@@ -283,9 +236,11 @@ public class TonWithdrawFlowTests : IUseHarness
             .ConfigureMassTransit(Svc.TonTxns, this)
             .BuildServiceProvider(true);
 
-        var harness = provider.GetTestHarness();
+        var harness = await provider.StartTestHarness();
 
-        await harness.Start();
+        await provider.AddOrUpdateSaga(CreateSagaWithState
+         (TonWithdrawFlowState.AwaitingDeduction));
+
         var requestClient = harness.GetRequestClient<ITonWithdrawalStatusRequested>();
 
         // act
@@ -306,34 +261,27 @@ public class TonWithdrawFlowTests : IUseHarness
             .ConfigureMassTransit(Svc.TonTxns, this)
             .BuildServiceProvider(true);
 
-        var harness = provider.GetTestHarness();
+        var harness = await provider.StartTestHarness();
+        var saga = CreateSagaWithState
+            (TonWithdrawFlowState.AwaitingDeduction);
+        await provider.AddOrUpdateSaga(saga);
 
-        var argument = new
-        {
-            UserId = Guid.NewGuid(),
-            Destination = new TonAddress(_addr),
-            CorrelationId = Guid.NewGuid(),
-            Nanotons = 1_000_000_000uL
-        };
-        await harness.Start();
-        await harness.Bus.Publish<IWithdrawTonRequested>(argument);
         var stateMachineHarness = harness.GetSagaStateMachineHarness
             <TonWithdrawFlowStateMachine, TonWithdrawFlow>();
-        await stateMachineHarness.Consumed.Any<IWithdrawTonRequested>();
         var requestClient = harness.GetRequestClient<ITonWithdrawalStatusRequested>();
 
         // act
         var response = await requestClient.GetResponse<TonWithdrawalStatus, TonWithdrawalNotfound>(new
         {
-            CorrelationId = argument.CorrelationId
+            CorrelationId = correllationId
         });
 
         // assert
         response.Is(out Response<TonWithdrawalStatus> status).ShouldBeTrue();
 
-        status.Message.destination.ShouldBe(argument.Destination);
+        status.Message.destination.ShouldBe(saga.Destination);
         status.Message.failReason.ShouldBeNull();
-        status.Message.nanotons.ShouldBe(argument.Nanotons);
+        status.Message.nanotons.ShouldBe(saga.Nanotons);
     }
 
 
@@ -345,41 +293,47 @@ public class TonWithdrawFlowTests : IUseHarness
             .ConfigureMassTransit(Svc.TonTxns, this)
             .BuildServiceProvider(true);
 
-        var harness = provider.GetTestHarness();
+        var harness = await provider.StartTestHarness();
 
-        var argument = new
-        {
-            UserId = Guid.NewGuid(),
-            Destination = new TonAddress(_addr),
-            CorrelationId = Guid.NewGuid(),
-            Nanotons = 1_000_000_000uL
-        };
+        await provider.AddOrUpdateSaga(CreateSagaWithState
+            (TonWithdrawFlowState.AwaitingDeduction));
 
-        await harness.Start();
         var sagaHarness = harness.GetSagaStateMachineHarness
             <TonWithdrawFlowStateMachine, TonWithdrawFlow>();
-        await harness.Bus.Publish<IWithdrawTonRequested>(argument);
-        await sagaHarness.Consumed.Any<IWithdrawTonRequested>();
+
         await harness.Bus.Publish<IBalanceDeducted>(new BalanceDeductedImpl()
         {
-            CorrelationId = argument.CorrelationId
+            CorrelationId = correllationId
         });
 
-        await sagaHarness.Exists(argument.CorrelationId, x => x.BalanceDeductedSuccess);
+        await sagaHarness.Exists(correllationId, x => x.BalanceDeductedSuccess);
 
         // act
         using var adjustment = new QuartzTimeAdjustment(provider);
         await adjustment.AdvanceTime(TimeSpan.FromMinutes(10));
 
         // assert
-        (await sagaHarness.Exists(argument.CorrelationId, x => x.Expired))
+        (await sagaHarness.Exists(correllationId, x => x.Expired))
             .HasValue.ShouldBeTrue();
 
         await harness.OutputTimeline(_output, x => x.Now());
     }
 }
 
+#region Contract Implementations
 public class BalanceDeductedImpl : IBalanceDeducted
+{
+    public Guid CorrelationId { get; set; }
+}
+
+public class DeductBalanceImpl : IDeductBalance
+{
+    public Guid CorrelationId { get; set; }
+    public Guid UserId { get; set; }
+    public FundsInfo Funds { get; set; }
+}
+
+public class UnDeductBalanceImpl : IUnDeductBalance
 {
     public Guid CorrelationId { get; set; }
 }
@@ -388,3 +342,4 @@ public class SendTonsCompletedImpl : ISendTonsCompleted
 {
     public Guid CorrelationId { get; set; }
 }
+#endregion

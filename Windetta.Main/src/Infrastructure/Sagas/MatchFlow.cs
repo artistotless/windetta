@@ -1,6 +1,7 @@
 ﻿using MassTransit;
 using Windetta.Common.Constants;
 using Windetta.Common.MassTransit;
+using Windetta.Common.Types;
 using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
 using Windetta.Main.Core.Exceptions;
@@ -22,6 +23,16 @@ public class MatchFlow : SagaStateMachineInstance
     public string? CanceledReason { get; set; }
 }
 
+public enum MatchFlowState : int
+{
+    AwaitingHoldBalances = 3,
+    GameServerSearch = 4,
+    GameServerSearchExpired = 5,
+    Running = 6,
+    ProcessingWinnings = 7,
+    Canceled = 8
+}
+
 public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
 {
     public MatchFlowStateMachine(IMatchHubs hubs)
@@ -36,13 +47,20 @@ public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
 
         Initially(
             When(MatchHubReady)
-                    .CopyDataToInstance(hubs)
-                    .StartGameServerSearching()
-                    .TransitionTo(GameServerSearch));
+                .CopyDataToInstance(hubs)
+                .HoldBalances()
+                .TransitionTo(AwaitingHoldBalances));
+
+        During(AwaitingHoldBalances,
+            When(BalancesHeld)
+                .StartGameServerSearching()
+                .TransitionTo(GameServerSearch),
+            When(HoldBalancesFailed)
+                .NotifyMatchCanceled(x => "One of the players has insufficient balance")
+                .Finalize());
 
         During(GameServerSearch,
             Ignore(MatchHubReady),
-
             When(GameServerPrepared)
                 .NotifyMatchBegun()
                 .TransitionTo(Running),
@@ -50,17 +68,21 @@ public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
                 .TransitionTo(GameServerSearchExpired)
                 .NotifyMatchAwaitingExpired(),
             When(CancellationRequested)
+                .SetCanceledReason(x => x.Reason)
                 .TransitionTo(Canceled));
 
         During(Running,
             When(CancellationRequested)
-                .TransitionTo(Canceled)
-                .Then(ctx => { }),
+                .SetCanceledReason(x => x.Reason)
+                .TransitionTo(Canceled),
             When(MatchCompleted)
                 .TransitionTo(ProcessingWinnings)
-                .Then(ctx => { }));
+                .ProcessWinnings());
+
+        SetCompletedWhenFinalized();
     }
 
+    public State AwaitingHoldBalances { get; set; }
     public State GameServerSearch { get; set; }
     public State GameServerSearchExpired { get; set; }
     public State Running { get; set; }
@@ -68,6 +90,8 @@ public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
     public State Canceled { get; set; }
 
     public Event<IMatchHubReady> MatchHubReady { get; }
+    public Event<IBalancesHeld> BalancesHeld { get; }
+    public Event<Fault<IHoldBalances>> HoldBalancesFailed { get; }
     public Event<IGameServerReservationPeriodExpired> GameServerReservationPeriodExpired { get; }
     public Event<IGameServerPrepared> GameServerPrepared { get; }
     public Event<ICancellationMatchRequested> CancellationRequested { get; }
@@ -91,7 +115,6 @@ public class MatchFlowDefinition : SagaDefinition<MatchFlow>
 }
 
 #region Extension methods
-
 public static class MatchFlowStateMachineExtensions
 {
     public static EventActivityBinder<MatchFlow, IMatchHubReady> CopyDataToInstance(
@@ -114,14 +137,24 @@ public static class MatchFlowStateMachineExtensions
         });
     }
 
-    public static EventActivityBinder<MatchFlow, IMatchHubReady> StartGameServerSearching(
-    this EventActivityBinder<MatchFlow, IMatchHubReady> binder)
+    public static EventActivityBinder<MatchFlow, IBalancesHeld> StartGameServerSearching(
+    this EventActivityBinder<MatchFlow, IBalancesHeld> binder)
     {
         return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<StartSearchingGameServer>(new
         {
             ctx.Message.CorrelationId,
             ctx.Saga.GameId,
             ctx.Saga.Players
+        }));
+    }
+
+    public static EventActivityBinder<MatchFlow, IMatchHubReady> HoldBalances(
+    this EventActivityBinder<MatchFlow, IMatchHubReady> binder)
+    {
+        return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<IHoldBalances>(new
+        {
+            Funds = new FundsInfo(ctx.Saga.Bet.CurrencyId, ctx.Saga.Bet.Amount),
+            UsersIds = ctx.Saga.Players.Select(x => x.Id)
         }));
     }
 
@@ -133,6 +166,35 @@ public static class MatchFlowStateMachineExtensions
             ctx.Message.CorrelationId,
             ctx.Message.Endpoint,
             ctx.Message.Tickets
+        }));
+    }
+
+    public static EventActivityBinder<MatchFlow, TData> NotifyMatchCanceled<TData>(
+    this EventActivityBinder<MatchFlow, TData> binder, Func<TData, string> selectReason)
+    where TData : class
+    {
+        return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<INotifyMatchCanceled>(new
+        {
+            Reason = selectReason.Invoke(ctx.Message)
+        }));
+    }
+
+    public static EventActivityBinder<MatchFlow, TData> SetCanceledReason<TData>(
+    this EventActivityBinder<MatchFlow, TData> binder, Func<TData, string> selectReason)
+    where TData : class
+    {
+        return binder.Then(x => x.Saga.CanceledReason = selectReason(x.Message));
+    }
+
+    public static EventActivityBinder<MatchFlow, IMatchCompleted> ProcessWinnings(
+    this EventActivityBinder<MatchFlow, IMatchCompleted> binder)
+    {
+        return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<IProcessWinnings>(new
+        {
+            ctx.Message.CorrelationId,
+            ctx.Message.Winners,
+            ctx.Saga.Bet.Amount,
+            ctx.Saga.Bet.CurrencyId,
         }));
     }
 

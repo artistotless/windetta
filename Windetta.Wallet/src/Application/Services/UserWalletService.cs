@@ -38,16 +38,16 @@ public class UserWalletService : IUserWalletService
         await _uow.SaveChangesAsync();
     }
 
-    public async Task HoldBalanceAsync(Guid userId, int currencyId, ulong amount)
+    public async Task HoldBalanceAsync(Guid userId, FundsInfo funds)
     {
         var wallet = await _uow.Wallets.GetAsync(userId);
 
         if (wallet is null)
             throw new WindettaException(Errors.Wallet.NotFound);
 
-        var balance = wallet.GetBalance(currencyId);
+        var balance = wallet.GetBalance(funds.CurrencyId);
 
-        balance.Hold(amount);
+        balance.Hold(funds.Amount);
 
         await _uow.SaveChangesAsync();
     }
@@ -62,7 +62,7 @@ public class UserWalletService : IUserWalletService
         if (wallet is null)
             throw new WindettaException(Errors.Wallet.NotFound);
 
-        var balance = wallet.GetBalance(arg.currencyId);
+        var balance = wallet.GetBalance(arg.funds.CurrencyId);
 
         //using var transaction = _ctx.Database
         //    .BeginTransaction(IsolationLevel.Serializable);
@@ -71,12 +71,13 @@ public class UserWalletService : IUserWalletService
 
         try
         {
-            balance.Increase(arg.amount);
+            balance.Increase(arg.funds.Amount);
 
             await _uow.Transactions.AddAsync(new()
             {
                 Id = arg.OperationId,
-                Amount = arg.amount,
+                CurrencyId = arg.funds.CurrencyId,
+                Amount = arg.funds.Amount,
                 TimeStamp = DateTime.UtcNow,
                 Type = TransactionType.TopUp,
                 UserId = arg.userId
@@ -107,12 +108,13 @@ public class UserWalletService : IUserWalletService
 
         try
         {
-            user1Wallet.TransferToWallet(user2Wallet, arg.currencyId, arg.amount);
+            user1Wallet.TransferToWallet(user2Wallet, arg.funds);
 
             await _uow.Transactions.AddAsync(new()
             {
                 Id = arg.OperationId,
-                Amount = arg.amount,
+                Amount = arg.funds.Amount,
+                CurrencyId = arg.funds.CurrencyId,
                 TimeStamp = DateTime.UtcNow,
                 Type = TransactionType.Transfer,
                 UserId = arg.userId
@@ -138,18 +140,19 @@ public class UserWalletService : IUserWalletService
         if (wallet is null)
             throw new WindettaException(Errors.Wallet.NotFound);
 
-        var balance = wallet.GetBalance(arg.currencyId);
+        var balance = wallet.GetBalance(arg.funds.CurrencyId);
 
         _uow.BeginTransaction(IsolationLevel.Serializable);
 
         try
         {
-            balance.Decrease(arg.amount);
+            balance.Decrease(arg.funds.Amount);
 
             await _uow.Transactions.AddAsync(new()
             {
                 Id = arg.OperationId,
-                Amount = arg.amount,
+                Amount = arg.funds.Amount,
+                CurrencyId = arg.funds.CurrencyId,
                 TimeStamp = DateTime.UtcNow,
                 Type = TransactionType.Withdrawal,
                 UserId = arg.userId
@@ -207,6 +210,22 @@ public class UserWalletService : IUserWalletService
         var balance = wallet.GetBalance(currencyId);
 
         balance.UnHold();
+
+        await _uow.SaveChangesAsync();
+    }
+
+    public async Task HoldBalanceAsync(IEnumerable<Guid> userIds, FundsInfo funds)
+    {
+        var wallets = await _uow.Wallets.GetAllAsync(userIds);
+
+        if (!wallets.Any())
+            throw new WindettaException(Errors.Wallet.NotFound);
+
+        var balances = wallets.SelectMany(w => w.Balances
+            .Where(b => b.CurrencyId == funds.CurrencyId));
+
+        foreach (var item in balances)
+            item.Hold(funds.Amount);
 
         await _uow.SaveChangesAsync();
     }

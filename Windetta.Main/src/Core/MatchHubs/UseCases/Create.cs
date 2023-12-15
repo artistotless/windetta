@@ -1,4 +1,5 @@
-﻿using Windetta.Main.Core.Exceptions;
+﻿using Windetta.Common.Types;
+using Windetta.Main.Core.Exceptions;
 using Windetta.Main.Core.MatchHubs.Plugins;
 using Windetta.Main.Core.Rooms;
 using Windetta.Main.Core.Services.Wallet;
@@ -19,7 +20,7 @@ public class Create : ICreateMatchHubUseCase
     public async Task<IMatchHub> ExecuteAsync(MatchHubOptions options)
     {
         if (!await _walletService.IsEqualOrGreater(
-            options.InitiatorId, options.Bet.CurrencyId, options.Bet.Amount))
+            options.InitiatorId, new FundsInfo(options.Bet.CurrencyId, options.Bet.Amount)))
         {
             throw WalletException.FundsNotEnough;
         }

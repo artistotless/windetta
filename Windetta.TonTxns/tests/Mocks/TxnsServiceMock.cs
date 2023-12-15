@@ -3,7 +3,7 @@ using Windetta.TonTxns.Application.Services.Audit;
 
 namespace Windetta.TonTxnsTests.Mocks;
 
-public class TxnsServiceMock : MockInitializator<IWithdrawalsService>
+public class TxnsServiceMock : MockInitializator<IWithdrawals>
 {
     public bool UseExistingTxnCase = false;
 
@@ -12,7 +12,7 @@ public class TxnsServiceMock : MockInitializator<IWithdrawalsService>
         UseExistingTxnCase = useExistingTxnCase;
     }
 
-    protected override void Setup(Mock<IWithdrawalsService> mock)
+    protected override void Setup(Mock<IWithdrawals> mock)
     {
         mock.Setup(x => x.ExistAsync(It.IsAny<Guid>()))
             .ReturnsAsync(false);

@@ -14,7 +14,9 @@ public class UnDeductConsumer : IConsumer<IUnDeductBalance>
     }
 
     public async Task Consume(ConsumeContext<IUnDeductBalance> context)
-        => await _walletService.CancelDeductAsync(context.Message.CorrelationId);
+    {
+        await _walletService.CancelDeductAsync(context.Message.CorrelationId);
+    }
 }
 
 public class UnDeductConsumerDefinition : ConsumerDefinition<UnDeductConsumer>

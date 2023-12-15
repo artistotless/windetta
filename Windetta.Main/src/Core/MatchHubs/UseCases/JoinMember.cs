@@ -1,4 +1,5 @@
-﻿using Windetta.Main.Core.Exceptions;
+﻿using Windetta.Common.Types;
+using Windetta.Main.Core.Exceptions;
 using Windetta.Main.Core.MatchHubs.Plugins;
 using Windetta.Main.Core.Rooms;
 using Windetta.Main.Core.Services.Wallet;
@@ -24,7 +25,7 @@ public class JoinMember : IJoinMemberMatchHubUseCase
             throw MatchHubException.NotFound;
 
         if (!await _walletService.IsEqualOrGreater(
-            userId, hub.Bet.CurrencyId, hub.Bet.Amount))
+            userId, new FundsInfo(hub.Bet.CurrencyId, hub.Bet.Amount)))
         {
             throw WalletException.FundsNotEnough;
         }

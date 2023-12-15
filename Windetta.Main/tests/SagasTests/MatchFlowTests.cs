@@ -7,6 +7,7 @@ using Windetta.Common.Testing;
 using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
 using Windetta.Main.Core.Games;
+using Windetta.Main.Core.Matches;
 using Windetta.Main.Core.MatchHubs;
 using Windetta.Main.Core.Services.LSPM;
 using Windetta.MainTests.Mocks;
@@ -29,6 +30,7 @@ public class MatchFlowTests : IUseHarness
         correllationId = Guid.Parse(correllationIdString);
     }
 
+    #region Configuration
     private ServiceProvider GetProvider()
     {
         var storageMock = new MatchHubsMock()
@@ -48,6 +50,19 @@ public class MatchFlowTests : IUseHarness
         });
     }
 
+    private MatchFlow CreateSagaWithState(MatchFlowState initialState)
+    {
+        return new MatchFlow
+        {
+            CurrentState = (int)initialState,
+            CorrelationId = correllationId,
+            Bet = new Bet(1, 1000),
+            Created = DateTimeOffset.UtcNow,
+            GameId = IdExamples.GameId,
+            Players = new[] { new Player(Guid.NewGuid(), "Nick", 0) }
+        };
+    }
+
     public Action<IBusRegistrationConfigurator> ConfigureHarness()
     {
         return cfg =>
@@ -56,34 +71,61 @@ public class MatchFlowTests : IUseHarness
             cfg.AddSagaStateMachine<MatchFlowStateMachine, MatchFlow>();
         };
     }
+    #endregion
 
     [Fact]
     public async Task When_MatchHubReady()
     {
         // arrange
         await using var provider = GetProvider();
-        var harness = provider.GetTestHarness();
+        var harness = await provider.StartTestHarness();
         var argument = new
         {
             CorrelationId = correllationId,
             TimeStamp = DateTimeOffset.UtcNow
         };
-
-        await harness.Start();
         var sagaHarness = harness.GetSagaStateMachineHarness
             <MatchFlowStateMachine, MatchFlow>();
 
         // act
         await harness.Bus.Publish<IMatchHubReady>(argument);
 
-
         // assert
         (await sagaHarness.Consumed.Any<IMatchHubReady>())
+                .ShouldBeTrue();
+        (await sagaHarness.Exists(argument.CorrelationId, x => x.AwaitingHoldBalances))
+                .HasValue.ShouldBeTrue();
+        (await harness.Sent.Any<IHoldBalances>())
             .ShouldBeTrue();
-        (await sagaHarness.Exists(argument.CorrelationId, x => x.GameServerSearch))
-            .HasValue.ShouldBeTrue();
+
+        await harness.OutputTimeline(_output, x => x.Now());
+    }
+
+    [Fact]
+    public async Task When_BalancesHeld()
+    {
+        // arrange
+        await using var provider = GetProvider();
+        var harness = await provider.StartTestHarness();
+
+        await provider.AddOrUpdateSaga(CreateSagaWithState
+            (MatchFlowState.AwaitingHoldBalances));
+
+        var sagaHarness = harness.GetSagaStateMachineHarness
+            <MatchFlowStateMachine, MatchFlow>();
+
+        // act
+        await harness.Bus.Publish<IBalancesHeld>(new
+        {
+            CorrelationId = correllationId,
+        });
+        await sagaHarness.Consumed.Any<IBalancesHeld>();
+
+        // assert
         (await harness.Sent.Any<StartSearchingGameServer>())
             .ShouldBeTrue();
+        (await sagaHarness.Exists(correllationId, s => s.GameServerSearch))
+            .HasValue.ShouldBeTrue();
 
         await harness.OutputTimeline(_output, x => x.Now());
     }
@@ -93,16 +135,13 @@ public class MatchFlowTests : IUseHarness
     {
         // arrange
         await using var provider = GetProvider();
-        var harness = provider.GetTestHarness();
-        await harness.Start();
+        var harness = await provider.StartTestHarness();
+
+        await provider.AddOrUpdateSaga(CreateSagaWithState
+            (MatchFlowState.GameServerSearch));
+
         var sagaHarness = harness.GetSagaStateMachineHarness
             <MatchFlowStateMachine, MatchFlow>();
-        await harness.Bus.Publish<IMatchHubReady>(new
-        {
-            CorrelationId = correllationId,
-            TimeStamp = DateTimeOffset.UtcNow
-        });
-        await sagaHarness.Consumed.Any<IMatchHubReady>();
 
         // act
         await harness.Bus.Publish<IGameServerPrepared>(new
@@ -127,16 +166,13 @@ public class MatchFlowTests : IUseHarness
     {
         // arrange
         await using var provider = GetProvider();
-        var harness = provider.GetTestHarness();
-        await harness.Start();
+        var harness = await provider.StartTestHarness();
+
+        await provider.AddOrUpdateSaga(CreateSagaWithState
+            (MatchFlowState.GameServerSearch));
+
         var sagaHarness = harness.GetSagaStateMachineHarness
             <MatchFlowStateMachine, MatchFlow>();
-        await harness.Bus.Publish<IMatchHubReady>(new
-        {
-            CorrelationId = correllationId,
-            TimeStamp = DateTimeOffset.UtcNow
-        });
-        await sagaHarness.Consumed.Any<IMatchHubReady>();
 
         // act
         await harness.Bus.Publish<IGameServerReservationPeriodExpired>(new
@@ -159,16 +195,13 @@ public class MatchFlowTests : IUseHarness
     {
         // arrange
         await using var provider = GetProvider();
-        var harness = provider.GetTestHarness();
-        await harness.Start();
+        var harness = await provider.StartTestHarness();
+
+        await provider.AddOrUpdateSaga(CreateSagaWithState
+            (MatchFlowState.GameServerSearch));
+
         var sagaHarness = harness.GetSagaStateMachineHarness
             <MatchFlowStateMachine, MatchFlow>();
-        await harness.Bus.Publish<IMatchHubReady>(new
-        {
-            CorrelationId = correllationId,
-            TimeStamp = DateTimeOffset.UtcNow
-        });
-        await sagaHarness.Consumed.Any<IMatchHubReady>();
 
         // act
         await harness.Bus.Publish<ICancellationMatchRequested>(new
@@ -189,28 +222,19 @@ public class MatchFlowTests : IUseHarness
     {
         // arrange
         await using var provider = GetProvider();
-        var harness = provider.GetTestHarness();
-        await harness.Start();
+        var harness = await provider.StartTestHarness();
+
+        await provider.AddOrUpdateSaga(CreateSagaWithState
+            (MatchFlowState.Running));
+
         var sagaHarness = harness.GetSagaStateMachineHarness
             <MatchFlowStateMachine, MatchFlow>();
-        await harness.Bus.Publish<IMatchHubReady>(new
-        {
-            CorrelationId = correllationId,
-            TimeStamp = DateTimeOffset.UtcNow
-        });
-        await sagaHarness.Consumed.Any<IMatchHubReady>();
-        await harness.Bus.Publish<IGameServerPrepared>(new
-        {
-            CorrelationId = correllationId,
-            Endpoint = "gameserver-1",
-            Tickets = new Dictionary<Guid, string>() { { Guid.Empty, "ticket1" } }.AsReadOnly()
-        });
-        await sagaHarness.Consumed.Any<IGameServerPrepared>();
 
         // act
         await harness.Bus.Publish<ICancellationMatchRequested>(new
         {
             CorrelationId = correllationId,
+            Reason = string.Empty,
         });
         await sagaHarness.Consumed.Any<ICancellationMatchRequested>();
 
@@ -226,23 +250,13 @@ public class MatchFlowTests : IUseHarness
     {
         // arrange
         await using var provider = GetProvider();
-        var harness = provider.GetTestHarness();
-        await harness.Start();
+        var harness = await provider.StartTestHarness();
+
+        await provider.AddOrUpdateSaga(CreateSagaWithState
+            (MatchFlowState.Running));
+
         var sagaHarness = harness.GetSagaStateMachineHarness
             <MatchFlowStateMachine, MatchFlow>();
-        await harness.Bus.Publish<IMatchHubReady>(new
-        {
-            CorrelationId = correllationId,
-            TimeStamp = DateTimeOffset.UtcNow
-        });
-        await sagaHarness.Consumed.Any<IMatchHubReady>();
-        await harness.Bus.Publish<IGameServerPrepared>(new
-        {
-            CorrelationId = correllationId,
-            Endpoint = "gameserver-1",
-            Tickets = new Dictionary<Guid, string>() { { Guid.Empty, "ticket1" } }.AsReadOnly()
-        });
-        await sagaHarness.Consumed.Any<IGameServerPrepared>();
 
         // act
         await harness.Bus.Publish<IMatchCompleted>(new
@@ -254,6 +268,8 @@ public class MatchFlowTests : IUseHarness
         // assert
         (await sagaHarness.Exists(correllationId, s => s.ProcessingWinnings))
             .HasValue.ShouldBeTrue();
+        (await harness.Sent.Any<IProcessWinnings>())
+            .ShouldBeTrue();
 
         await harness.OutputTimeline(_output, x => x.Now());
     }

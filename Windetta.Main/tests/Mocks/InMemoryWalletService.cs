@@ -1,4 +1,5 @@
-﻿using Windetta.Main.Core.Services.Wallet;
+﻿using Windetta.Common.Types;
+using Windetta.Main.Core.Services.Wallet;
 
 namespace Windetta.MainTests.Mocks;
 public class InMemoryWalletService : IWalletService
@@ -35,22 +36,22 @@ public class InMemoryWalletService : IWalletService
         return Task.FromResult(new UserBalance() { Amount = balance.Amount, HeldAmount = balance.HeldAmount });
     }
 
-    public Task HoldBalance(Guid userId, int currencyId, ulong amount)
+    public Task HoldBalance(Guid userId, FundsInfo funds)
     {
         var wallet = _wallets.Find(w => w.UserId == userId);
-        var balance = wallet.Balances.Find(b => b.CurrencyId == currencyId);
+        var balance = wallet.Balances.Find(b => b.CurrencyId == funds.CurrencyId);
 
-        balance.Hold(amount);
+        balance.Hold(funds.Amount);
 
         return Task.CompletedTask;
     }
 
-    public Task<bool> IsEqualOrGreater(Guid userId, int currencyId, ulong amount)
+    public Task<bool> IsEqualOrGreater(Guid userId, FundsInfo funds)
     {
         var wallet = _wallets.Find(w => w.UserId == userId);
-        var balance = wallet.Balances.Find(b => b.CurrencyId == currencyId);
+        var balance = wallet.Balances.Find(b => b.CurrencyId == funds.CurrencyId);
 
-        return Task.FromResult((balance.Amount - balance.HeldAmount) >= amount);
+        return Task.FromResult((balance.Amount - balance.HeldAmount) >= funds.Amount);
     }
 
     public Task UnHoldBalance(Guid userId, int currencyId)

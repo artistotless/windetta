@@ -7,7 +7,6 @@ using Windetta.Main.Core.Services.LSPM;
 using Windetta.Operations.Sagas;
 
 namespace Windetta.Main.Infrastructure.Consumers;
-
 public class SearchingGameServerConsumer : IConsumer<StartSearchingGameServer>
 {
     private readonly ILspms lspms;

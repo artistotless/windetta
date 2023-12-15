@@ -1,5 +1,6 @@
 ﻿using MassTransit;
 using Windetta.Contracts.Commands;
+using Windetta.Contracts.Events;
 using Windetta.Wallet.Application.Services;
 
 namespace Windetta.Wallet.Infrastructure.Consumers;
@@ -16,12 +17,16 @@ public class DeductConsumer : IConsumer<IDeductBalance>
     public async Task Consume(ConsumeContext<IDeductBalance> context)
     {
         var userId = context.Message.UserId;
-        var value = context.Message.Amount;
-        var currencyId = context.Message.CurrencyId;
+        var funds = context.Message.Funds;
 
-        await _walletService.DeductAsync(new(userId, currencyId, value)
+        await _walletService.DeductAsync(new(userId, funds)
         {
             OperationId = context.Message.CorrelationId
+        });
+
+        await context.Publish<IBalanceDeducted>(new
+        {
+            context.Message.CorrelationId
         });
     }
 }
@@ -31,6 +36,7 @@ public class DeductConsumerDefinition : ConsumerDefinition<DeductConsumer>
     protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator,
     IConsumerConfigurator<DeductConsumer> consumerConfigurator, IRegistrationContext context)
     {
+        consumerConfigurator.UseInMemoryOutbox(context);
         consumerConfigurator.UseScheduledRedelivery(r =>
         {
             r.Intervals(TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(4));

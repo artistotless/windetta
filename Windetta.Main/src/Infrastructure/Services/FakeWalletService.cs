@@ -1,4 +1,5 @@
-﻿using Windetta.Main.Core.Services.Wallet;
+﻿using Windetta.Common.Types;
+using Windetta.Main.Core.Services.Wallet;
 
 namespace Windetta.Main.Infrastructure.Services;
 
@@ -9,12 +10,12 @@ public class FakeWalletService : IWalletService
         return Task.FromResult(new UserBalance(10_000_000_000, 0));
     }
 
-    public Task HoldBalance(Guid userId, int currencyId, ulong amount)
+    public Task HoldBalance(Guid userId, FundsInfo funds)
     {
         return Task.CompletedTask;
     }
 
-    public Task<bool> IsEqualOrGreater(Guid userId, int currencyId, ulong amount)
+    public Task<bool> IsEqualOrGreater(Guid userId, FundsInfo funds)
     {
         return Task.FromResult(true);
     }

@@ -18,10 +18,9 @@ namespace Windetta.Wallet.Infrastructure.Consumers
         public async Task Consume(ConsumeContext<IFundsAdded> context)
         {
             var userId = context.Message.UserId;
-            var amount = context.Message.Amount;
-            var currencyId = context.Message.CurrencyId;
+            var funds = context.Message.Funds;
 
-            await _walletService.TopUpBalance(new TopUpArgument(userId, currencyId, amount)
+            await _walletService.TopUpBalance(new TopUpArgument(userId, funds)
             {
                 OperationId = context.Message.CorrelationId,
             });
