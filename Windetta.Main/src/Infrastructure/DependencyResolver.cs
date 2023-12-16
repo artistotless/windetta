@@ -1,8 +1,10 @@
-﻿using Windetta.Main.Core.MatchHubs;
+﻿using Polly;
 using Windetta.Main.Core.MatchHubs.Plugins;
 using Windetta.Main.Core.MatchHubs.UseCases;
 using Windetta.Main.Core.Services.LSPM;
 using Windetta.Main.Infrastructure.MatchHub.Plugins;
+using Windetta.Main.Infrastructure.Retries;
+using Windetta.Main.Infrastructure.Sagas.Activities;
 using Windetta.Main.Infrastructure.Services;
 
 namespace Windetta.Main.Infrastructure;
@@ -43,5 +45,11 @@ public static class DependencyResolver
     public static void AddInMemoryLspms(this IServiceCollection services)
     {
         services.AddScoped<ILspms, InMemoryLspms>();
+    }
+
+    public static void AddPolyRetries(this IServiceCollection services)
+    {
+        services.AddResiliencePipeline(typeof(SearchingGameServerActivity),
+            PollyPipelines.SearchingGameServerActivity);
     }
 }

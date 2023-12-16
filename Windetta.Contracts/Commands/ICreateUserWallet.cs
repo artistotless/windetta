@@ -3,7 +3,7 @@ using Windetta.Common.Messages;
 
 namespace Windetta.Contracts.Commands;
 
-public interface ICreateUserWallet : ICommand, CorrelatedBy<Guid>
+public interface ICreateUserWallet : CorrelatedBy<Guid>, ICommand
 {
     public Guid UserId { get; set; }
 }

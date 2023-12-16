@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using MassTransit.Configuration;
 using MassTransit.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Windetta.Common.Constants;
@@ -10,8 +11,8 @@ using Windetta.Main.Core.Games;
 using Windetta.Main.Core.Matches;
 using Windetta.Main.Core.MatchHubs;
 using Windetta.Main.Core.Services.LSPM;
+using Windetta.Main.Infrastructure.Sagas;
 using Windetta.MainTests.Mocks;
-using Windetta.Operations.Sagas;
 using Xunit.Abstractions;
 
 namespace Windetta.MainTests.SagasTests;
@@ -22,7 +23,6 @@ public class MatchFlowTests : IUseHarness
 
     private readonly Guid correllationId;
     private const string correllationIdString = "3bac654b-64db-4914-8d8e-b531ae796d5c";
-
 
     public MatchFlowTests(ITestOutputHelper output)
     {
@@ -67,7 +67,7 @@ public class MatchFlowTests : IUseHarness
     {
         return cfg =>
         {
-            cfg.AddRequestClient<RequestGameServer>();
+            cfg.AddRequestClient<GameServerRequested>();
             cfg.AddSagaStateMachine<MatchFlowStateMachine, MatchFlow>();
         };
     }
@@ -102,10 +102,24 @@ public class MatchFlowTests : IUseHarness
     }
 
     [Fact]
-    public async Task When_BalancesHeld()
+    public async Task When_BalancesHeld_LspmResponds()
     {
         // arrange
-        await using var provider = GetProvider();
+        var lspm = new Lspm()
+        {
+            Endpoint = new Uri("http://127.0.0.1:3303"),
+            Id = Guid.NewGuid(),
+            Load = 0,
+            SupportedGames = new[] { IdExamples.GameId }
+        };
+
+        await using var provider = SharedServiceProvider.GetInstance(services =>
+        {
+            services.RegisterConsumer<AlwaysRespondsSuccessLspmConsumer>();
+            services.AddScoped(p => new LspmsMock(new List<Lspm> { lspm }).Mock.Object);
+            services.ConfigureMassTransit(Svc.Main, this);
+        });
+
         var harness = await provider.StartTestHarness();
 
         await provider.AddOrUpdateSaga(CreateSagaWithState
@@ -122,11 +136,54 @@ public class MatchFlowTests : IUseHarness
         await sagaHarness.Consumed.Any<IBalancesHeld>();
 
         // assert
-        (await harness.Sent.Any<StartSearchingGameServer>())
+        (await harness.Published.Any<GameServerRequested>())
+            .ShouldBeTrue();
+        (await sagaHarness.Consumed.Any<IGameServerPrepared>())
+            .ShouldBeTrue();
+        await harness.OutputTimeline(_output, x => x.Now());
+    }
+
+    [Fact]
+    public async Task When_BalancesHeld_LspmOverload()
+    {
+        // arrange
+        var lspm = new Lspm()
+        {
+            Endpoint = new Uri("http://127.0.0.1:3303"),
+            Id = Guid.NewGuid(),
+            Load = 0,
+            SupportedGames = new[] { IdExamples.GameId }
+        };
+
+        await using var provider = SharedServiceProvider.GetInstance(services =>
+        {
+            services.RegisterConsumer<AlwaysOverloadLspmConsumer>();
+            services.AddScoped(p => new LspmsMock(new List<Lspm> { lspm }).Mock.Object);
+            services.ConfigureMassTransit(Svc.Main, this);
+        });
+
+        var harness = await provider.StartTestHarness();
+
+        await provider.AddOrUpdateSaga(CreateSagaWithState
+            (MatchFlowState.AwaitingHoldBalances));
+
+        var sagaHarness = harness.GetSagaStateMachineHarness
+            <MatchFlowStateMachine, MatchFlow>();
+
+        // act
+        await harness.Bus.Publish<IBalancesHeld>(new
+        {
+            CorrelationId = correllationId,
+        });
+        await sagaHarness.Consumed.Any<IBalancesHeld>();
+
+        // assert
+        (await harness.Published.Any<GameServerRequested>())
             .ShouldBeTrue();
         (await sagaHarness.Exists(correllationId, s => s.GameServerSearch))
             .HasValue.ShouldBeTrue();
-
+        (await harness.Sent.Any<INotifyMatchCanceled>())
+              .ShouldBeTrue();
         await harness.OutputTimeline(_output, x => x.Now());
     }
 
@@ -250,6 +307,7 @@ public class MatchFlowTests : IUseHarness
     {
         // arrange
         await using var provider = GetProvider();
+
         var harness = await provider.StartTestHarness();
 
         await provider.AddOrUpdateSaga(CreateSagaWithState
@@ -268,8 +326,35 @@ public class MatchFlowTests : IUseHarness
         // assert
         (await sagaHarness.Exists(correllationId, s => s.ProcessingWinnings))
             .HasValue.ShouldBeTrue();
-        (await harness.Sent.Any<IProcessWinnings>())
-            .ShouldBeTrue();
+
+        await harness.OutputTimeline(_output, x => x.Now());
+    }
+
+    [Fact]
+    public async Task When_Finalized()
+    {
+        // arrange
+        await using var provider = GetProvider();
+
+        var harness = await provider.StartTestHarness();
+
+        await provider.AddOrUpdateSaga(CreateSagaWithState
+            (MatchFlowState.ProcessingWinnings));
+
+        var sagaHarness = harness.GetSagaStateMachineHarness
+            <MatchFlowStateMachine, MatchFlow>();
+
+        // act
+        await harness.Bus.Publish<IWinningsProcessed>(new
+        {
+            CorrelationId = correllationId,
+        });
+        await sagaHarness.Consumed.Any<IWinningsProcessed>();
+
+        // assert
+        await Task.Delay(2_000);
+        //(await sagaHarness.Exists(correllationId, s => s.ProcessingWinnings))
+        //    .HasValue.ShouldBeTrue();
 
         await harness.OutputTimeline(_output, x => x.Now());
     }

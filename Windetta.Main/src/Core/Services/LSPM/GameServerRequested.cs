@@ -1,9 +1,10 @@
 ﻿using MassTransit;
+using Windetta.Common.Messages;
 using Windetta.Main.Core.Matches;
 
 namespace Windetta.Main.Core.Services.LSPM;
 
-public class RequestGameServer : CorrelatedBy<Guid>
+public class GameServerRequested : CorrelatedBy<Guid>, ICommand
 {
     public Guid CorrelationId { get; set; }
     public Guid GameId { get; set; }

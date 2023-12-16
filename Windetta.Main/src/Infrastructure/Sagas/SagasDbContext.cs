@@ -2,7 +2,6 @@
 using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Windetta.Operations.Sagas;
 
 namespace Windetta.Main.Infrastructure.Sagas;
 

@@ -7,9 +7,9 @@ public class LspmsMock : MockInitializator<ILspms>
 {
     private readonly InMemoryLspms _storage;
 
-    public LspmsMock()
+    public LspmsMock(List<Lspm>? initial = null)
     {
-        _storage = new InMemoryLspms();
+        _storage = new InMemoryLspms(initial);
     }
 
     protected override void Setup(Mock<ILspms> mock)
