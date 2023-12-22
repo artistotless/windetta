@@ -1,4 +1,5 @@
-﻿using Windetta.Main.Core.MatchHubs;
+﻿using Windetta.Contracts;
+using Windetta.Main.Core.MatchHubs;
 
 namespace Windetta.Main.Core.Matches;
 

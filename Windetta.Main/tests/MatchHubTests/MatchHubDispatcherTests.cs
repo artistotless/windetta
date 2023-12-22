@@ -22,8 +22,8 @@ public class MatchHubDispatcherTests
         // arrange
         var request = new CreateMatchHubRequest()
         {
-            GameId = IdExamples.GameId,
-            InitiatorId = IdExamples.UserId,
+            GameId = ExampleGuids.GameId,
+            InitiatorId = ExampleGuids.UserId,
             Bet = new Bet(currencyId: 1, bet: 100),
         };
 
@@ -53,8 +53,8 @@ public class MatchHubDispatcherTests
         var request = new CreateMatchHubRequest()
         {
             Bet = new Bet(1, 1000),
-            GameId = IdExamples.GameId,
-            InitiatorId = IdExamples.UserId
+            GameId = ExampleGuids.GameId,
+            InitiatorId = ExampleGuids.UserId
         };
 
         var buffer = new Queue<string>();
@@ -92,8 +92,8 @@ public class MatchHubDispatcherTests
 
         var request = new CreateMatchHubRequest()
         {
-            GameId = IdExamples.GameId,
-            InitiatorId = IdExamples.UserId,
+            GameId = ExampleGuids.GameId,
+            InitiatorId = ExampleGuids.UserId,
             Bet = new Bet(currencyId: 1, bet: 100),
             AutoReadyStrategy = new PluginSetDto(nameof(FullRoomsReadyStrategy)),
         };

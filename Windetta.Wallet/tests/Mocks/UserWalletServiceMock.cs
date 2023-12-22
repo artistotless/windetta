@@ -1,5 +1,5 @@
 ﻿using Windetta.Common.Testing;
-using Windetta.Common.Types;
+using Windetta.Contracts;
 using Windetta.Wallet.Application.Dto;
 using Windetta.Wallet.Application.Services;
 using Windetta.Wallet.Domain;

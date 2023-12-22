@@ -1,4 +1,4 @@
-﻿using Windetta.Common.Types;
+﻿using Windetta.Contracts;
 using Windetta.Main.Core.Exceptions;
 using Windetta.Main.Core.MatchHubs.Plugins;
 using Windetta.Main.Core.Rooms;

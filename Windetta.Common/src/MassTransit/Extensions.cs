@@ -6,7 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using Windetta.Common.Configuration;
-using Windetta.Common.Messages;
+using Windetta.Contracts.Base;
 
 namespace Windetta.Common.MassTransit;
 

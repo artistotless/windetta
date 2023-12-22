@@ -1,5 +1,4 @@
-﻿using Windetta.Common.Types;
-using Windetta.Contracts;
+﻿using Windetta.Contracts;
 
 namespace Windetta.Wallet.Application.Dto;
 

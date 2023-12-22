@@ -7,7 +7,7 @@ using Windetta.Common.Database;
 using Windetta.Common.MassTransit;
 using Windetta.Common.Mongo;
 using Windetta.Common.Types;
-using Windetta.Main.Core.Services.LSPM;
+using Windetta.Contracts.Events;
 using Windetta.Main.Infrastructure;
 using Windetta.Main.Infrastructure.Sagas;
 using Windetta.Main.Infrastructure.Security;
@@ -30,7 +30,7 @@ services.AddMysqlDbContext<SagasDbContext>(assembly);
 services.AddInMemoryLspms();
 services.AddReadyMassTransit(assembly, Svc.Main, cfg =>
 {
-    cfg.AddRequestClient<GameServerRequested>();
+    cfg.AddRequestClient<IGameServerRequested>();
     cfg.SetEntityFrameworkSagaRepositoryProvider(x =>
     {
         x.ConcurrencyMode = ConcurrencyMode.Optimistic;

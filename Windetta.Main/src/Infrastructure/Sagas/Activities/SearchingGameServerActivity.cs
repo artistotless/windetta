@@ -1,7 +1,9 @@
 ﻿using MassTransit;
 using Polly.Registry;
 using Windetta.Common.Helpers;
+using Windetta.Contracts;
 using Windetta.Contracts.Events;
+using Windetta.Contracts.Responses;
 using Windetta.Main.Core.Exceptions;
 using Windetta.Main.Core.Services.LSPM;
 
@@ -11,12 +13,12 @@ namespace Windetta.Main.Infrastructure.Sagas.Activities;
 public class SearchingGameServerActivity : IStateMachineActivity<MatchFlow>
 {
     private readonly ILspms lspms;
-    private readonly IRequestClient<GameServerRequested> client;
+    private readonly IRequestClient<IGameServerRequested> client;
     private readonly ResiliencePipelineProvider<Type>? retryPolicy;
 
     public SearchingGameServerActivity(
         ILspms lspms,
-        IRequestClient<GameServerRequested> client,
+        IRequestClient<IGameServerRequested> client,
         ResiliencePipelineProvider<Type>? retryPolicy = null)
     {
         this.lspms = lspms;
@@ -44,14 +46,11 @@ public class SearchingGameServerActivity : IStateMachineActivity<MatchFlow>
 
         if (result.Success)
         {
-            if (!result.IsCompletedResponse)
-                return;
-
             await context.Publish<IGameServerPrepared>(new
             {
                 context.Saga.CorrelationId,
-                result.Info!.Endpoint,
-                result.Info.Tickets,
+                result.Details!.Endpoint,
+                result.Details.Tickets,
             });
         }
         else
@@ -65,7 +64,8 @@ public class SearchingGameServerActivity : IStateMachineActivity<MatchFlow>
         await next.Execute(context).ConfigureAwait(false);
     }
 
-    private async Task<RequestingGameServerResult> TryRequestGameServer(BehaviorContext<MatchFlow> ctx, IEnumerable<Lspm> allLspms)
+    private async Task<RequestingGameServerResult> TryRequestGameServer
+        (BehaviorContext<MatchFlow> ctx, IEnumerable<Lspm> allLspms)
     {
         if (allLspms is null || allLspms.Count() == 0)
             throw LspmException.NotFound;
@@ -74,7 +74,7 @@ public class SearchingGameServerActivity : IStateMachineActivity<MatchFlow>
 
         var requestTimeoutSeconds = 20;
 
-        Action<SendContext<GameServerRequested>> requestExpirationHeader = (context) =>
+        Action<SendContext<IGameServerRequested>> requestExpirationHeader = (context) =>
         {
             context.Headers.Set("expires",
                 DateTimeOffset.UtcNow.AddSeconds(requestTimeoutSeconds));
@@ -84,7 +84,7 @@ public class SearchingGameServerActivity : IStateMachineActivity<MatchFlow>
         {
             CorrelationId = ctx.Saga.CorrelationId,
             GameId = ctx.Saga.GameId,
-            Players = ctx.Saga.Players
+            Players = ctx.Saga.Players,
         };
 
         async Task<Response<RequestingGameServerResult>?> SendDurableRequest()
@@ -140,4 +140,14 @@ public class SearchingGameServerActivity : IStateMachineActivity<MatchFlow>
     {
         context.CreateScope("hold-balances");
     }
+    private class GameServerRequested : IGameServerRequested
+    {
+        public Guid CorrelationId { get; set; }
+        public Guid GameId { get; set; }
+        public IEnumerable<Player> Players { get; set; }
+        public Dictionary<string, string> Properties { get; set; }
+        public string LspmKey { get; set; }
+    }
 }
+
+

@@ -1,5 +1,6 @@
 ﻿using Windetta.Common.Constants;
 using Windetta.Common.Types;
+using Windetta.Contracts;
 
 namespace Windetta.Wallet.Domain;
 

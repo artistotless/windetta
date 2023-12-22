@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Windetta.Common.Constants;
+using Windetta.Common.Testing;
 using Windetta.Main.Core.Exceptions;
 using Windetta.Main.Core.MatchHubs;
 using Windetta.Main.Core.MatchHubs.Dtos;
@@ -15,8 +16,8 @@ public class JoinFiltersTests
         // arrange
         var request = new CreateMatchHubRequest()
         {
-            GameId = IdExamples.GameId,
-            InitiatorId = IdExamples.UserId,
+            GameId = ExampleGuids.GameId,
+            InitiatorId = ExampleGuids.UserId,
             Bet = new Bet(1, 100),
             JoinFilters = new[] { new PluginSetDto(nameof(AlwaysFalseJoinFilter)) }
         };

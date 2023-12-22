@@ -1,6 +1,6 @@
-﻿namespace Windetta.Main.Core.Matches;
+﻿namespace Windetta.Contracts;
 
-public class Player
+public record Player
 {
     public Guid Id { get; init; }
     public string DisplayName { get; init; }
@@ -8,7 +8,7 @@ public class Player
 
     public Player()
     {
-        
+
     }
 
     public Player(Guid id, string displayName, int teamIndex)

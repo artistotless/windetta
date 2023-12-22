@@ -1,4 +1,4 @@
-﻿using Windetta.Common.Types;
+﻿using Windetta.Contracts;
 
 namespace Windetta.TonTxns.Application.Models;
 

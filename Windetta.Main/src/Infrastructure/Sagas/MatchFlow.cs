@@ -1,11 +1,10 @@
 ﻿using MassTransit;
 using Windetta.Common.Constants;
 using Windetta.Common.MassTransit;
-using Windetta.Common.Types;
+using Windetta.Contracts;
 using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
 using Windetta.Main.Core.Exceptions;
-using Windetta.Main.Core.Matches;
 using Windetta.Main.Core.MatchHubs;
 using Windetta.Main.Infrastructure.Sagas.Activities;
 
@@ -126,7 +125,7 @@ public class MatchFlowDefinition : SagaDefinition<MatchFlow>
         sagaConfigurator.UseMessageRetry(c =>
         {
             c.Interval(10, TimeSpan.FromSeconds(10));
-            c.Ignore<LspmException>(e => e.ErrorCode == Errors.Main.LspmNotFound);
+            c.Ignore<LspmException>(e => e.ErrorCode == Errors.LSPM.NotFound);
         });
     }
 }

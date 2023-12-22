@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using Windetta.Common.Constants;
 using Windetta.Common.Types;
+using Windetta.Contracts;
 using Windetta.Wallet.Application.DAL;
 using Windetta.Wallet.Application.Dto;
 using Windetta.Wallet.Domain;

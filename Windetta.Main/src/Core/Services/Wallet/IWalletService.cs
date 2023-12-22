@@ -1,4 +1,5 @@
 ﻿using Windetta.Common.Types;
+using Windetta.Contracts;
 
 namespace Windetta.Main.Core.Services.Wallet;
 

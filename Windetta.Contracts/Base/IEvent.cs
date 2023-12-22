@@ -1,6 +1,6 @@
 ﻿using MassTransit;
 
-namespace Windetta.Common.Messages;
+namespace Windetta.Contracts.Base;
 
 // marker interface
 [ExcludeFromTopology]

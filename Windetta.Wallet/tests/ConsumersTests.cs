@@ -3,14 +3,13 @@ using MassTransit.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Windetta.Common.Constants;
 using Windetta.Common.MassTransit;
-using Windetta.Common.Types;
+using Windetta.Contracts;
 using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
 using Windetta.Wallet.Application.Dto;
 using Windetta.Wallet.Application.Services;
 using Windetta.Wallet.Infrastructure.Consumers;
 using Windetta.WalletTests.Mocks;
-using static MongoDB.Driver.WriteConcern;
 
 namespace Windetta.WalletTests.ConsumersTests;
 
@@ -176,6 +175,6 @@ public class TransferBalanceImpl : ITransferBalance
 {
     public Guid InitiatorUserId { get; set; }
     public Guid DestinationUserId { get; set; }
-    public  FundsInfo Funds { get; set; }
+    public FundsInfo Funds { get; set; }
     public Guid CorrelationId { get; set; }
 }

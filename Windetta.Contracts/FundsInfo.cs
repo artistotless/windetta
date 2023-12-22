@@ -1,4 +1,4 @@
-﻿namespace Windetta.Common.Types;
+﻿namespace Windetta.Contracts;
 
 public class FundsInfo
 {

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Windetta.Common.Constants;
+using Windetta.Common.Testing;
 using Windetta.Main.Core.Exceptions;
 using Windetta.Main.Core.Games;
 using Windetta.Main.Core.MatchHubs;
@@ -16,8 +17,8 @@ public class DeleteTests
         var options = new MatchHubOptions()
         {
             Bet = new Bet(),
-            GameId = IdExamples.GameId,
-            InitiatorId = IdExamples.UserId,
+            GameId = ExampleGuids.GameId,
+            InitiatorId = ExampleGuids.UserId,
             GameConfiguration = new GameConfiguration() { MaxPlayers = 2 }
         };
 
@@ -46,8 +47,8 @@ public class DeleteTests
         var options = new MatchHubOptions()
         {
             Bet = new Bet(),
-            GameId = IdExamples.GameId,
-            InitiatorId = IdExamples.UserId,
+            GameId = ExampleGuids.GameId,
+            InitiatorId = ExampleGuids.UserId,
             GameConfiguration = new GameConfiguration() { MaxPlayers = 2 }
         };
 

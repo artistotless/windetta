@@ -1,4 +1,5 @@
-﻿using Windetta.Main.Core.Exceptions;
+﻿using Windetta.Common.Testing;
+using Windetta.Main.Core.Exceptions;
 using Windetta.Main.Core.Games;
 
 namespace Windetta.MainTests.Mocks;
@@ -13,7 +14,7 @@ public class InMemoryGamesRepository : IGames
         {
             new Game()
             {
-                Id = IdExamples.GameId,
+                Id = ExampleGuids.GameId,
                 Description = "Sea battle",
                 IconPath = "/seabattle.png",
                 Configuration = new GameConfiguration() { MaxPlayers = 2, MinPlayers = 1 },

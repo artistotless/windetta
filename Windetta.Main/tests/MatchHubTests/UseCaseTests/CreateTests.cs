@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Windetta.Common.Constants;
+using Windetta.Common.Testing;
 using Windetta.Main.Core.Exceptions;
 using Windetta.Main.Core.MatchHubs;
 using Windetta.Main.Core.MatchHubs.Plugins;
@@ -22,8 +23,8 @@ public class CreateTests
         var options = new MatchHubOptions()
         {
             Bet = new Bet(currencyId: 1, bet: 100_0),
-            GameId = IdExamples.GameId,
-            InitiatorId = IdExamples.UserId,
+            GameId = ExampleGuids.GameId,
+            InitiatorId = ExampleGuids.UserId,
             GameConfiguration = new() { MaxPlayers = 2 },
         };
 
@@ -52,8 +53,8 @@ public class CreateTests
         var options = new MatchHubOptions()
         {
             Bet = new Bet(currencyId: 1, bet: 100_0),
-            GameId = IdExamples.GameId,
-            InitiatorId = IdExamples.UserId,
+            GameId = ExampleGuids.GameId,
+            InitiatorId = ExampleGuids.UserId,
             GameConfiguration = new() { MaxPlayers = 2 },
         };
 
@@ -82,8 +83,8 @@ public class CreateTests
         var options = new TournamentMatchHubOptions()
         {
             Bet = new Bet(currencyId: 1, bet: 100_0),
-            GameId = IdExamples.GameId,
-            InitiatorId = IdExamples.UserId,
+            GameId = ExampleGuids.GameId,
+            InitiatorId = ExampleGuids.UserId,
             GameConfiguration = new() { MaxPlayers = 2 },
         };
 
@@ -111,8 +112,8 @@ public class CreateTests
         var options = new MatchHubOptions()
         {
             Bet = new Bet(currencyId: 1, bet: 100_0),
-            GameId = IdExamples.GameId,
-            InitiatorId = IdExamples.UserId,
+            GameId = ExampleGuids.GameId,
+            InitiatorId = ExampleGuids.UserId,
             GameConfiguration = new() { MaxPlayers = 2 },
         };
 

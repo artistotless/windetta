@@ -1,4 +1,5 @@
 ﻿using Windetta.Common.Types;
+using Windetta.Contracts;
 using Windetta.Wallet.Application.Dto;
 using Windetta.Wallet.Domain;
 

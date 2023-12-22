@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Windetta.Common.Testing;
 using Windetta.Main.Core.Games;
 using Windetta.Main.Core.MatchHubs;
 using Windetta.MainTests.Mocks;
@@ -27,8 +28,8 @@ public class HubTests
 
         var request = new CreateMatchHubRequest()
         {
-            GameId = IdExamples.GameId,
-            InitiatorId = IdExamples.UserId,
+            GameId = ExampleGuids.GameId,
+            InitiatorId = ExampleGuids.UserId,
             Bet = new Bet(currencyId: 1, bet: 100)
         };
 
@@ -48,8 +49,8 @@ public class HubTests
         // arrange
         var request = new CreateMatchHubRequest()
         {
-            GameId = IdExamples.GameId,
-            InitiatorId = IdExamples.UserId,
+            GameId = ExampleGuids.GameId,
+            InitiatorId = ExampleGuids.UserId,
             Bet = new Bet(currencyId: 1, bet: 100)
         };
 
@@ -73,8 +74,8 @@ public class HubTests
         // arrange
         var request = new CreateMatchHubRequest()
         {
-            GameId = IdExamples.GameId,
-            InitiatorId = IdExamples.UserId,
+            GameId = ExampleGuids.GameId,
+            InitiatorId = ExampleGuids.UserId,
             Bet = new Bet(currencyId: 1, bet: 100)
         };
 
@@ -108,8 +109,8 @@ public class HubTests
         // arrange
         var request = new CreateMatchHubRequest()
         {
-            GameId = IdExamples.GameId,
-            InitiatorId = IdExamples.UserId,
+            GameId = ExampleGuids.GameId,
+            InitiatorId = ExampleGuids.UserId,
             Bet = new Bet(currencyId: 1, bet: 100)
         };
 

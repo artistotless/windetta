@@ -1,4 +1,5 @@
-﻿using Windetta.Common.Types;
+﻿using Windetta.Contracts;
+using Windetta.Common.Testing;
 using Windetta.Main.Core.Services.Wallet;
 
 namespace Windetta.MainTests.Mocks;
@@ -11,14 +12,14 @@ public class InMemoryWalletService : IWalletService
         var balance = new Wallet.Domain.UserBalance()
         {
             CurrencyId = 1,
-            WalletId = IdExamples.UserId
+            WalletId = ExampleGuids.UserId
         };
 
         balance.Increase(1000);
 
         var wallet = new Wallet.Domain.UserWallet()
         {
-            UserId = IdExamples.UserId,
+            UserId = ExampleGuids.UserId,
             Balances = new() { balance },
         };
 

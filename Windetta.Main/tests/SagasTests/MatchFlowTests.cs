@@ -5,10 +5,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Windetta.Common.Constants;
 using Windetta.Common.MassTransit;
 using Windetta.Common.Testing;
+using Windetta.Contracts;
 using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
 using Windetta.Main.Core.Games;
-using Windetta.Main.Core.Matches;
 using Windetta.Main.Core.MatchHubs;
 using Windetta.Main.Core.Services.LSPM;
 using Windetta.Main.Infrastructure.Sagas;
@@ -37,7 +37,7 @@ public class MatchFlowTests : IUseHarness
         {
             ReturnThisHub = new ProxyMatchHub(new MatchHubOptions()
             {
-                InitiatorId = IdExamples.UserId,
+                InitiatorId = ExampleGuids.UserId,
                 GameConfiguration = new GameConfiguration() { MaxPlayers = 2 },
             })
         };
@@ -58,7 +58,7 @@ public class MatchFlowTests : IUseHarness
             CorrelationId = correllationId,
             Bet = new Bet(1, 1000),
             Created = DateTimeOffset.UtcNow,
-            GameId = IdExamples.GameId,
+            GameId = ExampleGuids.GameId,
             Players = new[] { new Player(Guid.NewGuid(), "Nick", 0) }
         };
     }
@@ -67,7 +67,7 @@ public class MatchFlowTests : IUseHarness
     {
         return cfg =>
         {
-            cfg.AddRequestClient<GameServerRequested>();
+            cfg.AddRequestClient<IGameServerRequested>();
             cfg.AddSagaStateMachine<MatchFlowStateMachine, MatchFlow>();
         };
     }
@@ -110,7 +110,7 @@ public class MatchFlowTests : IUseHarness
             Endpoint = new Uri("http://127.0.0.1:3303"),
             Id = Guid.NewGuid(),
             Load = 0,
-            SupportedGames = new[] { IdExamples.GameId }
+            SupportedGames = new[] { ExampleGuids.GameId }
         };
 
         await using var provider = SharedServiceProvider.GetInstance(services =>
@@ -136,7 +136,7 @@ public class MatchFlowTests : IUseHarness
         await sagaHarness.Consumed.Any<IBalancesHeld>();
 
         // assert
-        (await harness.Published.Any<GameServerRequested>())
+        (await harness.Published.Any<IGameServerRequested>())
             .ShouldBeTrue();
         (await sagaHarness.Consumed.Any<IGameServerPrepared>())
             .ShouldBeTrue();
@@ -152,7 +152,7 @@ public class MatchFlowTests : IUseHarness
             Endpoint = new Uri("http://127.0.0.1:3303"),
             Id = Guid.NewGuid(),
             Load = 0,
-            SupportedGames = new[] { IdExamples.GameId }
+            SupportedGames = new[] { ExampleGuids.GameId }
         };
 
         await using var provider = SharedServiceProvider.GetInstance(services =>
@@ -178,7 +178,7 @@ public class MatchFlowTests : IUseHarness
         await sagaHarness.Consumed.Any<IBalancesHeld>();
 
         // assert
-        (await harness.Published.Any<GameServerRequested>())
+        (await harness.Published.Any<IGameServerRequested>())
             .ShouldBeTrue();
         (await sagaHarness.Exists(correllationId, s => s.GameServerSearch))
             .HasValue.ShouldBeTrue();

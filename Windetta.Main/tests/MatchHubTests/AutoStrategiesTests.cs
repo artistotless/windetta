@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Windetta.Common.Testing;
 using Windetta.Main.Core.MatchHubs;
 using Windetta.Main.Core.MatchHubs.Dtos;
 using Windetta.MainTests.Mocks;
@@ -16,8 +17,8 @@ public class AutoStrategiesTests
         {
             Bet = new Bet(1, 1000),
             AutoReadyStrategy = new PluginSetDto(nameof(FullRoomsReadyStrategy)),
-            GameId = IdExamples.GameId,
-            InitiatorId = IdExamples.UserId
+            GameId = ExampleGuids.GameId,
+            InitiatorId = ExampleGuids.UserId
         };
 
         var interactor = SharedServiceProvider.GetInstance()
@@ -56,8 +57,8 @@ public class AutoStrategiesTests
         {
             Bet = new Bet(1, 800),
             AutoDisposeStrategy = new PluginSetDto(nameof(DateDisposeStrategy)),
-            GameId = IdExamples.GameId,
-            InitiatorId = IdExamples.UserId
+            GameId = ExampleGuids.GameId,
+            InitiatorId = ExampleGuids.UserId
         };
 
         var interactor = SharedServiceProvider.GetInstance()

@@ -25,11 +25,6 @@ public static class Errors
         #region Game
         public const string GameConfigurationsNotFound = "game_configurations_notfound";
         #endregion
-
-        #region LSPM
-        public const string LspmNotFound = "lspm_notfound";
-        public const string LspmOverload = "lspm_overload";
-        #endregion
     }
 
     public static class Identity
@@ -49,5 +44,12 @@ public static class Errors
     public static class TonTxns
     {
         public const string TonTransferError = "ton_transfer_error";
+    }
+
+    public static class LSPM
+    {
+        public const string NotFound = "lspm_notfound";
+        public const string Overload = "lspm_overload";
+        public const string LaunchServerTimeout = "launch_server_timeout";
     }
 }

@@ -1,19 +1,20 @@
 ﻿using MassTransit;
-using Windetta.Main.Core.Matches;
-using Windetta.Main.Core.Services.LSPM;
+using Windetta.Contracts;
+using Windetta.Contracts.Events;
+using Windetta.Contracts.Responses;
 
 namespace Windetta.MainTests.Mocks;
 
-public class AlwaysRespondsSuccessLspmConsumer : IConsumer<GameServerRequested>
+public class AlwaysRespondsSuccessLspmConsumer : IConsumer<IGameServerRequested>
 {
-    public Task Consume(ConsumeContext<GameServerRequested> context)
+    public Task Consume(ConsumeContext<IGameServerRequested> context)
     {
         return context.RespondAsync<RequestingGameServerResult>(new()
         {
             Success = true,
-            Info = new GameServerInfo()
+            Details = new ConnectionToServerDetails()
             {
-                Endpoint = "udp:127.0.0.1",
+                Endpoint = new UriBuilder("udp", "127.0.0.1", 9999).Uri,
                 Tickets = CreateTickets(context.Message.Players)
             },
             Error = null,
@@ -33,14 +34,14 @@ public class AlwaysRespondsSuccessLspmConsumer : IConsumer<GameServerRequested>
     }
 }
 
-public class AlwaysOverloadLspmConsumer : IConsumer<GameServerRequested>
+public class AlwaysOverloadLspmConsumer : IConsumer<IGameServerRequested>
 {
-    public Task Consume(ConsumeContext<GameServerRequested> context)
+    public Task Consume(ConsumeContext<IGameServerRequested> context)
     {
         return context.RespondAsync<RequestingGameServerResult>(new()
         {
             Success = false,
-            Info = null,
+            Details = null,
             Error = null,
         });
     }
