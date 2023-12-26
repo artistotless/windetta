@@ -51,5 +51,6 @@ public static class Errors
         public const string NotFound = "lspm_notfound";
         public const string Overload = "lspm_overload";
         public const string LaunchServerTimeout = "launch_server_timeout";
+        public const string GameServerNotFound = "gameserver_notfound";
     }
 }

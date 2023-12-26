@@ -26,7 +26,7 @@ public class UserWalletService : IUserWalletService
         var userWallet = new UserWallet()
         {
             UserId = userId,
-            Balances = initial?.ToList()
+            Balances = initial?.ToList() ?? new List<UserBalance>()
         };
 
         var foundWallet = await _uow.Wallets.GetAsync(userId);

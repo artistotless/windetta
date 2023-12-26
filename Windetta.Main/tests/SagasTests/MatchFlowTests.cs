@@ -46,7 +46,7 @@ public class MatchFlowTests : IUseHarness
         {
             services.AddSingleton(p => storageMock.Mock.Object);
             services.AddScoped(p => new LspmsMock().Mock.Object);
-            services.ConfigureMassTransit(Svc.Main, this);
+            services.ConfigureTestMassTransit(Svc.Main, this);
         });
     }
 
@@ -117,7 +117,7 @@ public class MatchFlowTests : IUseHarness
         {
             services.RegisterConsumer<AlwaysRespondsSuccessLspmConsumer>();
             services.AddScoped(p => new LspmsMock(new List<Lspm> { lspm }).Mock.Object);
-            services.ConfigureMassTransit(Svc.Main, this);
+            services.ConfigureTestMassTransit(Svc.Main, this);
         });
 
         var harness = await provider.StartTestHarness();
@@ -159,7 +159,7 @@ public class MatchFlowTests : IUseHarness
         {
             services.RegisterConsumer<AlwaysOverloadLspmConsumer>();
             services.AddScoped(p => new LspmsMock(new List<Lspm> { lspm }).Mock.Object);
-            services.ConfigureMassTransit(Svc.Main, this);
+            services.ConfigureTestMassTransit(Svc.Main, this);
         });
 
         var harness = await provider.StartTestHarness();

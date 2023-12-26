@@ -25,7 +25,7 @@ public class ConsumersTests : IUseHarness
 
         var services = new ServiceCollection()
             .AddSingleton(x => _walletSvcMock.Object)
-            .ConfigureMassTransit(Svc.Wallet, this)
+            .ConfigureTestMassTransit(Svc.Wallet, this)
             .BuildServiceProvider();
 
         _harness = services.GetRequiredService<ITestHarness>();

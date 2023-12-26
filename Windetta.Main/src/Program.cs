@@ -13,8 +13,8 @@ using Windetta.Main.Infrastructure.Sagas;
 using Windetta.Main.Infrastructure.Security;
 using Windetta.Main.Infrastructure.SignalR;
 
-var appBuilder = WebApplication.CreateBuilder(args);
-var services = appBuilder.Services;
+var webHost = WebApplication.CreateBuilder(args);
+var services = webHost.Services;
 var assembly = Assembly.GetExecutingAssembly();
 
 services.AddDefaultInstanceIdProvider();
@@ -45,13 +45,13 @@ services.AddSignalR(hubOptions =>
 
 services.AddSingleton<SignalRExceptionFilter>();
 
-appBuilder.Host.UseServiceProviderFactory(
+webHost.Host.UseServiceProviderFactory(
     new AutofacServiceProviderFactory(builder =>
     {
         builder.ResolveDependenciesFromAssembly();
     }));
 
-var app = appBuilder.Build();
+var app = webHost.Build();
 
 app.UseCors("allow_any_origins");
 app.UseAuthentication();

@@ -52,7 +52,7 @@ public class TonWithdrawFlowTests : IUseHarness
     {
         // arrange
         await using var provider = new ServiceCollection()
-            .ConfigureMassTransit(Svc.TonTxns, this)
+            .ConfigureTestMassTransit(Svc.TonTxns, this)
             .BuildServiceProvider(true);
 
         var harness = await provider.StartTestHarness();
@@ -86,7 +86,7 @@ public class TonWithdrawFlowTests : IUseHarness
     {
         // arrange
         await using var provider = new ServiceCollection()
-            .ConfigureMassTransit(Svc.TonTxns, this)
+            .ConfigureTestMassTransit(Svc.TonTxns, this)
             .BuildServiceProvider(true);
 
         var harness = await provider.StartTestHarness();
@@ -117,7 +117,7 @@ public class TonWithdrawFlowTests : IUseHarness
     {
         // arrange
         await using var provider = new ServiceCollection()
-            .ConfigureMassTransit(Svc.TonTxns, this)
+            .ConfigureTestMassTransit(Svc.TonTxns, this)
             .BuildServiceProvider(true);
 
         var harness = await provider.StartTestHarness();
@@ -145,7 +145,7 @@ public class TonWithdrawFlowTests : IUseHarness
     {
         // arrange
         await using var provider = new ServiceCollection()
-            .ConfigureMassTransit(Svc.TonTxns, this)
+            .ConfigureTestMassTransit(Svc.TonTxns, this)
             .BuildServiceProvider(true);
 
         var harness = await provider.StartTestHarness();
@@ -174,7 +174,7 @@ public class TonWithdrawFlowTests : IUseHarness
     {
         // arrange
         await using var provider = new ServiceCollection()
-            .ConfigureMassTransit(Svc.TonTxns, this)
+            .ConfigureTestMassTransit(Svc.TonTxns, this)
             .BuildServiceProvider(true);
 
         var harness = await provider.StartTestHarness();
@@ -205,7 +205,7 @@ public class TonWithdrawFlowTests : IUseHarness
     {
         // arrange
         await using var provider = new ServiceCollection()
-            .ConfigureMassTransit(Svc.TonTxns, this)
+            .ConfigureTestMassTransit(Svc.TonTxns, this)
             .BuildServiceProvider(true);
 
         var harness = await provider.StartTestHarness();
@@ -233,7 +233,7 @@ public class TonWithdrawFlowTests : IUseHarness
     {
         // arrange
         await using var provider = new ServiceCollection()
-            .ConfigureMassTransit(Svc.TonTxns, this)
+            .ConfigureTestMassTransit(Svc.TonTxns, this)
             .BuildServiceProvider(true);
 
         var harness = await provider.StartTestHarness();
@@ -258,7 +258,7 @@ public class TonWithdrawFlowTests : IUseHarness
     {
         // arrange
         await using var provider = new ServiceCollection()
-            .ConfigureMassTransit(Svc.TonTxns, this)
+            .ConfigureTestMassTransit(Svc.TonTxns, this)
             .BuildServiceProvider(true);
 
         var harness = await provider.StartTestHarness();
@@ -290,7 +290,7 @@ public class TonWithdrawFlowTests : IUseHarness
     {
         // arrange
         await using var provider = new ServiceCollection()
-            .ConfigureMassTransit(Svc.TonTxns, this)
+            .ConfigureTestMassTransit(Svc.TonTxns, this)
             .BuildServiceProvider(true);
 
         var harness = await provider.StartTestHarness();
