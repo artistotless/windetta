@@ -1,4 +1,5 @@
-﻿using MassTransit;
+﻿using LSPM.Models;
+using MassTransit;
 using Windetta.Common.Constants;
 using Windetta.Common.MassTransit;
 using Windetta.Contracts;
@@ -17,7 +18,8 @@ public class MatchFlow : SagaStateMachineInstance
     public Guid GameId { get; set; }
     public string Endpoint { get; set; }
     public DateTimeOffset Created { get; set; }
-    public Bet Bet { get; set; }
+    public int BetCurrencyId { get; set; }
+    public ulong BetAmount { get; set; }
     public int CurrentState { get; set; }
     public string? CanceledReason { get; set; }
 }
@@ -58,7 +60,7 @@ public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
             When(GameServerReservationFailed)
                 .NotifyMatchCanceled(x => "GameServers unavailable")
                 .Finalize(),
-            When(GameServerPrepared)
+            When(GameServerFound)
                 .NotifyMatchBegun()
                 .TransitionTo(Running),
             When(GameServerReservationPeriodExpired)
@@ -103,7 +105,7 @@ public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
     public Event<IBalancesHeld> BalancesHeld { get; }
     public Event<IWinningsProcessed> WinningsProcessed { get; }
     public Event<IGameServerReservationPeriodExpired> GameServerReservationPeriodExpired { get; }
-    public Event<IGameServerPrepared> GameServerPrepared { get; }
+    public Event<IGameServerFound> GameServerFound { get; }
     public Event<ICancellationMatchRequested> CancellationRequested { get; }
     public Event<IMatchCompleted> MatchCompleted { get; }
 
@@ -144,7 +146,8 @@ public static class MatchFlowStateMachineExtensions
             if (hub is null)
                 throw MatchHubException.NotFound;
 
-            ctx.Saga.Bet = hub.Bet;
+            ctx.Saga.BetCurrencyId = hub.Bet.CurrencyId;
+            ctx.Saga.BetAmount = hub.Bet.Amount;
             ctx.Saga.GameId = hub.GameId;
             ctx.Saga.Players = hub.Rooms.SelectMany(r => r.Members,
                 (r, m) => new Player(m.Id, "Nick", r.Index));
@@ -165,13 +168,13 @@ public static class MatchFlowStateMachineExtensions
         return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<IHoldBalances>(new
         {
             ctx.Message.CorrelationId,
-            Funds = new FundsInfo(ctx.Saga.Bet.CurrencyId, ctx.Saga.Bet.Amount),
+            Funds = new FundsInfo(ctx.Saga.BetCurrencyId, ctx.Saga.BetAmount),
             UsersIds = ctx.Saga.Players.Select(x => x.Id)
         }));
     }
 
-    public static EventActivityBinder<MatchFlow, IGameServerPrepared> NotifyMatchBegun(
-    this EventActivityBinder<MatchFlow, IGameServerPrepared> binder)
+    public static EventActivityBinder<MatchFlow, IGameServerFound> NotifyMatchBegun(
+    this EventActivityBinder<MatchFlow, IGameServerFound> binder)
     {
         return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<INotifyMatchBegun>(new
         {

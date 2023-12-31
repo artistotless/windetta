@@ -1,9 +1,8 @@
-﻿using MassTransit;
+﻿using LSPM.Models;
+using MassTransit;
 using Polly.Registry;
 using Windetta.Common.Helpers;
-using Windetta.Contracts;
 using Windetta.Contracts.Events;
-using Windetta.Contracts.Responses;
 using Windetta.Main.Core.Exceptions;
 using Windetta.Main.Core.Services.LSPM;
 
@@ -46,7 +45,7 @@ public class SearchingGameServerActivity : IStateMachineActivity<MatchFlow>
 
         if (result.Success)
         {
-            await context.Publish<IGameServerPrepared>(new
+            await context.Publish<IGameServerFound>(new
             {
                 context.Saga.CorrelationId,
                 result.Details!.Endpoint,

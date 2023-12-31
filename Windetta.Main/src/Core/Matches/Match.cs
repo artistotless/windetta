@@ -1,4 +1,4 @@
-﻿using Windetta.Contracts;
+﻿using LSPM.Models;
 using Windetta.Main.Core.MatchHubs;
 
 namespace Windetta.Main.Core.Matches;

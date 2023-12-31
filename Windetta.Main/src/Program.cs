@@ -1,4 +1,5 @@
 ﻿using Autofac.Extensions.DependencyInjection;
+using LSPM.Models;
 using MassTransit;
 using Microsoft.AspNetCore.SignalR;
 using System.Reflection;
@@ -59,5 +60,18 @@ app.UseAuthorization();
 
 app.MapGet("/", () => "Windetta");
 app.MapHub<MainHub>("/mainHub");
+app.MapGet("/e", async (IRequestClient<IGameServerRequested> client) =>
+{
+    var server = await client.GetResponse<RequestingGameServerResult>(new
+    {
+        CorrelationId = Guid.NewGuid(),
+        GameId = Guid.Parse("accea9d1-7f70-40e2-8a8d-a90d3a79842b"),
+        Players = new[] { new Player(Guid.NewGuid(), "Nick", 0), new Player(Guid.NewGuid(), "John", 1) },
+        Properties = new Dictionary<string, string>(),
+        LspmKey = string.Empty
+    });
+
+    return Results.Ok(server);
+});
 
 app.Run();

@@ -9,8 +9,13 @@ public class MatchesMap : SagaClassMap<MatchFlow>
 {
     protected override void Configure(EntityTypeBuilder<MatchFlow> entity, ModelBuilder model)
     {
-        entity.Property(x => x.CurrentState).HasMaxLength(64);
+        entity.Property(x => x.CurrentState)
+            .HasColumnType("TINYINT");
         entity.HasIndex(x => x.CorrelationId);
+        entity.Property(x => x.CanceledReason)
+            .HasColumnType("VARCHAR(32)");
+        entity.Property(x => x.Endpoint)
+            .HasColumnType("VARCHAR(42)");
     }
 }
 

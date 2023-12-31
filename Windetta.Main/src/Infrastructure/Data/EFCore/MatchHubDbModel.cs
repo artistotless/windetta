@@ -3,6 +3,7 @@ using Windetta.Main.Core.MatchHubs.Dtos;
 
 namespace Windetta.Main.Infrastructure.Data.EFCore;
 
+public record BetDbModel(int CurrencyId, ulong Amount);
 public class MatchHubDbModel
 {
     private string _instanceId;

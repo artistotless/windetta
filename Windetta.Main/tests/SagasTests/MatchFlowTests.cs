@@ -1,11 +1,11 @@
-﻿using MassTransit;
+﻿using LSPM.Models;
+using MassTransit;
 using MassTransit.Configuration;
 using MassTransit.Testing;
 using Microsoft.Extensions.DependencyInjection;
 using Windetta.Common.Constants;
 using Windetta.Common.MassTransit;
 using Windetta.Common.Testing;
-using Windetta.Contracts;
 using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
 using Windetta.Main.Core.Games;
@@ -56,7 +56,8 @@ public class MatchFlowTests : IUseHarness
         {
             CurrentState = (int)initialState,
             CorrelationId = correllationId,
-            Bet = new Bet(1, 1000),
+            BetAmount = 1000,
+            BetCurrencyId = 1,
             Created = DateTimeOffset.UtcNow,
             GameId = ExampleGuids.GameId,
             Players = new[] { new Player(Guid.NewGuid(), "Nick", 0) }
@@ -138,7 +139,7 @@ public class MatchFlowTests : IUseHarness
         // assert
         (await harness.Published.Any<IGameServerRequested>())
             .ShouldBeTrue();
-        (await sagaHarness.Consumed.Any<IGameServerPrepared>())
+        (await sagaHarness.Consumed.Any<IGameServerFound>())
             .ShouldBeTrue();
         await harness.OutputTimeline(_output, x => x.Now());
     }
@@ -201,13 +202,13 @@ public class MatchFlowTests : IUseHarness
             <MatchFlowStateMachine, MatchFlow>();
 
         // act
-        await harness.Bus.Publish<IGameServerPrepared>(new
+        await harness.Bus.Publish<IGameServerFound>(new
         {
             CorrelationId = correllationId,
             Endpoint = "gameserver-1",
             Tickets = new Dictionary<Guid, string>() { { Guid.Empty, "ticket1" } }.AsReadOnly()
         });
-        await sagaHarness.Consumed.Any<IGameServerPrepared>();
+        await sagaHarness.Consumed.Any<IGameServerFound>();
 
         // assert
         (await harness.Sent.Any<INotifyMatchBegun>())

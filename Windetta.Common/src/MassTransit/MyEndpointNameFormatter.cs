@@ -43,7 +43,7 @@ public class MyEndpointNameFormatter : DefaultEndpointNameFormatter
         {
             consumerName = $"command.consumer";
         }
-        else if (genericArgumentType.IsAssignableTo(typeof(ICommand)))
+        else if (genericArgumentType.IsAssignableTo(typeof(IEvent)))
         {
             consumerName = $"event.consumer.{typeof(T).Name.Replace("Consumer", string.Empty)}";
         }

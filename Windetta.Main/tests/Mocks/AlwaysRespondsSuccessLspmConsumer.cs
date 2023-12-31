@@ -1,7 +1,6 @@
-﻿using MassTransit;
-using Windetta.Contracts;
+﻿using LSPM.Models;
+using MassTransit;
 using Windetta.Contracts.Events;
-using Windetta.Contracts.Responses;
 
 namespace Windetta.MainTests.Mocks;
 
