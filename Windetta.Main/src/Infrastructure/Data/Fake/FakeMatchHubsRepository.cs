@@ -19,7 +19,7 @@ public class FakeMatchHubsRepository : IMatchHubs
     public Task<IEnumerable<MatchHubDto>> GetAllAsync()
     {
         return Task.FromResult(_hubs
-            .Select(h => h is TournamentMatchHub ? new TournamentMatchHubDto(h) : new MatchHubDto(h))
+            .Select(h => new MatchHubDto(h))
             .AsEnumerable());
     }
 

@@ -23,7 +23,7 @@ public class ProxyMatchHub : IMatchHub
     public string? AutoReadyStrategy => _original.AutoReadyStrategy;
     public string? AutoDisposeStrategy => _original.AutoDisposeStrategy;
     public IEnumerable<Room> Rooms => _original.Rooms;
-    public MatchHubState State { get { return _original.State; } set { _original.State = value; } }
+    public MatchHubState State { get { return _original.State; }  set { _original.State = value; } }
     public bool IsDisposed { get { return _original.IsDisposed; } private set { } }
 
     //Events

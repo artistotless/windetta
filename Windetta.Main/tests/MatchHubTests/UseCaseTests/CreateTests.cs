@@ -71,35 +71,6 @@ public class CreateTests
     }
 
     [Fact]
-    public void Should_CreateTournamentHub_IfPassCorrespondingOptions()
-    {
-        // arrange
-        var walletService = new WalletServiceMock() { ReturnIsEqualOrGreater = true };
-        var provider = SharedServiceProvider.GetInstance((s) =>
-        {
-            s.AddScoped(p => walletService.Mock.Object);
-        });
-
-        var options = new TournamentMatchHubOptions()
-        {
-            Bet = new Bet(currencyId: 1, bet: 100_0),
-            GameId = ExampleGuids.GameId,
-            InitiatorId = ExampleGuids.UserId,
-            GameConfiguration = new() { MaxPlayers = 2 },
-        };
-
-        var useCase = provider
-            .GetRequiredService<IMatchHubUseCasesFactory>()
-            .Get<ICreateMatchHubUseCase>();
-
-        // act
-        var hub = Should.NotThrow(() => useCase.ExecuteAsync(options));
-
-        // assert
-        hub.ShouldBeOfType<TournamentMatchHub>();
-    }
-
-    [Fact]
     public void Should_UseDefaultStrategiesIfNotProvided()
     {
         // arrange

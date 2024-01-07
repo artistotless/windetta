@@ -5,7 +5,7 @@ using Windetta.Main.Core.Rooms;
 
 namespace Windetta.Main.Core.MatchHubs;
 
-public class MatchHub : IMatchHub
+public sealed class MatchHub : IMatchHub
 {
     public Guid Id { get; init; }
     public Guid GameId { get; init; }

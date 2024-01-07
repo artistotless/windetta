@@ -46,21 +46,15 @@ public class MatchHubsInteractor : IScopedService
 
     public async Task<IMatchHub> CreateAsync(CreateMatchHubRequest request)
     {
-        var isTournament = request is CreateTournamentMatchHubRequest;
-
-        if (!isTournament)
-        {
-            if (_matchHubsUsersSets.GetHubId(request.InitiatorId).HasValue)
-                throw MatchHubException.AlreadyMemberOfHub;
-        }
+        if (_matchHubsUsersSets.GetHubId(request.InitiatorId).HasValue)
+            throw MatchHubException.AlreadyMemberOfHub;
 
         var options = await BuildMatchHubOptions(request);
 
         var hub = await _useCasesFactory.Get<ICreateMatchHubUseCase>()
              .ExecuteAsync(options);
 
-        if (!isTournament)
-            _matchHubsUsersSets.Set(hub.Id, request.InitiatorId);
+        _matchHubsUsersSets.Set(hub.Id, request.InitiatorId);
 
         return hub;
     }
@@ -90,62 +84,28 @@ public class MatchHubsInteractor : IScopedService
 
         ValidateBet(configurations.sc, request.Bet);
 
-        MatchHubOptions options;
-
-        if (request is CreateTournamentMatchHubRequest r)
+        var options = new MatchHubOptions()
         {
-            options = new TournamentMatchHubOptions()
-            {
-                InitiatorId = request.InitiatorId,
-                GameId = request.GameId,
-                Bet = request.Bet,
-                GameConfiguration = configurations.cfg,
-                Private = request.Private,
+            Private = request.Private,
+            GameId = request.GameId,
+            GameConfiguration = configurations.cfg,
+            Bet = request.Bet,
+            InitiatorId = request.InitiatorId,
 
-                AutoDisposeStrategy = request.AutoDisposeStrategy is null ? null :
-                _pluginsFactory.Get<IAutoDisposeStrategy>(
-                    request.AutoDisposeStrategy.Name,
-                    request.AutoDisposeStrategy.RequirementsValues),
+            AutoDisposeStrategy = request.AutoDisposeStrategy is null ? null :
+            _pluginsFactory.Get<IAutoDisposeStrategy>(
+                request.AutoDisposeStrategy.Name,
+                request.AutoDisposeStrategy.RequirementsValues),
 
-                AutoReadyStrategy = request.AutoReadyStrategy is null ? null :
-                _pluginsFactory.Get<IAutoReadyStrategy>(
-                    request.AutoReadyStrategy.Name,
-                    request.AutoReadyStrategy.RequirementsValues),
+            AutoReadyStrategy = request.AutoReadyStrategy is null ? null :
+            _pluginsFactory.Get<IAutoReadyStrategy>(
+                request.AutoReadyStrategy.Name,
+                request.AutoReadyStrategy.RequirementsValues),
 
-                JoinFilters = request.JoinFilters is null ? null :
-                request.JoinFilters.Select(f =>
-                _pluginsFactory.Get<IJoinFilter>(f.Name, f.RequirementsValues)!),
-
-                Site = r.Site,
-                Description = r.Description,
-                OrganizerId = r.InitiatorId
-            };
-        }
-        else
-        {
-            options = new MatchHubOptions()
-            {
-                Private = request.Private,
-                GameId = request.GameId,
-                GameConfiguration = configurations.cfg,
-                Bet = request.Bet,
-                InitiatorId = request.InitiatorId,
-
-                AutoDisposeStrategy = request.AutoDisposeStrategy is null ? null :
-                _pluginsFactory.Get<IAutoDisposeStrategy>(
-                    request.AutoDisposeStrategy.Name,
-                    request.AutoDisposeStrategy.RequirementsValues),
-
-                AutoReadyStrategy = request.AutoReadyStrategy is null ? null :
-                _pluginsFactory.Get<IAutoReadyStrategy>(
-                    request.AutoReadyStrategy.Name,
-                    request.AutoReadyStrategy.RequirementsValues),
-
-                JoinFilters = request.JoinFilters is null ? null :
-                request.JoinFilters.Select(f => _pluginsFactory
-                .Get<IJoinFilter>(f.Name, f.RequirementsValues)),
-            };
-        }
+            JoinFilters = request.JoinFilters is null ? null :
+            request.JoinFilters.Select(f => _pluginsFactory
+            .Get<IJoinFilter>(f.Name, f.RequirementsValues)),
+        };
 
         return options;
     }

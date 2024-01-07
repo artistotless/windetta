@@ -34,9 +34,7 @@ internal class SignalROutput : IMatchHubObserverOutput
     {
         _logger.LogDebug($"Hub updated: {hub.Id}");
 
-        var dto = hub is TournamentMatchHub ?
-            new TournamentMatchHubDto(hub) :
-            new MatchHubDto(hub);
+        var dto = new MatchHubDto(hub);
 
         await _context.Clients.All.SendAsync("onUpdateddMatchHub", dto);
     }

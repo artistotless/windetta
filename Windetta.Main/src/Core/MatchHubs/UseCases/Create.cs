@@ -27,18 +27,11 @@ public class Create : ICreateMatchHubUseCase
 
         IMatchHub hub;
 
-        if (options is TournamentMatchHubOptions o)
-        {
-            hub = new TournamentMatchHub(o);
-        }
-        else
-        {
-            hub = new MatchHub(options);
+        hub = new MatchHub(options);
 
-            var initiator = new RoomMember(options.InitiatorId);
+        var initiator = new RoomMember(options.InitiatorId);
 
-            hub.Add(initiator, hub.Rooms.First().Id);
-        }
+        hub.Add(initiator, hub.Rooms.First().Id);
 
         hub.SetAutoReadyStrategy(options.AutoReadyStrategy ??
             new DefaultReadyStrategy());

@@ -38,7 +38,7 @@ public class MatchFlowTests : IUseHarness
             ReturnThisHub = new ProxyMatchHub(new MatchHubOptions()
             {
                 InitiatorId = ExampleGuids.UserId,
-                GameConfiguration = new GameConfiguration() { MaxPlayers = 2 },
+                GameConfiguration = new GameConfiguration(2,2),
             })
         };
 

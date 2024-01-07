@@ -62,9 +62,10 @@ app.MapGet("/", () => "Windetta");
 app.MapHub<MainHub>("/mainHub");
 app.MapGet("/e", async (IRequestClient<IGameServerRequested> client) =>
 {
+    var matchId = Guid.Parse("195da05a-d3ee-4d8b-917c-a77cf7afa906");
     var server = await client.GetResponse<RequestingGameServerResult>(new
     {
-        CorrelationId = Guid.NewGuid(),
+        CorrelationId = matchId,
         GameId = Guid.Parse("accea9d1-7f70-40e2-8a8d-a90d3a79842b"),
         Players = new[] { new Player(Guid.NewGuid(), "Nick", 0), new Player(Guid.NewGuid(), "John", 1) },
         Properties = new Dictionary<string, string>(),

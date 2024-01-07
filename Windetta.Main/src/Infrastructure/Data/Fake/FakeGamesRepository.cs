@@ -18,9 +18,12 @@ public class FakeGamesRepository : IGames
                 Id = ExampleId,
                 Description = "Sea battle",
                 IconPath = "/seabattle.png",
-                Configuration = new GameConfiguration() { MaxPlayers = 2, MinPlayers = 1 },
+                Configuration = new GameConfiguration(2,1),
                 Title = "Sea battle",
-                SupportedCurrencies = new[] { new SupportedCurrency() { CurrencyId = 1, MaxBet = 1000, MinBet = 100 } }
+                SupportedCurrencies = new[] {
+                    new SupportedCurrency() {
+                        CurrencyId = 1, MaxBet = 1000, MinBet = 100
+                    }}
             }
         };
     }
