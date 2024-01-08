@@ -34,7 +34,7 @@ public sealed class MatchHub : IMatchHub
     private IAutoDisposeStrategy? _disposeStrategy;
     private IEnumerable<IJoinFilter>? _joinFilters;
 
-    private IReadOnlyDictionary<Guid, Room> _rooms;
+    private IReadOnlyDictionary<ushort, Room> _rooms;
 
 
     public MatchHub(MatchHubOptions options, Guid? id = null)
@@ -74,9 +74,9 @@ public sealed class MatchHub : IMatchHub
         OnUpdated();
     }
 
-    public void Add(RoomMember member, Guid roomId)
+    public void Add(RoomMember member, ushort roomIndex)
     {
-        if (!_rooms.TryGetValue(roomId, out var room))
+        if (!_rooms.TryGetValue(roomIndex, out var room))
             return;
 
         member.Join(room);
@@ -148,22 +148,21 @@ public sealed class MatchHub : IMatchHub
         Updated?.Invoke(this, null);
     }
 
-    private IReadOnlyDictionary<Guid, Room> CreateRooms()
+    private IReadOnlyDictionary<ushort, Room> CreateRooms()
     {
         var maxTeams = Math.Max(1, Configuration.MaxTeams);
 
-        IEnumerable<KeyValuePair<Guid, Room>> BuildKeyValuePairs()
+        IEnumerable<KeyValuePair<ushort, Room>> BuildKeyValuePairs()
         {
-            for (uint i = 0; i < maxTeams; i++)
+            for (ushort i = 0; i < maxTeams; i++)
             {
-                var roomId = Guid.NewGuid();
-                var room = new Room(roomId, Configuration.MaxPlayers);
+                var room = new Room(i, Configuration.MaxPlayers);
 
-                yield return new KeyValuePair<Guid, Room>(roomId, room);
+                yield return new KeyValuePair<ushort, Room>(i, room);
             }
         }
 
-        return new ReadOnlyDictionary<Guid, Room>(
-            new Dictionary<Guid, Room>(BuildKeyValuePairs()));
+        return new ReadOnlyDictionary<ushort, Room>(
+            new Dictionary<ushort, Room>(BuildKeyValuePairs()));
     }
 }

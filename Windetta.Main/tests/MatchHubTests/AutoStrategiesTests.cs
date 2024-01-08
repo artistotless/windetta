@@ -27,7 +27,6 @@ public class AutoStrategiesTests
         IMatchHub hub = await interactor.CreateAsync(request);
 
         var member2Id = Guid.NewGuid();
-        var roomId = hub.Rooms.First().Id;
 
         bool autoStrategyWorkedOut = false;
         var tcs = new TaskCompletionSource<bool>();
@@ -41,7 +40,7 @@ public class AutoStrategiesTests
         hub.Ready += callback;
 
         // act
-        await interactor.JoinMember(member2Id, hub.Id, roomId);
+        await interactor.JoinMemberAsync(member2Id, hub.Id, roomIndex: 0);
 
         await tcs.Task;
 
@@ -76,7 +75,7 @@ public class AutoStrategiesTests
 
 
         hub.Disposed += callback;
-        await interactor.LeaveMember(request.InitiatorId, hub.Id);
+        await interactor.LeaveMemberAsync(request.InitiatorId, hub.Id);
 
         // act
         await tcs.Task;

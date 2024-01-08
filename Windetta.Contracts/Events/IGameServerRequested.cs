@@ -10,5 +10,5 @@ public interface IGameServerRequested : CorrelatedBy<Guid>, IEvent
     public Guid GameId { get; set; }
     public IEnumerable<Player> Players { get; set; }
     public Dictionary<string, string> Properties { get; set; }
-    public string LspmKey { get; set; }
+    public string LspmIp { get; set; }
 }

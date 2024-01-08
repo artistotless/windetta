@@ -1,4 +1,5 @@
 ﻿using Windetta.Common.Constants;
+using Windetta.Common.Helpers;
 using Windetta.Common.Types;
 
 namespace Windetta.Main.Core.Rooms;
@@ -6,12 +7,14 @@ namespace Windetta.Main.Core.Rooms;
 public sealed class RoomMember
 {
     public Guid Id { get; init; }
+    public string? Name { get; init; }
 
     private Room? _room;
 
-    public RoomMember(Guid id)
+    public RoomMember(Guid id, string? name = null)
     {
         Id = id;
+        Name = name ?? $"Player#{id.Cut(6)}";
     }
 
     public void Join(Room room)

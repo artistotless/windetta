@@ -33,12 +33,11 @@ public class MatchHubDispatcherTests
         var outputChannel = new MatchHubDebugOutput(_output, ref buffer);
         var dispatcher = new MatchHubObserver(outputChannel, new Mock<IMatchHubs>().Object);
         var hub = await interactor.CreateAsync(request);
-        var roomId = hub.Rooms.First().Id;
 
         // act
         dispatcher.AddToTracking(hub);
-        await interactor.LeaveMember(request.InitiatorId, hub.Id);
-        await interactor.JoinMember(request.InitiatorId, hub.Id, roomId);
+        await interactor.LeaveMemberAsync(request.InitiatorId, hub.Id);
+        await interactor.JoinMemberAsync(request.InitiatorId, hub.Id, roomIndex: 0);
 
         // assert
         var text = $"Hub updated: {hub.Id}";
@@ -104,12 +103,11 @@ public class MatchHubDispatcherTests
         var outputChannel = new MatchHubDebugOutput(_output, ref buffer);
         var dispatcher = new MatchHubObserver(outputChannel, storage);
         var hub = await interactor.CreateAsync(request);
-        var roomId = hub.Rooms.First().Id;
 
         // act
         dispatcher.AddToTracking(hub);
-        await interactor.JoinMember(Guid.NewGuid(), hub.Id, roomId);
-        await interactor.JoinMember(Guid.NewGuid(), hub.Id, roomId);
+        await interactor.JoinMemberAsync(Guid.NewGuid(), hub.Id, roomIndex:0);
+        await interactor.JoinMemberAsync(Guid.NewGuid(), hub.Id, roomIndex: 0);
 
         while (buffer.Count < 3 && new CancellationTokenSource
             (TimeSpan.FromSeconds(6)).IsCancellationRequested == false)

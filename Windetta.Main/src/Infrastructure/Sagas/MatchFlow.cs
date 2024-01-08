@@ -15,9 +15,9 @@ public class MatchFlow : SagaStateMachineInstance
 {
     public Guid CorrelationId { get; set; }
     public IEnumerable<Player> Players { get; set; }
-    public IEnumerable<Ticket> Tickets { get; set; }
+    public IReadOnlyDictionary<Guid, string>? Tickets { get; set; }
     public Guid GameId { get; set; }
-    public string Endpoint { get; set; }
+    public string? Endpoint { get; set; }
     public DateTimeOffset Created { get; set; }
     public int BetCurrencyId { get; set; }
     public ulong BetAmount { get; set; }
@@ -64,13 +64,14 @@ public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
                 .Finalize(),
             When(GameServerFound)
                 .NotifyServerFound()
+                .SaveGameServerInfo()
                 .TransitionTo(ServerFound),
             When(GameServerReservationPeriodExpired)
                 .TransitionTo(GameServerSearchExpired)
                 .NotifyMatchAwaitingExpired(),
             When(CancellationRequested)
                 .SetCanceledReason(x => x.Reason)
-                .TransitionTo(Canceled));
+                .TransitionTo(Canceled)); ;
 
         During(ServerFound,
             When(ReadyAcceptConnections)
@@ -122,7 +123,6 @@ public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
     public Event<Fault<IHoldBalances>> HoldBalancesFailed { get; }
     public Event<Fault<IBalancesHeld>> GameServerReservationFailed { get; }
     public Event<Fault<IMatchCompleted>> ProcessingWinningsFailed { get; }
-
 }
 
 public class MatchFlowDefinition : SagaDefinition<MatchFlow>
@@ -147,7 +147,6 @@ public static class MatchFlowStateMachineExtensions
     public static EventActivityBinder<MatchFlow, IMatchHubReady> CopyDataToInstance(
         this EventActivityBinder<MatchFlow, IMatchHubReady> binder, IMatchHubs hubs)
     {
-
         return binder.Then(async ctx =>
         {
             var hub = await hubs.GetAsync(ctx.Message.CorrelationId);
@@ -159,7 +158,7 @@ public static class MatchFlowStateMachineExtensions
             ctx.Saga.BetAmount = hub.Bet.Amount;
             ctx.Saga.GameId = hub.GameId;
             ctx.Saga.Players = hub.Rooms.SelectMany(r => r.Members,
-                (r, m) => new Player(m.Id, "Nick", r.Index));
+                (r, m) => new Player(m.Id, m.Name, r.Index));
             ctx.Saga.CorrelationId = ctx.Message.CorrelationId;
             ctx.Saga.Created = ctx.Message.TimeStamp;
         });
@@ -174,7 +173,7 @@ public static class MatchFlowStateMachineExtensions
     public static EventActivityBinder<MatchFlow, IMatchHubReady> HoldBalances(
     this EventActivityBinder<MatchFlow, IMatchHubReady> binder)
     {
-        return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<IHoldBalances>(new
+        return binder.SendCommandAsync(Svc.Wallet, ctx => ctx.Init<IHoldBalances>(new
         {
             ctx.Message.CorrelationId,
             Funds = new FundsInfo(ctx.Saga.BetCurrencyId, ctx.Saga.BetAmount),
@@ -200,6 +199,16 @@ public static class MatchFlowStateMachineExtensions
         {
             ctx.Message.CorrelationId,
         }));
+    }
+
+    public static EventActivityBinder<MatchFlow, IGameServerFound> SaveGameServerInfo(
+    this EventActivityBinder<MatchFlow, IGameServerFound> binder)
+    {
+        return binder.Then(x =>
+        {
+            x.Saga.Endpoint = x.Message.Endpoint.ToString();
+            x.Saga.Tickets = x.Message.Tickets.ToDictionary(x => x.PlayerId, x => x.Value);
+        });
     }
 
     public static EventActivityBinder<MatchFlow, TData> NotifyMatchCanceled<TData>(

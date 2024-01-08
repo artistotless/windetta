@@ -9,8 +9,8 @@ public class Room : IDisposable
     public event EventHandler<RoomEventArg> MemberLeft;
 
     // Public fields
-    public Guid Id { get; private set; }
-    public int Index { get; init; }
+    //public Guid Id { get; private set; }
+    public ushort Index { get; init; }
     public IReadOnlyCollection<RoomMember> Members => _members;
     public uint MaxMembers { get; init; }
     public int MembersCount => Members.Count;
@@ -23,11 +23,10 @@ public class Room : IDisposable
     /// Room constructor
     /// </summary>
     /// <param name="maxMembers">0 - unlimit</param>
-    public Room(uint maxMembers = 0) : this(Guid.NewGuid(), maxMembers) { }
 
-    public Room(Guid id, uint maxMembers = 0, IEnumerable<RoomMember>? members = null)
+    public Room(ushort index = 0, uint maxMembers = 0, IEnumerable<RoomMember>? members = null)
     {
-        Id = id;
+        Index = index;
 
         if (members is not null)
             _members = members.ToList();

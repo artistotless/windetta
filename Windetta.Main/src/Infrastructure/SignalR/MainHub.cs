@@ -39,16 +39,16 @@ public class MainHub : Hub
         await Clients.All.SendAsync("onAddedMatchHub", new MatchHubDto(hub));
     }
 
-    public async Task JoinHub(Guid hubId, Guid roomId)
+    public async Task JoinHub(Guid hubId, ushort roomIndex)
     {
-        await _interactor.JoinMember(GetUserId(), hubId, roomId);
+        await _interactor.JoinMemberAsync(GetUserId(), hubId, roomIndex);
 
         await Groups.AddToGroupAsync(Context.ConnectionId, hubId.ToString());
     }
 
     public async Task LeaveHub(Guid hubId)
     {
-        await _interactor.LeaveMember(GetUserId(), hubId);
+        await _interactor.LeaveMemberAsync(GetUserId(), hubId);
 
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, hubId.ToString());
     }
@@ -62,7 +62,7 @@ public class MainHub : Hub
 
     public override async Task OnConnectedAsync()
     {
-        var hubId = await _interactor.GetHubIdByUserId(GetUserId());
+        var hubId = await _interactor.GetHubIdByUserIdAsync(GetUserId());
 
         if (hubId.HasValue == true)
             await Groups.AddToGroupAsync(Context.ConnectionId, hubId.Value.ToString());
@@ -82,9 +82,9 @@ public class MainHub : Hub
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
         var userId = GetUserId();
-        var hubId = await _interactor.GetHubIdByUserId(userId);
+        var hubId = await _interactor.GetHubIdByUserIdAsync(userId);
 
         if (hubId.HasValue == true)
-            await _interactor.LeaveMember(userId, hubId.Value);
+            await _interactor.LeaveMemberAsync(userId, hubId.Value);
     }
 }

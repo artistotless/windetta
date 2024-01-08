@@ -2,5 +2,5 @@
 
 public interface IJoinMemberMatchHubUseCase : IMatchHubUseCase
 {
-    Task ExecuteAsync(Guid userId, Guid hubId, Guid roomId);
+    Task ExecuteAsync(Guid userId, Guid hubId, ushort roomIndex);
 }

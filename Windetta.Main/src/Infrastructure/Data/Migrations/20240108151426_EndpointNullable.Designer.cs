@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Windetta.Main.Infrastructure.Sagas;
 
@@ -10,14 +11,39 @@ using Windetta.Main.Infrastructure.Sagas;
 namespace Windetta.Main.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(SagasDbContext))]
-    partial class SagasDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240108151426_EndpointNullable")]
+    partial class EndpointNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "7.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
+
+            modelBuilder.Entity("LSPM.Models.Player", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid?>("MatchFlowCorrelationId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<int>("TeamIndex")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MatchFlowCorrelationId");
+
+                    b.ToTable("Player");
+                });
 
             modelBuilder.Entity("Windetta.Main.Infrastructure.Sagas.MatchFlow", b =>
                 {
@@ -46,11 +72,8 @@ namespace Windetta.Main.Infrastructure.Data.Migrations
                     b.Property<Guid>("GameId")
                         .HasColumnType("char(36)");
 
-                    b.Property<string>("Players")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<string>("Tickets")
+                        .IsRequired()
                         .HasColumnType("longtext")
                         .UseCollation("latin1_general_ci");
 
@@ -59,6 +82,18 @@ namespace Windetta.Main.Infrastructure.Data.Migrations
                     b.HasIndex("CorrelationId");
 
                     b.ToTable("MatchFlow");
+                });
+
+            modelBuilder.Entity("LSPM.Models.Player", b =>
+                {
+                    b.HasOne("Windetta.Main.Infrastructure.Sagas.MatchFlow", null)
+                        .WithMany("Players")
+                        .HasForeignKey("MatchFlowCorrelationId");
+                });
+
+            modelBuilder.Entity("Windetta.Main.Infrastructure.Sagas.MatchFlow", b =>
+                {
+                    b.Navigation("Players");
                 });
 #pragma warning restore 612, 618
         }

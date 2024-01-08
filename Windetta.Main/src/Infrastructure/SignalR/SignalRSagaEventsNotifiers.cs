@@ -5,13 +5,15 @@ using Windetta.Main.Infrastructure.SignalR;
 
 namespace Windetta.Main.Infrastructure.MatchHub;
 
+public class SignalRSagaEventsNotifiers { }
+
 public class MatchBegunNotifier : IConsumer<INotifyMatchBegun>
 {
-    private readonly ILogger<MatchBegunNotifier> _logger;
+    private readonly ILogger<SignalRSagaEventsNotifiers> _logger;
     private readonly IHubContext<MainHub> _context;
 
     public MatchBegunNotifier(
-    ILogger<MatchBegunNotifier> logger,
+    ILogger<SignalRSagaEventsNotifiers> logger,
     IHubContext<MainHub> context)
     {
         _logger = logger;
@@ -30,11 +32,11 @@ public class MatchBegunNotifier : IConsumer<INotifyMatchBegun>
 
 public class ServerFoundNotifier : IConsumer<INotifyServerFound>
 {
-    private readonly ILogger<ServerFoundNotifier> _logger;
+    private readonly ILogger<SignalRSagaEventsNotifiers> _logger;
     private readonly IHubContext<MainHub> _context;
 
     public ServerFoundNotifier(
-    ILogger<ServerFoundNotifier> logger,
+    ILogger<SignalRSagaEventsNotifiers> logger,
     IHubContext<MainHub> context)
     {
         _logger = logger;
@@ -53,11 +55,11 @@ public class ServerFoundNotifier : IConsumer<INotifyServerFound>
 
 public class MatchCanceledNotifier : IConsumer<INotifyMatchCanceled>
 {
-    private readonly ILogger<MatchCanceledNotifier> _logger;
+    private readonly ILogger<SignalRSagaEventsNotifiers> _logger;
     private readonly IHubContext<MainHub> _context;
 
     public MatchCanceledNotifier(
-    ILogger<MatchCanceledNotifier> logger,
+    ILogger<SignalRSagaEventsNotifiers> logger,
     IHubContext<MainHub> context)
     {
         _logger = logger;
@@ -76,11 +78,11 @@ public class MatchCanceledNotifier : IConsumer<INotifyMatchCanceled>
 
 public class MatchAwaitingExpiredNotifier : IConsumer<INotifyMatchAwaitingExpired>
 {
-    private readonly ILogger<MatchAwaitingExpiredNotifier> _logger;
+    private readonly ILogger<SignalRSagaEventsNotifiers> _logger;
     private readonly IHubContext<MainHub> _context;
 
     public MatchAwaitingExpiredNotifier(
-        ILogger<MatchAwaitingExpiredNotifier> logger,
+        ILogger<SignalRSagaEventsNotifiers> logger,
         IHubContext<MainHub> context)
     {
         _logger = logger;

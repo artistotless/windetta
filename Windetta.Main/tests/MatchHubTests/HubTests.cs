@@ -62,7 +62,7 @@ public class HubTests
         // act
         IMatchHub hub = await interactor.CreateAsync(request);
         var room = hub.Rooms.First();
-        await interactor.JoinMember(memberId, hub.Id, room.Id);
+        await interactor.JoinMemberAsync(memberId, hub.Id, room.Index);
 
         // assert
         room.Members.ShouldContain(x => x.Id == memberId);
@@ -84,7 +84,6 @@ public class HubTests
 
         IMatchHub hub = await interactor.CreateAsync(request);
         var memberId = Guid.NewGuid();
-        var roomId = hub.Rooms.First().Id;
         bool updateEventRaised = false;
         var tcs = new TaskCompletionSource<bool>();
 
@@ -97,7 +96,7 @@ public class HubTests
         hub.Updated += callback;
 
         // act
-        await interactor.JoinMember(memberId, hub.Id, roomId);
+        await interactor.JoinMemberAsync(memberId, hub.Id, roomIndex: 0);
 
         // assert
         updateEventRaised.ShouldBeTrue();
@@ -119,7 +118,6 @@ public class HubTests
 
         IMatchHub hub = await interactor.CreateAsync(request);
         var memberId = Guid.NewGuid();
-        var roomId = hub.Rooms.First().Id;
         bool updateEventRaised = false;
         var tcs = new TaskCompletionSource<bool>();
 
@@ -130,9 +128,9 @@ public class HubTests
         };
 
         // act
-        await interactor.JoinMember(memberId, hub.Id, roomId);
+        await interactor.JoinMemberAsync(memberId, hub.Id, roomIndex: 0);
         hub.Updated += callback;
-        await interactor.LeaveMember(memberId, hub.Id);
+        await interactor.LeaveMemberAsync(memberId, hub.Id);
 
         // assert
         updateEventRaised.ShouldBeTrue();

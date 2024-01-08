@@ -1,10 +1,12 @@
 ﻿using MongoDB.Driver;
+using Windetta.Common.Types;
 using Windetta.Main.Core.MatchHubs;
 using Windetta.Main.Core.MatchHubs.Dtos;
 using Windetta.Main.Infrastructure.Services;
 
 namespace Windetta.Main.Infrastructure.Data.Mongo;
 
+[AutoInjectExclude]
 public class MongoMatchHubsRepository : IMatchHubs
 {
     private readonly MongoDbContext _context;

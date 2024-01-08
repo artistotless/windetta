@@ -28,7 +28,7 @@ public sealed class MatchHubsInteractor : IScopedService
         _gamesRepository = gamesRepository;
     }
 
-    public Task<Guid?> GetHubIdByUserId(Guid userId)
+    public Task<Guid?> GetHubIdByUserIdAsync(Guid userId)
         => _useCasesFactory.Get<IGetMatchHubIdByUserIdUseCase>().ExecuteAsync(userId);
 
     public Task<IEnumerable<MatchHubDto>> GetAllAsync()
@@ -59,15 +59,15 @@ public sealed class MatchHubsInteractor : IScopedService
         return hub;
     }
 
-    public async Task JoinMember(Guid userId, Guid hubId, Guid roomId)
+    public async Task JoinMemberAsync(Guid userId, Guid hubId, ushort roomIndex)
     {
         await _useCasesFactory.Get<IJoinMemberMatchHubUseCase>()
-            .ExecuteAsync(userId, hubId, roomId);
+            .ExecuteAsync(userId, hubId, roomIndex);
 
         _matchHubsUsersSets.Set(hubId, userId);
     }
 
-    public async Task LeaveMember(Guid userId, Guid hubId)
+    public async Task LeaveMemberAsync(Guid userId, Guid hubId)
     {
         await _useCasesFactory.Get<ILeaveMemberMatchHubUseCase>()
              .ExecuteAsync(userId, hubId);

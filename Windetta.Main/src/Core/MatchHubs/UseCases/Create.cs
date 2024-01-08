@@ -31,7 +31,7 @@ public class Create : ICreateMatchHubUseCase
 
         var initiator = new RoomMember(options.InitiatorId);
 
-        hub.Add(initiator, hub.Rooms.First().Id);
+        hub.Add(initiator, hub.Rooms.First().Index);
 
         hub.SetAutoReadyStrategy(options.AutoReadyStrategy ??
             new DefaultReadyStrategy());

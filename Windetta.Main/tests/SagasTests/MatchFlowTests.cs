@@ -38,7 +38,7 @@ public class MatchFlowTests : IUseHarness
             ReturnThisHub = new ProxyMatchHub(new MatchHubOptions()
             {
                 InitiatorId = ExampleGuids.UserId,
-                GameConfiguration = new GameConfiguration(2,2),
+                GameConfiguration = new GameConfiguration(2, 2),
             })
         };
 
@@ -205,8 +205,11 @@ public class MatchFlowTests : IUseHarness
         await harness.Bus.Publish<IGameServerFound>(new
         {
             CorrelationId = correllationId,
-            Endpoint = "gameserver-1",
-            Tickets = new Dictionary<Guid, string>() { { Guid.Empty, "ticket1" } }.AsReadOnly()
+            Endpoint = new Uri("https://127.0.0.0:9090"),
+            Tickets = new[] {
+                new Ticket(){PlayerId = Guid.NewGuid(), Value="ffff" },
+                new Ticket(){PlayerId = Guid.NewGuid(), Value="ffff" },
+            }
         });
         await sagaHarness.Consumed.Any<IGameServerFound>();
 

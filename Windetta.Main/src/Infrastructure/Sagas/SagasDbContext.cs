@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Windetta.Main.Infrastructure.Sagas;
-
 public class MatchesMap : SagaClassMap<MatchFlow>
 {
     protected override void Configure(EntityTypeBuilder<MatchFlow> entity, ModelBuilder model)
@@ -15,7 +14,13 @@ public class MatchesMap : SagaClassMap<MatchFlow>
         entity.Property(x => x.CanceledReason)
             .HasColumnType("VARCHAR(32)");
         entity.Property(x => x.Endpoint)
+            .UseCollation("latin1_general_ci")
             .HasColumnType("VARCHAR(42)");
+        entity.Property(x => x.Players)
+            .HasConversion<PlayersDbModelConverter>();
+        entity.Property(x => x.Tickets)
+            .UseCollation("latin1_general_ci")
+            .HasConversion<TicketsDbModelConverter>();
     }
 }
 
@@ -30,4 +35,6 @@ public class SagasDbContext : SagaDbContext
             yield return new MatchesMap();
         }
     }
+
+    //public override Sa
 }

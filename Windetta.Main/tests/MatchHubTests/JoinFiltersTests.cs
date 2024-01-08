@@ -31,7 +31,7 @@ public class JoinFiltersTests
 
         // act
         var exception = await Should.ThrowAsync<MatchHubPluginException>(
-            () => interactor.JoinMember(memberId, hub.Id, room.Id));
+            () => interactor.JoinMemberAsync(memberId, hub.Id, roomIndex: 0));
 
         // assert
         room.MembersCount.ShouldBe(1);

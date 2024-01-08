@@ -17,7 +17,7 @@ public class JoinMember : IJoinMemberMatchHubUseCase
         _walletService = walletService;
     }
 
-    public async Task ExecuteAsync(Guid userId, Guid hubId, Guid roomId)
+    public async Task ExecuteAsync(Guid userId, Guid hubId, ushort roomIndex)
     {
         var hub = await _hubs.GetAsync(hubId);
 
@@ -37,6 +37,6 @@ public class JoinMember : IJoinMemberMatchHubUseCase
 
         var member = new RoomMember(userId);
 
-        hub.Add(member, roomId);
+        hub.Add(member, roomIndex);
     }
 }

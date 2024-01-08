@@ -22,7 +22,7 @@ public class JoinMemberTests
         // act
         var exception = await Should.ThrowAsync<MatchHubException>(
             () => factory.Get<IJoinMemberMatchHubUseCase>()
-            .ExecuteAsync(userId: Guid.NewGuid(), hubId: Guid.NewGuid(), roomId: Guid.NewGuid()));
+            .ExecuteAsync(userId: Guid.NewGuid(), hubId: Guid.NewGuid(), roomIndex: 0));
 
         //assert
         exception.ErrorCode.ShouldBe(Errors.Main.MatchHubNotFound);
@@ -52,7 +52,7 @@ public class JoinMemberTests
         // act
         var exception = await Should.ThrowAsync<WalletException>(
             () => factory.Get<IJoinMemberMatchHubUseCase>()
-            .ExecuteAsync(userId: Guid.NewGuid(), hubId: hub.Id, roomId: hub.Rooms.First().Id));
+            .ExecuteAsync(userId: Guid.NewGuid(), hubId: hub.Id, roomIndex: 0));
 
         //assert
         exception.ErrorCode.ShouldBe(Errors.Wallet.FundsNotEnough);
@@ -92,7 +92,7 @@ public class JoinMemberTests
             .ExecuteAsync(
                 userId: Guid.NewGuid(),
                 hubId: hubMock.Object.Id,
-                roomId: hubMock.Object.Rooms.First().Id));
+                roomIndex: 0));
 
         //assert
         exception.ErrorCode.ShouldBe(Errors.Main.JoinFilterValidationFail);

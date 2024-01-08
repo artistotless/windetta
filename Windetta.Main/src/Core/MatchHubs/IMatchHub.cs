@@ -24,6 +24,6 @@ public interface IMatchHub : IHubDisposeListener, IHubReadyListener, IDisposable
     public string? AutoDisposeStrategy { get; }
 
     IEnumerable<IJoinFilter>? GetJoinFilters();
-    void Add(RoomMember member, Guid roomId);
+    void Add(RoomMember member, ushort roomIndex);
     void Remove(Guid memberId);
 }

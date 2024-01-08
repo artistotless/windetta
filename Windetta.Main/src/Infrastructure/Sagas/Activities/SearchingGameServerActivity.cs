@@ -1,7 +1,6 @@
 ﻿using LSPM.Models;
 using MassTransit;
 using Polly.Registry;
-using Windetta.Common.Helpers;
 using Windetta.Contracts.Events;
 using Windetta.Main.Core.Exceptions;
 using Windetta.Main.Core.Services.LSPM;
@@ -103,7 +102,7 @@ public class SearchingGameServerActivity : IStateMachineActivity<MatchFlow>
 
         foreach (var item in allLspms)
         {
-            request.LspmKey = item.Endpoint.ParseIdentifier();
+            request.LspmIp = item.Endpoint.DnsSafeHost;
 
             var response = await SendDurableRequest();
 
@@ -145,7 +144,7 @@ public class SearchingGameServerActivity : IStateMachineActivity<MatchFlow>
         public Guid GameId { get; set; }
         public IEnumerable<Player> Players { get; set; }
         public Dictionary<string, string> Properties { get; set; }
-        public string LspmKey { get; set; }
+        public string LspmIp { get; set; }
     }
 }
 
