@@ -15,6 +15,7 @@ public class MatchFlow : SagaStateMachineInstance
 {
     public Guid CorrelationId { get; set; }
     public IEnumerable<Player> Players { get; set; }
+    public IEnumerable<Ticket> Tickets { get; set; }
     public Guid GameId { get; set; }
     public string Endpoint { get; set; }
     public DateTimeOffset Created { get; set; }
@@ -33,6 +34,7 @@ public enum MatchFlowState : int
     ProcessingWinnings = 7,
     ProcessingWinningsFail = 8,
     Canceled = 9,
+    ServerFound = 10,
 }
 
 public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
@@ -61,14 +63,19 @@ public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
                 .NotifyMatchCanceled(x => "GameServers unavailable")
                 .Finalize(),
             When(GameServerFound)
-                .NotifyMatchBegun()
-                .TransitionTo(Running),
+                .NotifyServerFound()
+                .TransitionTo(ServerFound),
             When(GameServerReservationPeriodExpired)
                 .TransitionTo(GameServerSearchExpired)
                 .NotifyMatchAwaitingExpired(),
             When(CancellationRequested)
                 .SetCanceledReason(x => x.Reason)
                 .TransitionTo(Canceled));
+
+        During(ServerFound,
+            When(ReadyAcceptConnections)
+                .NotifyMatchBegun()
+                .TransitionTo(Running));
 
         During(Running,
             When(CancellationRequested)
@@ -100,12 +107,14 @@ public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
     public State ProcessingWinnings { get; set; }
     public State ProcessingWinningsFail { get; set; }
     public State Canceled { get; set; }
+    public State ServerFound { get; set; }
 
     public Event<IMatchHubReady> MatchHubReady { get; }
     public Event<IBalancesHeld> BalancesHeld { get; }
     public Event<IWinningsProcessed> WinningsProcessed { get; }
     public Event<IGameServerReservationPeriodExpired> GameServerReservationPeriodExpired { get; }
     public Event<IGameServerFound> GameServerFound { get; }
+    public Event<IGameServeReadyAcceptConnections> ReadyAcceptConnections { get; }
     public Event<ICancellationMatchRequested> CancellationRequested { get; }
     public Event<IMatchCompleted> MatchCompleted { get; }
 
@@ -173,14 +182,23 @@ public static class MatchFlowStateMachineExtensions
         }));
     }
 
-    public static EventActivityBinder<MatchFlow, IGameServerFound> NotifyMatchBegun(
-    this EventActivityBinder<MatchFlow, IGameServerFound> binder)
+    public static EventActivityBinder<MatchFlow, IGameServeReadyAcceptConnections> NotifyMatchBegun(
+    this EventActivityBinder<MatchFlow, IGameServeReadyAcceptConnections> binder)
     {
         return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<INotifyMatchBegun>(new
         {
             ctx.Message.CorrelationId,
-            ctx.Message.Endpoint,
-            ctx.Message.Tickets
+            ctx.Saga.Endpoint,
+            ctx.Saga.Tickets
+        }));
+    }
+
+    public static EventActivityBinder<MatchFlow, IGameServerFound> NotifyServerFound(
+    this EventActivityBinder<MatchFlow, IGameServerFound> binder)
+    {
+        return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<INotifyServerFound>(new
+        {
+            ctx.Message.CorrelationId,
         }));
     }
 

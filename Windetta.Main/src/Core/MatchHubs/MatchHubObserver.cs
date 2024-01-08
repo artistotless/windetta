@@ -2,7 +2,7 @@
 
 namespace Windetta.Main.Core.MatchHubs;
 
-public class MatchHubObserver : ISingletonService
+public sealed class MatchHubObserver : ISingletonService
 {
     private readonly IMatchHubObserverOutput _output;
     private readonly IMatchHubs _hubs;

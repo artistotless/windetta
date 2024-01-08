@@ -6,7 +6,7 @@ using Windetta.Main.Core.MatchHubs.Dtos;
 namespace Windetta.Main.Infrastructure.SignalR;
 
 [Authorize(Policy = "NeedRealtimeScope")]
-internal class MainHub : Hub
+public class MainHub : Hub
 {
     private readonly MatchHubsInteractor _interactor;
     private readonly MatchHubObserver _dispatcher;

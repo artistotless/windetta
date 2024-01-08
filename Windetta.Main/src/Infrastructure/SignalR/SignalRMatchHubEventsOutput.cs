@@ -1,16 +1,19 @@
-﻿using Microsoft.AspNetCore.SignalR;
+﻿using MassTransit;
+using Microsoft.AspNetCore.SignalR;
 using Windetta.Main.Core.MatchHubs;
 using Windetta.Main.Core.MatchHubs.Dtos;
 using Windetta.Main.Infrastructure.SignalR;
 
 namespace Windetta.Main.Infrastructure.MatchHub;
 
-internal class SignalROutput : IMatchHubObserverOutput
+public class SignalRMatchHubEventsOutput : IMatchHubObserverOutput
 {
-    private readonly ILogger<SignalROutput> _logger;
+    private readonly ILogger<SignalRMatchHubEventsOutput> _logger;
     private readonly IHubContext<MainHub> _context;
 
-    public SignalROutput(ILogger<SignalROutput> logger, IHubContext<MainHub> context)
+    public SignalRMatchHubEventsOutput(
+        ILogger<SignalRMatchHubEventsOutput> logger, 
+        IHubContext<MainHub> context)
     {
         _logger = logger;
         _context = context;

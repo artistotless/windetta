@@ -189,7 +189,7 @@ public class MatchFlowTests : IUseHarness
     }
 
     [Fact]
-    public async Task When_GameServerPrepared()
+    public async Task When_GameServerFound()
     {
         // arrange
         await using var provider = GetProvider();
@@ -209,6 +209,35 @@ public class MatchFlowTests : IUseHarness
             Tickets = new Dictionary<Guid, string>() { { Guid.Empty, "ticket1" } }.AsReadOnly()
         });
         await sagaHarness.Consumed.Any<IGameServerFound>();
+
+        // assert
+        (await harness.Sent.Any<INotifyServerFound>())
+            .ShouldBeTrue();
+        (await sagaHarness.Exists(correllationId, s => s.ServerFound))
+            .HasValue.ShouldBeTrue();
+
+        await harness.OutputTimeline(_output, x => x.Now());
+    }
+
+    [Fact]
+    public async Task When_ReadyAcceptConnections()
+    {
+        // arrange
+        await using var provider = GetProvider();
+        var harness = await provider.StartTestHarness();
+
+        await provider.AddOrUpdateSaga(CreateSagaWithState
+            (MatchFlowState.ServerFound));
+
+        var sagaHarness = harness.GetSagaStateMachineHarness
+            <MatchFlowStateMachine, MatchFlow>();
+
+        // act
+        await harness.Bus.Publish<IGameServeReadyAcceptConnections>(new
+        {
+            CorrelationId = correllationId,
+        });
+        await sagaHarness.Consumed.Any<IGameServeReadyAcceptConnections>();
 
         // assert
         (await harness.Sent.Any<INotifyMatchBegun>())

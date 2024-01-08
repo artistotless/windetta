@@ -7,7 +7,7 @@ using Windetta.Main.Core.MatchHubs.UseCases;
 
 namespace Windetta.Main.Core.MatchHubs;
 
-public class MatchHubsInteractor : IScopedService
+public sealed class MatchHubsInteractor : IScopedService
 {
     private readonly IGames _gamesRepository;
     private readonly IMatchHubUsersAssociations _matchHubsUsersSets;
