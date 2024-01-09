@@ -12,6 +12,7 @@ using Windetta.Common.Types;
 using Windetta.Contracts.Events;
 using Windetta.Main.Core.MatchHubs;
 using Windetta.Main.Infrastructure;
+using Windetta.Main.Infrastructure.Logging;
 using Windetta.Main.Infrastructure.Sagas;
 using Windetta.Main.Infrastructure.Security;
 using Windetta.Main.Infrastructure.SignalR;
@@ -20,6 +21,7 @@ var webHost = WebApplication.CreateBuilder(args);
 var services = webHost.Services;
 var assembly = Assembly.GetExecutingAssembly();
 
+webHost.ConfigureAddLogging();
 services.AddDefaultInstanceIdProvider();
 services.ConfigureAddAuthentication();
 services.ConfigureAddAuthorization();
@@ -29,7 +31,7 @@ services.AddMatchHub();
 services.AddMatchHubPlugins();
 services.AddMongo();
 services.AddPolyRetries();
-services.AddMysqlDbContext<SagasDbContext>(assembly, enableSensitiveDataLogging: true);
+services.AddMysqlDbContext<SagasDbContext>(assembly);
 services.AddInMemoryLspms();
 services.AddReadyMassTransit(assembly, Svc.Main, cfg =>
 {

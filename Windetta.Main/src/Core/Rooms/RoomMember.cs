@@ -7,7 +7,7 @@ namespace Windetta.Main.Core.Rooms;
 public sealed class RoomMember
 {
     public Guid Id { get; init; }
-    public string? Name { get; init; }
+    public string Name { get; init; }
 
     private Room? _room;
 

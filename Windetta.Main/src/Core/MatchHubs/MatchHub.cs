@@ -36,7 +36,6 @@ public sealed class MatchHub : IMatchHub
 
     private IReadOnlyDictionary<ushort, Room> _rooms;
 
-
     public MatchHub(MatchHubOptions options, Guid? id = null)
     {
         Id = id ?? Guid.NewGuid();

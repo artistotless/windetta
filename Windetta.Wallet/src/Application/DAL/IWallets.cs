@@ -1,8 +1,9 @@
-﻿using Windetta.Wallet.Domain;
+﻿using Windetta.Common.Types;
+using Windetta.Wallet.Domain;
 
 namespace Windetta.Wallet.Application.DAL;
 
-public interface IWallets
+public interface IWallets : IScopedService
 {
     public Task AddAsync(UserWallet wallet);
     public Task<UserWallet?> GetAsync(Guid userId);

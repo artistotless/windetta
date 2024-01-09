@@ -1,6 +1,7 @@
 ﻿using MassTransit;
 using Windetta.Contracts.Commands;
 using Windetta.Wallet.Application.Services;
+using Windetta.Wallet.Exceptions;
 
 namespace Windetta.Wallet.Infrastructure.Consumers;
 
@@ -26,6 +27,7 @@ public class UnDeductConsumerDefinition : ConsumerDefinition<UnDeductConsumer>
     {
         consumerConfigurator.UseMessageRetry(r =>
         {
+            r.Ignore<WalletException>();
             r.Interval(retryCount: 3, interval: TimeSpan.FromSeconds(5));
         });
     }

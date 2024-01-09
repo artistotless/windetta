@@ -15,7 +15,7 @@ public class WalletsController : ControllerBase
 
     [HttpGet]
     [Route("{userId:guid}/balances/{currencyId:int}")]
-    public async Task<IActionResult> GetBalance(Guid userId, int currencyId)
+    public async Task<IActionResult> GetBalance([FromRoute] Guid userId, [FromRoute] int currencyId)
     {
         var balance = await _walletService.GetBalance(userId, currencyId);
 

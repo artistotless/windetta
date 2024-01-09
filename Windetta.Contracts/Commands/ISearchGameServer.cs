@@ -2,13 +2,11 @@
 using MassTransit;
 using Windetta.Contracts.Base;
 
-namespace Windetta.Contracts.Events;
+namespace Windetta.Contracts.Commands;
 
-public interface IGameServerRequested : CorrelatedBy<Guid>, IEvent
+public interface ISearchGameServer : CorrelatedBy<Guid>, ICommand
 {
-    public Guid CorrelationId { get; set; }
     public Guid GameId { get; set; }
     public IEnumerable<Player> Players { get; set; }
     public Dictionary<string, string>? Properties { get; set; }
-    public string LspmIp { get; set; }
 }

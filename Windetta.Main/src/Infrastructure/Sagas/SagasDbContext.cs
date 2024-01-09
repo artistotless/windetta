@@ -18,6 +18,8 @@ public class MatchesMap : SagaClassMap<MatchFlow>
             .HasColumnType("VARCHAR(42)");
         entity.Property(x => x.Players)
             .HasConversion<PlayersDbModelConverter>();
+        entity.Property(x => x.Properties)
+            .HasConversion<PropertiesDbModelConverter>();
         entity.Property(x => x.Tickets)
             .UseCollation("latin1_general_ci")
             .HasConversion<TicketsDbModelConverter>();
@@ -35,6 +37,4 @@ public class SagasDbContext : SagaDbContext
             yield return new MatchesMap();
         }
     }
-
-    //public override Sa
 }

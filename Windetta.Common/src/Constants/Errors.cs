@@ -39,6 +39,7 @@ public static class Errors
         public const string FundsAlreadyHeld = "funds_already_held";
         public const string NotFound = "wallet_notfound";
         public const string BalanceNotFound = "wallet_balance_notfound";
+        public const string UnholdProblem = "wallet_balance_unhold_problem";
     }
 
     public static class TonTxns

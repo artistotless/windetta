@@ -14,11 +14,10 @@ public class UserWalletTests
         var wallet = new UserWallet();
 
         // act
-        var exception = Should.Throw<WindettaException>(
-            () => wallet.GetBalance(currencyId: 1));
+        var balance = wallet.GetBalance(currencyId: 1);
 
         // assert
-        exception.ErrorCode.ShouldBe(Errors.Wallet.BalanceNotFound);
+        balance.ShouldBeNull();
     }
 
     [Fact]
@@ -63,7 +62,6 @@ public class UserWalletTests
 
         // assert
         exception.ShouldNotBeNull();
-        exception.ErrorCode.ShouldBe(Errors.Wallet.BalanceNotFound);
     }
 
     [Fact]

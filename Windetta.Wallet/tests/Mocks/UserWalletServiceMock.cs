@@ -15,6 +15,6 @@ internal class UserWalletServiceMock : MockInitializator<IUserWalletService>
         mock.Setup(x => x.DeductAsync(It.IsAny<DeductArgument>()));
         mock.Setup(x => x.TopUpBalance(It.IsAny<TopUpArgument>()));
         mock.Setup(x => x.HoldBalanceAsync(It.IsAny<Guid>(), It.IsAny<FundsInfo>()));
-        mock.Setup(x => x.UnHoldBalanceAsync(It.IsAny<Guid>(), It.IsAny<int>()));
+        mock.Setup(x => x.UnHoldBalanceAsync(It.IsAny<Guid>(), It.IsAny<FundsInfo>()));
     }
 }

@@ -1,5 +1,4 @@
-﻿using Windetta.Common.Constants;
-using Windetta.Common.Types;
+﻿using Windetta.Wallet.Domain.Exceptions;
 
 namespace Windetta.Wallet.Domain;
 
@@ -9,8 +8,8 @@ public class UserBalance
     public int CurrencyId { get; init; }
     public ulong Amount { get; private set; } = 0;
     public ulong HeldAmount { get; private set; } = 0;
+    private ulong _availableAmount => Amount - HeldAmount;
 
-    #region Business logic
     public void Increase(ulong value)
     {
         Amount += value;
@@ -18,16 +17,18 @@ public class UserBalance
 
     public void Hold(ulong amount)
     {
-        if (HeldAmount != 0)
-            throw new WindettaException(
-                Errors.Wallet.FundsAlreadyHeld, "Funds already held");
+        if (amount > _availableAmount)
+            throw new FundsNotEnoughException();
 
-        HeldAmount = amount;
+        HeldAmount += amount;
     }
 
-    public void UnHold()
+    public void UnHold(ulong amount)
     {
-        HeldAmount = 0;
+        if (amount > HeldAmount)
+            throw new UnholdExceedException();
+
+        HeldAmount -= amount;
     }
 
     public void Decrease(ulong value)
@@ -35,11 +36,9 @@ public class UserBalance
         if (value <= 0)
             return;
 
-        if (Amount - HeldAmount < value)
-            throw new WindettaException(
-                Errors.Wallet.FundsNotEnough, "Insufficient funds");
+        if (value > _availableAmount)
+            throw new FundsNotEnoughException();
 
         Amount -= value;
     }
-    #endregion
 }

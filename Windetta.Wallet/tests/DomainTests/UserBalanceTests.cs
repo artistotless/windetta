@@ -46,19 +46,4 @@ public class UserBalanceTests
         Should.Throw<WindettaException>(() => entity.Decrease(101))
             .ErrorCode.ShouldBe(Errors.Wallet.FundsNotEnough);
     }
-
-    [Fact]
-    public void ShouldThrowsExceptionIfHoldTwiceAndMore()
-    {
-        // arrange
-        var entity = new UserBalance();
-
-        // act
-        entity.Increase(100);
-        entity.Hold(20);
-
-        // assert
-        Should.Throw<WindettaException>(() => entity.Hold(30))
-            .ErrorCode.ShouldBe(Errors.Wallet.FundsAlreadyHeld);
-    }
 }

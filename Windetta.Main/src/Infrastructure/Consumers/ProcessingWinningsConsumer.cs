@@ -1,0 +1,18 @@
+﻿using MassTransit;
+using Windetta.Contracts.Commands;
+using Windetta.Contracts.Events;
+
+namespace Windetta.Main.Infrastructure.Consumers;
+
+public class ProcessingWinningsConsumer : IConsumer<IProcessWinnings>
+{
+    public async Task Consume(ConsumeContext<IProcessWinnings> context)
+    {
+        // TODO: implement it
+
+        await context.Publish<IWinningsProcessed>(new
+        {
+            context.Message.CorrelationId,
+        });
+    }
+}

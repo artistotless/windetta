@@ -2,6 +2,7 @@
 using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
 using Windetta.Wallet.Application.Services;
+using Windetta.Wallet.Exceptions;
 using Windetta.Wallet.Infrastructure.Consumers;
 
 namespace Windetta.Wallet.Infrastructure.Consumers
@@ -35,11 +36,13 @@ public class CreateConsumerDefinition : ConsumerDefinition<CreateConsumer>
     {
         consumerConfigurator.UseScheduledRedelivery(r =>
         {
+            r.Ignore<WalletException>();
             r.Intervals(TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(4), TimeSpan.FromMinutes(10));
         });
 
         consumerConfigurator.UseMessageRetry(r =>
         {
+            r.Ignore<WalletException>();
             r.Interval(retryCount: 3, interval: TimeSpan.FromSeconds(10));
         });
     }

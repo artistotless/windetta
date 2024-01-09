@@ -68,7 +68,7 @@ public class MatchCanceledNotifier : IConsumer<INotifyMatchCanceled>
 
     public Task Consume(ConsumeContext<INotifyMatchCanceled> context)
     {
-        _logger.LogDebug("Saga Event: {event}", "server_found");
+        _logger.LogDebug("Saga Event: {event}", "match_canceled");
 
         return _context.Clients
             .Group(context.Message.CorrelationId.ToString())

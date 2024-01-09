@@ -8,23 +8,31 @@ public class DbUnitOfWork : UnitOfWorkCommittable
     public IWallets Wallets { get; set; }
     public ITransactions Transactions { get; set; }
 
+    public DbUnitOfWork(IWallets wallets, ITransactions transactions)
+    {
+        Wallets = wallets;
+        Transactions = transactions;
+    }
+
     public void BeginTransaction(IsolationLevel level)
     {
-        throw new NotImplementedException();
+        // TODO: implement it
     }
 
     public void Commit()
     {
-        throw new NotImplementedException();
+        // TODO: implement it
     }
 
     public void Rollback()
     {
-        throw new NotImplementedException();
+        // TODO: implement it
     }
 
     public Task SaveChangesAsync()
     {
-        throw new NotImplementedException();
+        // TODO: implement it
+
+        return Task.CompletedTask;
     }
 }

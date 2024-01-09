@@ -2,6 +2,7 @@
 using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
 using Windetta.Wallet.Application.Services;
+using Windetta.Wallet.Exceptions;
 
 namespace Windetta.Wallet.Infrastructure.Consumers;
 
@@ -39,11 +40,13 @@ public class DeductConsumerDefinition : ConsumerDefinition<DeductConsumer>
         consumerConfigurator.UseInMemoryOutbox(context);
         consumerConfigurator.UseScheduledRedelivery(r =>
         {
+            r.Ignore<WalletException>();
             r.Intervals(TimeSpan.FromMinutes(1), TimeSpan.FromMinutes(4));
         });
 
         consumerConfigurator.UseMessageRetry(r =>
         {
+            r.Ignore<WalletException>();
             r.Interval(retryCount: 3, interval: TimeSpan.FromSeconds(10));
         });
     }

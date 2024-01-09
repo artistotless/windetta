@@ -117,6 +117,7 @@ public class MatchFlowTests : IUseHarness
         await using var provider = SharedServiceProvider.GetInstance(services =>
         {
             services.RegisterConsumer<AlwaysRespondsSuccessLspmConsumer>();
+            services.RegisterConsumer<TestSearchGameServerConsumer>();
             services.AddScoped(p => new LspmsMock(new List<Lspm> { lspm }).Mock.Object);
             services.ConfigureTestMassTransit(Svc.Main, this);
         });
@@ -137,6 +138,8 @@ public class MatchFlowTests : IUseHarness
         await sagaHarness.Consumed.Any<IBalancesHeld>();
 
         // assert
+        (await harness.Consumed.Any<ISearchGameServer>())
+            .ShouldBeTrue();
         (await harness.Published.Any<IGameServerRequested>())
             .ShouldBeTrue();
         (await sagaHarness.Consumed.Any<IGameServerFound>())
@@ -159,6 +162,7 @@ public class MatchFlowTests : IUseHarness
         await using var provider = SharedServiceProvider.GetInstance(services =>
         {
             services.RegisterConsumer<AlwaysOverloadLspmConsumer>();
+            services.RegisterConsumer<TestSearchGameServerConsumer>();
             services.AddScoped(p => new LspmsMock(new List<Lspm> { lspm }).Mock.Object);
             services.ConfigureTestMassTransit(Svc.Main, this);
         });
@@ -181,9 +185,11 @@ public class MatchFlowTests : IUseHarness
         // assert
         (await harness.Published.Any<IGameServerRequested>())
             .ShouldBeTrue();
-        (await sagaHarness.Exists(correllationId, s => s.GameServerSearch))
+        (await sagaHarness.Exists(correllationId, s => s.GameServerSearching))
             .HasValue.ShouldBeTrue();
-        (await harness.Sent.Any<INotifyMatchCanceled>())
+        (await harness.Published.Any<IGameServerReservationPeriodExpired>())
+            .ShouldBeTrue();
+        (await harness.Sent.Any<INotifyMatchAwaitingExpired>())
               .ShouldBeTrue();
         await harness.OutputTimeline(_output, x => x.Now());
     }
@@ -196,7 +202,7 @@ public class MatchFlowTests : IUseHarness
         var harness = await provider.StartTestHarness();
 
         await provider.AddOrUpdateSaga(CreateSagaWithState
-            (MatchFlowState.GameServerSearch));
+            (MatchFlowState.GameServerSearching));
 
         var sagaHarness = harness.GetSagaStateMachineHarness
             <MatchFlowStateMachine, MatchFlow>();
@@ -259,7 +265,7 @@ public class MatchFlowTests : IUseHarness
         var harness = await provider.StartTestHarness();
 
         await provider.AddOrUpdateSaga(CreateSagaWithState
-            (MatchFlowState.GameServerSearch));
+            (MatchFlowState.GameServerSearching));
 
         var sagaHarness = harness.GetSagaStateMachineHarness
             <MatchFlowStateMachine, MatchFlow>();
@@ -288,7 +294,7 @@ public class MatchFlowTests : IUseHarness
         var harness = await provider.StartTestHarness();
 
         await provider.AddOrUpdateSaga(CreateSagaWithState
-            (MatchFlowState.GameServerSearch));
+            (MatchFlowState.GameServerSearching));
 
         var sagaHarness = harness.GetSagaStateMachineHarness
             <MatchFlowStateMachine, MatchFlow>();
@@ -301,8 +307,8 @@ public class MatchFlowTests : IUseHarness
         await sagaHarness.Consumed.Any<ICancellationMatchRequested>();
 
         // assert
-        (await sagaHarness.Exists(correllationId, s => s.Canceled))
-            .HasValue.ShouldBeTrue();
+        (await sagaHarness.NotExists(correllationId))
+            .HasValue.ShouldBeFalse();
 
         await harness.OutputTimeline(_output, x => x.Now());
     }
@@ -329,8 +335,8 @@ public class MatchFlowTests : IUseHarness
         await sagaHarness.Consumed.Any<ICancellationMatchRequested>();
 
         // assert
-        (await sagaHarness.Exists(correllationId, s => s.Canceled))
-            .HasValue.ShouldBeTrue();
+        (await sagaHarness.NotExists(correllationId))
+            .HasValue.ShouldBeFalse();
 
         await harness.OutputTimeline(_output, x => x.Now());
     }
