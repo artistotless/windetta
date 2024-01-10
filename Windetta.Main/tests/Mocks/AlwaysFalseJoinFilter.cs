@@ -1,4 +1,4 @@
-﻿using Windetta.Main.Core.MatchHubs.Plugins;
+﻿using Windetta.Main.Core.Lobbies.Plugins;
 
 namespace Windetta.MainTests.Mocks;
 

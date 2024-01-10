@@ -1,9 +1,9 @@
 ﻿using Polly;
-using Windetta.Main.Core.MatchHubs.Plugins;
-using Windetta.Main.Core.MatchHubs.UseCases;
+using Windetta.Main.Core.Lobbies.Plugins;
+using Windetta.Main.Core.Lobbies.UseCases;
 using Windetta.Main.Core.Services.LSPM;
 using Windetta.Main.Infrastructure.Consumers;
-using Windetta.Main.Infrastructure.MatchHub.Plugins;
+using Windetta.Main.Infrastructure.Lobby.Plugins;
 using Windetta.Main.Infrastructure.Retries;
 using Windetta.Main.Infrastructure.Services;
 
@@ -22,24 +22,24 @@ public static class DependencyResolver
         });
     }
 
-    public static void AddMatchHub(this IServiceCollection services)
+    public static void AddLobby(this IServiceCollection services)
     {
-        services.AddScoped<IMatchHubUseCase, Create>();
-        services.AddScoped<IMatchHubUseCase, Delete>();
-        services.AddScoped<IMatchHubUseCase, Get>();
-        services.AddScoped<IMatchHubUseCase, GetAll>();
-        services.AddScoped<IMatchHubUseCase, GetHubIdByUserId>();
-        services.AddScoped<IGetMatchHubIdByUserIdUseCase, GetHubIdByUserId>();
-        services.AddScoped<IMatchHubUseCase, JoinMember>();
-        services.AddScoped<IMatchHubUseCase, LeaveMember>();
+        services.AddScoped<ILobbyUseCase, Create>();
+        services.AddScoped<ILobbyUseCase, Delete>();
+        services.AddScoped<ILobbyUseCase, Get>();
+        services.AddScoped<ILobbyUseCase, GetAll>();
+        services.AddScoped<ILobbyUseCase, GetLobbyIdByUserId>();
+        services.AddScoped<IGetLobbyIdByUserIdUseCase, GetLobbyIdByUserId>();
+        services.AddScoped<ILobbyUseCase, JoinMember>();
+        services.AddScoped<ILobbyUseCase, LeaveMember>();
     }
 
-    public static void AddMatchHubPlugins(this IServiceCollection services)
+    public static void AddLobbyPlugins(this IServiceCollection services)
     {
-        services.AddScoped<IMatchHubPlugin, DefaultDisposeStrategy>();
-        services.AddScoped<IMatchHubPlugin, DefaultReadyStrategy>();
-        services.AddScoped<IMatchHubPlugin, RoleJoinFilter>();
-        services.AddScoped<IMatchHubPlugin, DateReadyStrategy>();
+        services.AddScoped<ILobbyPlugin, DefaultDisposeStrategy>();
+        services.AddScoped<ILobbyPlugin, DefaultReadyStrategy>();
+        services.AddScoped<ILobbyPlugin, RoleJoinFilter>();
+        services.AddScoped<ILobbyPlugin, DateReadyStrategy>();
     }
 
     public static void AddInMemoryLspms(this IServiceCollection services)
@@ -50,6 +50,6 @@ public static class DependencyResolver
     public static void AddPolyRetries(this IServiceCollection services)
     {
         services.AddResiliencePipeline(typeof(SearchGameServerConsumer),
-            PollyPipelines.SearchingGameServerActivity);
+            PollyPipelines.AddSearchGameServerConsumerRetryPolicy);
     }
 }

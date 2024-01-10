@@ -1,25 +1,25 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
-using Windetta.Main.Core.MatchHubs;
-using Windetta.Main.Core.MatchHubs.Dtos;
+using Windetta.Main.Core.Lobbies;
+using Windetta.Main.Core.Lobbies.Dtos;
 
 namespace Windetta.Main.Infrastructure.SignalR;
 
 [Authorize(Policy = "NeedRealtimeScope")]
 public class MainHub : Hub
 {
-    private readonly MatchHubsInteractor _interactor;
-    private readonly MatchHubObserver _dispatcher;
+    private readonly LobbiesInteractor _interactor;
+    private readonly LobbyObserver _dispatcher;
 
-    public MainHub(MatchHubsInteractor interactor, MatchHubObserver dispatcher)
+    public MainHub(LobbiesInteractor interactor, LobbyObserver dispatcher)
     {
         _interactor = interactor;
         _dispatcher = dispatcher;
     }
 
-    public async Task CreateMatchHub(CreateMatchHubRequestDto request)
+    public async Task CreateLobby(CreateLobbyRequestDto request)
     {
-        var createRequest = new CreateMatchHubRequest()
+        var createRequest = new CreateLobbyRequest()
         {
             Bet = request.Bet,
             InitiatorId = GetUserId(),
@@ -30,42 +30,42 @@ public class MainHub : Hub
             AutoReadyStrategy = request.AutoReadyStrategy,
         };
 
-        var hub = await _interactor.CreateAsync(createRequest);
+        var lobby = await _interactor.CreateAsync(createRequest);
 
-        _dispatcher.AddToTracking(hub);
+        _dispatcher.AddToTracking(lobby);
 
-        await Groups.AddToGroupAsync(Context.ConnectionId, hub.Id.ToString());
+        await Groups.AddToGroupAsync(Context.ConnectionId, lobby.Id.ToString());
 
-        await Clients.All.SendAsync("onAddedMatchHub", new MatchHubDto(hub));
+        await Clients.All.SendAsync("onAddedLobby", new LobbyDto(lobby));
     }
 
-    public async Task JoinHub(Guid hubId, ushort roomIndex)
+    public async Task JoinLobby(Guid lobbyId, ushort roomIndex)
     {
-        await _interactor.JoinMemberAsync(GetUserId(), hubId, roomIndex);
+        await _interactor.JoinMemberAsync(GetUserId(), lobbyId, roomIndex);
 
-        await Groups.AddToGroupAsync(Context.ConnectionId, hubId.ToString());
+        await Groups.AddToGroupAsync(Context.ConnectionId, lobbyId.ToString());
     }
 
-    public async Task LeaveHub(Guid hubId)
+    public async Task LeaveLobby(Guid lobbyId)
     {
-        await _interactor.LeaveMemberAsync(GetUserId(), hubId);
+        await _interactor.LeaveMemberAsync(GetUserId(), lobbyId);
 
-        await Groups.RemoveFromGroupAsync(Context.ConnectionId, hubId.ToString());
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, lobbyId.ToString());
     }
 
-    public async Task GetMatchHubs()
+    public async Task GetLobbies()
     {
-        var hubs = await _interactor.GetAllAsync();
+        var lobbies = await _interactor.GetAllAsync();
 
-        await Clients.Caller.SendAsync("onReceivedMatchHubs", hubs.ToArray());
+        await Clients.Caller.SendAsync("onReceivedLobbies", lobbies.ToArray());
     }
 
     public override async Task OnConnectedAsync()
     {
-        var hubId = await _interactor.GetHubIdByUserIdAsync(GetUserId());
+        var lobbyId = await _interactor.GetLobbyIdByUserIdAsync(GetUserId());
 
-        if (hubId.HasValue == true)
-            await Groups.AddToGroupAsync(Context.ConnectionId, hubId.Value.ToString());
+        if (lobbyId.HasValue == true)
+            await Groups.AddToGroupAsync(Context.ConnectionId, lobbyId.Value.ToString());
 
         // TODO: delete. test only
         //Context.Items.Add("id", Guid.NewGuid());
@@ -82,9 +82,9 @@ public class MainHub : Hub
     public override async Task OnDisconnectedAsync(Exception? exception)
     {
         var userId = GetUserId();
-        var hubId = await _interactor.GetHubIdByUserIdAsync(userId);
+        var lobbyId = await _interactor.GetLobbyIdByUserIdAsync(userId);
 
-        if (hubId.HasValue == true)
-            await _interactor.LeaveMemberAsync(userId, hubId.Value);
+        if (lobbyId.HasValue == true)
+            await _interactor.LeaveMemberAsync(userId, lobbyId.Value);
     }
 }

@@ -36,24 +36,14 @@ public class SearchGameServerConsumer : IConsumer<ISearchGameServer>
             result = await RequestGameServer(context.Message, allLspms);
         else
             result = await pipeline.ExecuteAsync(
-           async token => await RequestGameServer(context.Message, allLspms));
+            async token => await RequestGameServer(context.Message, allLspms));
 
-        if (result.Success)
+        await context.Publish<IGameServerFound>(new
         {
-            await context.Publish<IGameServerFound>(new
-            {
-                context.Message.CorrelationId,
-                result.Details!.Endpoint,
-                result.Details.Tickets,
-            });
-        }
-        else
-        {
-            await context.Publish<IGameServerReservationPeriodExpired>(new
-            {
-                context.Message.CorrelationId,
-            });
-        }
+            context.Message.CorrelationId,
+            result.Details!.Endpoint,
+            result.Details.Tickets,
+        });
     }
 
     private async Task<RequestingGameServerResult> RequestGameServer

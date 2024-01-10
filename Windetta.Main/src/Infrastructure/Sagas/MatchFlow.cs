@@ -6,7 +6,7 @@ using Windetta.Contracts;
 using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
 using Windetta.Main.Core.Exceptions;
-using Windetta.Main.Core.MatchHubs;
+using Windetta.Main.Core.Lobbies;
 
 namespace Windetta.Main.Infrastructure.Sagas;
 
@@ -29,22 +29,21 @@ public enum MatchFlowState : int
 {
     AwaitingHoldBalances = 3,
     GameServerSearching = 4,
-    GameServerSearchExpired = 5,
-    Running = 6,
-    ProcessingWinnings = 7,
-    ProcessingWinningsFail = 8,
-    ServerFound = 9,
+    Running = 5,
+    ProcessingWinnings = 6,
+    ProcessingWinningsFail = 7,
+    ServerFound = 8,
 }
 
 public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
 {
-    public MatchFlowStateMachine(IMatchHubs hubs)
+    public MatchFlowStateMachine(ILobbies lobbies)
     {
         InstanceState(instance => instance.CurrentState);
 
         Initially(
-            When(MatchHubReady)
-                .CopyDataToInstance(hubs)
+            When(LobbyReady)
+                .CopyDataToInstance(lobbies)
                 .HoldBalances()
                 .TransitionTo(AwaitingHoldBalances));
 
@@ -57,15 +56,13 @@ public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
 
         During(GameServerSearching,
             When(GameServerReservationFailed)
+                .NotifyMatchAwaitingExpired()
                 .CancelMatch(reason => "GameServers unavailable"),
             When(GameServerFound)
                 .NotifyServerFound()
                 .SaveGameServerInfo()
                 .If(condition => condition.Saga.CurrentState != (int)MatchFlowState.Running,
                  callback => callback.TransitionTo(ServerFound)),
-            When(GameServerReservationPeriodExpired)
-                .TransitionTo(GameServerSearchExpired)
-                .NotifyMatchAwaitingExpired(),
             When(CancellationRequested)
                 .CancelMatch(reason => reason.Reason));
 
@@ -100,16 +97,14 @@ public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
 
     public State AwaitingHoldBalances { get; set; }
     public State GameServerSearching { get; set; }
-    public State GameServerSearchExpired { get; set; }
     public State Running { get; set; }
     public State ProcessingWinnings { get; set; }
     public State ProcessingWinningsFail { get; set; }
     public State ServerFound { get; set; }
 
-    public Event<IMatchHubReady> MatchHubReady { get; }
+    public Event<ILobbyReady> LobbyReady { get; }
     public Event<IBalancesHeld> BalancesHeld { get; }
     public Event<IWinningsProcessed> WinningsProcessed { get; }
-    public Event<IGameServerReservationPeriodExpired> GameServerReservationPeriodExpired { get; }
     public Event<IGameServerFound> GameServerFound { get; }
     public Event<IGameServeReadyAcceptConnections> ReadyAcceptConnections { get; }
     public Event<ICancellationMatchRequested> CancellationRequested { get; }
@@ -117,8 +112,8 @@ public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
 
     // Faults
     public Event<Fault<IHoldBalances>> HoldBalancesFailed { get; }
-    public Event<Fault<IBalancesHeld>> GameServerReservationFailed { get; }
-    public Event<Fault<IMatchCompleted>> ProcessingWinningsFailed { get; }
+    public Event<Fault<ISearchGameServer>> GameServerReservationFailed { get; }
+    public Event<Fault<IProcessWinnings>> ProcessingWinningsFailed { get; }
 }
 
 public class MatchFlowDefinition : SagaDefinition<MatchFlow>
@@ -139,20 +134,20 @@ public class MatchFlowDefinition : SagaDefinition<MatchFlow>
 #region Extension methods
 public static class MatchFlowStateMachineExtensions
 {
-    public static EventActivityBinder<MatchFlow, IMatchHubReady> CopyDataToInstance(
-        this EventActivityBinder<MatchFlow, IMatchHubReady> binder, IMatchHubs hubs)
+    public static EventActivityBinder<MatchFlow, ILobbyReady> CopyDataToInstance(
+        this EventActivityBinder<MatchFlow, ILobbyReady> binder, ILobbies lobbies)
     {
         return binder.Then(async ctx =>
         {
-            var hub = await hubs.GetAsync(ctx.Message.CorrelationId);
+            var lobby = await lobbies.GetAsync(ctx.Message.CorrelationId);
 
-            if (hub is null)
-                throw MatchHubException.NotFound;
+            if (lobby is null)
+                throw LobbyException.NotFound;
 
-            ctx.Saga.BetCurrencyId = hub.Bet.CurrencyId;
-            ctx.Saga.BetAmount = hub.Bet.Amount;
-            ctx.Saga.GameId = hub.GameId;
-            ctx.Saga.Players = hub.Rooms.SelectMany(r => r.Members,
+            ctx.Saga.BetCurrencyId = lobby.Bet.CurrencyId;
+            ctx.Saga.BetAmount = lobby.Bet.Amount;
+            ctx.Saga.GameId = lobby.GameId;
+            ctx.Saga.Players = lobby.Rooms.SelectMany(r => r.Members,
                 (r, m) => new Player(m.Id, m.Name, r.Index));
             ctx.Saga.CorrelationId = ctx.Message.CorrelationId;
             ctx.Saga.Created = ctx.Message.TimeStamp;
@@ -171,8 +166,8 @@ public static class MatchFlowStateMachineExtensions
         }));
     }
 
-    public static EventActivityBinder<MatchFlow, IMatchHubReady> HoldBalances(
-    this EventActivityBinder<MatchFlow, IMatchHubReady> binder)
+    public static EventActivityBinder<MatchFlow, ILobbyReady> HoldBalances(
+    this EventActivityBinder<MatchFlow, ILobbyReady> binder)
     {
         return binder.SendCommandAsync(Svc.Wallet, ctx => ctx.Init<IHoldBalances>(new
         {
@@ -231,8 +226,8 @@ public static class MatchFlowStateMachineExtensions
             .Finalize();
     }
 
-    public static EventActivityBinder<MatchFlow, Fault<IMatchCompleted>> NotifyProccessingWinningsFailed(
-    this EventActivityBinder<MatchFlow, Fault<IMatchCompleted>> binder)
+    public static EventActivityBinder<MatchFlow, Fault<IProcessWinnings>> NotifyProccessingWinningsFailed(
+    this EventActivityBinder<MatchFlow, Fault<IProcessWinnings>> binder)
     {
         return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<INotifyProccessingWinningsFailed>(new
         {
@@ -252,12 +247,12 @@ public static class MatchFlowStateMachineExtensions
         }));
     }
 
-    public static EventActivityBinder<MatchFlow, IGameServerReservationPeriodExpired> NotifyMatchAwaitingExpired(
-    this EventActivityBinder<MatchFlow, IGameServerReservationPeriodExpired> binder)
+    public static EventActivityBinder<MatchFlow, Fault<ISearchGameServer>> NotifyMatchAwaitingExpired(
+    this EventActivityBinder<MatchFlow, Fault<ISearchGameServer>> binder)
     {
         return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<INotifyMatchAwaitingExpired>(new
         {
-            ctx.Message.CorrelationId,
+            ctx.Message.Message.CorrelationId,
         }));
     }
     #endregion

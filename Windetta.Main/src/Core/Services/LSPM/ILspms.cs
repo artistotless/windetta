@@ -1,6 +1,4 @@
-﻿using Windetta.Common.Types;
-
-namespace Windetta.Main.Core.Services.LSPM;
+﻿namespace Windetta.Main.Core.Services.LSPM;
 
 public interface ILspms
 {

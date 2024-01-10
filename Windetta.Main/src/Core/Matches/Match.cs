@@ -1,5 +1,5 @@
 ﻿using LSPM.Models;
-using Windetta.Main.Core.MatchHubs;
+using Windetta.Main.Core.Lobbies;
 
 namespace Windetta.Main.Core.Matches;
 

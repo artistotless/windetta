@@ -4,17 +4,17 @@ public static class Errors
 {
     public static class Main
     {
-        #region MatchHub
+        #region Lobby
         public const string MemberAlreadyJoinedRoom = "member_already_joined_room";
         public const string MemberNotInRoom = "member_not_in_room";
         public const string MaxMembersInRoomReached = "maxmembers_in_room_reached";
         public const string BetValidationFail = "bet_validation_fail";
-        public const string AlreadyMemberOfHub = "already_member_of_hub";
-        public const string MatchHubNotFound = "matchhub_notfound";
+        public const string AlreadyMemberOfLobby = "already_member_of_lobby";
+        public const string LobbyNotFound = "lobby_notfound";
         public const string BetIsLessMinimumAllowed = "bet_is_less_minimum_allowed";
         #endregion
 
-        #region MatchHubPlugin
+        #region LobbyPlugin
         public const string InvalidPluginName = "invalid_plugin_name";
         public const string RequirementTypeNotAllowed = "requirement_type_not_allowed";
         public const string JoinFilterValidationFail = "join_filter_validation_fail";

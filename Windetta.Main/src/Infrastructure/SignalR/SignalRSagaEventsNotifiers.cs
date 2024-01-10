@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.SignalR;
 using Windetta.Contracts.Commands;
 using Windetta.Main.Infrastructure.SignalR;
 
-namespace Windetta.Main.Infrastructure.MatchHub;
+namespace Windetta.Main.Infrastructure.Lobby;
 
 public class SignalRSagaEventsNotifiers { }
 
