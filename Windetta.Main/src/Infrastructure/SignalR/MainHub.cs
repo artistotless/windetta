@@ -46,9 +46,9 @@ public class MainHub : Hub
         await Groups.AddToGroupAsync(Context.ConnectionId, lobbyId.ToString());
     }
 
-    public async Task LeaveLobby(Guid lobbyId)
+    public async Task LeaveLobby(Guid lobbyId, ushort roomIndex)
     {
-        await _interactor.LeaveMemberAsync(GetUserId(), lobbyId);
+        await _interactor.LeaveMemberAsync(GetUserId(), lobbyId, roomIndex);
 
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, lobbyId.ToString());
     }
@@ -77,14 +77,5 @@ public class MainHub : Hub
 
         // TODO: delete. test only
         //return Context.Items.TryGetValue("id", out var value) ? (Guid)value : Guid.Parse(Context.UserIdentifier!);
-    }
-
-    public override async Task OnDisconnectedAsync(Exception? exception)
-    {
-        var userId = GetUserId();
-        var lobbyId = await _interactor.GetLobbyIdByUserIdAsync(userId);
-
-        if (lobbyId.HasValue == true)
-            await _interactor.LeaveMemberAsync(userId, lobbyId.Value);
     }
 }

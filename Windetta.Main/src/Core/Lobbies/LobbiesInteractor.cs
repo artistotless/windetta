@@ -14,7 +14,7 @@ public sealed class LobbiesInteractor : IScopedService
     private readonly ILobbyUseCasesFactory _useCasesFactory;
     private readonly ILobbyPluginsFactory _pluginsFactory;
 
-    public LobbiesInteractor( 
+    public LobbiesInteractor(
         IGames gamesRepository,
         ILobbyPluginsFactory pluginsFactory,
         ILobbyUseCasesFactory useCaseFactory,
@@ -67,10 +67,10 @@ public sealed class LobbiesInteractor : IScopedService
         _lobbiesUsersSets.Set(lobbyId, userId);
     }
 
-    public async Task LeaveMemberAsync(Guid userId, Guid lobbyId)
+    public async Task LeaveMemberAsync(Guid userId, Guid lobbyId, ushort roomIndex)
     {
         await _useCasesFactory.Get<ILeaveMemberLobbyUseCase>()
-             .ExecuteAsync(userId, lobbyId);
+             .ExecuteAsync(userId, lobbyId, roomIndex);
 
         _lobbiesUsersSets.Unset(userId);
     }
@@ -89,6 +89,7 @@ public sealed class LobbiesInteractor : IScopedService
             Private = request.Private,
             GameId = request.GameId,
             GameConfiguration = configurations.cfg,
+            Properties = request.Properties,
             Bet = request.Bet,
             InitiatorId = request.InitiatorId,
 

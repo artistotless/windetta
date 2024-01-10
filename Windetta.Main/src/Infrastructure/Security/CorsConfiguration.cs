@@ -1,8 +1,8 @@
 ﻿namespace Windetta.Main.Infrastructure.Security;
 
-public static class CorsExtensions
+public static class CorsConfiguration
 {
-    public static void ConfigureAddCors(this IServiceCollection services)
+    public static void Configure(IServiceCollection services)
     {
         services.AddCors(o => o.AddPolicy("allow_any_origins", builder =>
         {

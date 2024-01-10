@@ -9,7 +9,7 @@ public interface ILobby : ILobbyDisposeListener, ILobbyReadyListener, IDisposabl
     Guid GameId { get; init; }
 
     Guid InitiatorId { get; init; }
-    new int MembersCount { get; }
+    IReadOnlyDictionary<string, string> Properties { get; init; }
     LobbyState State { get; protected set; }
     bool IsDisposed { get; }
 
@@ -25,5 +25,5 @@ public interface ILobby : ILobbyDisposeListener, ILobbyReadyListener, IDisposabl
 
     IEnumerable<IJoinFilter>? GetJoinFilters();
     void Add(RoomMember member, ushort roomIndex);
-    void Remove(Guid memberId);
+    void Remove(Guid memberId, ushort roomIndex);
 }

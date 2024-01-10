@@ -17,7 +17,7 @@ public class LeaveMemberTests
         // act
         var exception = await Should.ThrowAsync<LobbyException>(
             () => factory.Get<ILeaveMemberLobbyUseCase>()
-            .ExecuteAsync(userId: Guid.NewGuid(), lobbyId: Guid.NewGuid()));
+            .ExecuteAsync(userId: Guid.NewGuid(), lobbyId: Guid.NewGuid(), roomIndex: 0));
 
         //assert
         exception.ErrorCode.ShouldBe(Errors.Main.LobbyNotFound);

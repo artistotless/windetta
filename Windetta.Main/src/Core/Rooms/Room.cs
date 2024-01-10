@@ -9,7 +9,6 @@ public class Room : IDisposable
     public event EventHandler<RoomEventArg> MemberLeft;
 
     // Public fields
-    //public Guid Id { get; private set; }
     public ushort Index { get; init; }
     public IReadOnlyCollection<RoomMember> Members => _members;
     public uint MaxMembers { get; init; }

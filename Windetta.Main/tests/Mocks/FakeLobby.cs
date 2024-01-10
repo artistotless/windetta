@@ -26,6 +26,8 @@ public class ProxyLobby : ILobby
     public LobbyState State { get { return _original.State; } set { _original.State = value; } }
     public bool IsDisposed { get { return _original.IsDisposed; } private set { } }
 
+    public IReadOnlyDictionary<string, string>? Properties { get { return _original.Properties; } init { } }
+
     //Events
     public event EventHandler? Updated;
     public event EventHandler? Disposed;
@@ -54,9 +56,9 @@ public class ProxyLobby : ILobby
         _original.Add(member, roomIndex);
     }
 
-    public virtual void Remove(Guid memberId)
+    public virtual void Remove(Guid memberId, ushort roomIndex)
     {
-        _original.Remove(memberId);
+        _original.Remove(memberId, roomIndex);
     }
 
     public virtual void Dispose()

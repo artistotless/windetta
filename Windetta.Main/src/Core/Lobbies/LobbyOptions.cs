@@ -9,6 +9,7 @@ public record LobbyOptions
     public Guid GameId { get; init; }
     public Bet Bet { get; init; }
     public GameConfiguration GameConfiguration { get; init; }
+    public IReadOnlyDictionary<string,string>? Properties { get; init; }
     public bool Private { get; init; }
     public IAutoReadyStrategy? AutoReadyStrategy { get; init; }
     public IAutoDisposeStrategy? AutoDisposeStrategy { get; init; }

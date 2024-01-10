@@ -32,7 +32,7 @@ public class Create : ICreateLobbyUseCase
 
         var initiator = new RoomMember(options.InitiatorId);
 
-        lobby.Add(initiator, lobby.Rooms.First().Index);
+        lobby.Add(initiator, roomIndex: 0);
 
         lobby.SetAutoReadyStrategy(options.AutoReadyStrategy ??
             new DefaultReadyStrategy());

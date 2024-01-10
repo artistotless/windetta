@@ -11,13 +11,13 @@ public class LeaveMember : ILeaveMemberLobbyUseCase
         _lobbies = lobbies;
     }
 
-    public async Task ExecuteAsync(Guid userId, Guid lobbyId)
+    public async Task ExecuteAsync(Guid userId, Guid lobbyId, ushort roomIndex)
     {
         var lobby = await _lobbies.GetAsync(lobbyId);
 
         if (lobby is null)
             throw LobbyException.NotFound;
 
-        lobby.Remove(userId);
+        lobby.Remove(userId, roomIndex);
     }
 }

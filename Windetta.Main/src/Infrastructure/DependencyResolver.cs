@@ -1,17 +1,60 @@
-﻿using Polly;
+﻿using Microsoft.AspNetCore.SignalR;
+using Polly;
+using System.Reflection;
+using Windetta.Common.Database;
+using Windetta.Common.Mongo;
 using Windetta.Main.Core.Lobbies.Plugins;
 using Windetta.Main.Core.Lobbies.UseCases;
 using Windetta.Main.Core.Services.LSPM;
 using Windetta.Main.Infrastructure.Consumers;
 using Windetta.Main.Infrastructure.Lobby.Plugins;
+using Windetta.Main.Infrastructure.Logging;
+using Windetta.Main.Infrastructure.MassTransit;
 using Windetta.Main.Infrastructure.Retries;
+using Windetta.Main.Infrastructure.Sagas;
+using Windetta.Main.Infrastructure.Security;
 using Windetta.Main.Infrastructure.Services;
+using Windetta.Main.Infrastructure.SignalR;
 
 namespace Windetta.Main.Infrastructure;
 
 public static class DependencyResolver
 {
-    public static void AddDefaultInstanceIdProvider(this IServiceCollection services)
+    public static void AddInfrastructureLayer(this WebApplicationBuilder builder)
+    {
+        var services = builder.Services;
+        var assembly = Assembly.GetExecutingAssembly();
+
+        builder.ConfigureAddLogging();
+        services.AddHttpContextUserIdProvider();
+        services.AddDefaultInstanceIdProvider();
+        services.AddConfigureAuthentication();
+        services.AddConfigureAuthorization();
+        services.ConfigureAddSignalR();
+        services.AddHttpContextAccessor();
+        services.AddConfigureCors();
+        services.AddLobby();
+        services.AddLobbyPlugins();
+        services.AddMongo();
+        services.AddPolyRetries();
+        services.AddMysqlDbContext<SagasDbContext>(assembly);
+        services.AddInMemoryLspms();
+        services.AddConfigureMassTransit(assembly);
+    }
+
+    private static void AddConfigureCors(this IServiceCollection services)
+        => CorsConfiguration.Configure(services);
+
+    private static void AddConfigureAuthentication(this IServiceCollection services)
+        => AuthenticationConfiguration.Configure(services);
+
+    private static void AddConfigureAuthorization(this IServiceCollection services)
+        => AuthorizationConfiguration.Configure(services);
+
+    private static void AddConfigureMassTransit(this IServiceCollection services, Assembly assembly)
+    => MassTransitConfiguration.Configure(services, assembly);
+
+    private static void AddDefaultInstanceIdProvider(this IServiceCollection services)
     {
         services.AddSingleton<IInstanceIdProvider, DefaultInstanceIdProvider>((p) =>
         {
@@ -22,7 +65,7 @@ public static class DependencyResolver
         });
     }
 
-    public static void AddLobby(this IServiceCollection services)
+    private static void AddLobby(this IServiceCollection services)
     {
         services.AddScoped<ILobbyUseCase, Create>();
         services.AddScoped<ILobbyUseCase, Delete>();
@@ -34,7 +77,7 @@ public static class DependencyResolver
         services.AddScoped<ILobbyUseCase, LeaveMember>();
     }
 
-    public static void AddLobbyPlugins(this IServiceCollection services)
+    private static void AddLobbyPlugins(this IServiceCollection services)
     {
         services.AddScoped<ILobbyPlugin, DefaultDisposeStrategy>();
         services.AddScoped<ILobbyPlugin, DefaultReadyStrategy>();
@@ -42,14 +85,32 @@ public static class DependencyResolver
         services.AddScoped<ILobbyPlugin, DateReadyStrategy>();
     }
 
-    public static void AddInMemoryLspms(this IServiceCollection services)
+    private static void AddInMemoryLspms(this IServiceCollection services)
     {
         services.AddScoped<ILspms, InMemoryLspms>();
     }
 
-    public static void AddPolyRetries(this IServiceCollection services)
+    private static void AddPolyRetries(this IServiceCollection services)
     {
         services.AddResiliencePipeline(typeof(SearchGameServerConsumer),
             PollyPipelines.AddSearchGameServerConsumerRetryPolicy);
+    }
+
+    private static void AddHttpContextUserIdProvider(this IServiceCollection services)
+    {
+        services.AddScoped<Core.Services.IUserIdProvider, HttpContextUserIdProvider>();
+    }
+
+    private static void ConfigureAddLogging(this WebApplicationBuilder builder)
+        => LoggingConfiguration.ConfigureAddLogging(builder);
+
+    private static void ConfigureAddSignalR(this IServiceCollection services)
+    {
+        services.AddSignalR(hubOptions =>
+        {
+            hubOptions.AddFilter<SignalRExceptionFilter>();
+        });
+
+        services.AddSingleton<SignalRExceptionFilter>();
     }
 }

@@ -2,5 +2,5 @@
 
 public interface ILeaveMemberLobbyUseCase : ILobbyUseCase
 {
-    Task ExecuteAsync(Guid userId, Guid lobbyId);
+    Task ExecuteAsync(Guid userId, Guid lobbyId, ushort roomIndex);
 }

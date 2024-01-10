@@ -36,7 +36,7 @@ public class LobbyDispatcherTests
 
         // act
         dispatcher.AddToTracking(lobby);
-        await interactor.LeaveMemberAsync(request.InitiatorId, lobby.Id);
+        await interactor.LeaveMemberAsync(request.InitiatorId, lobby.Id, roomIndex: 0);
         await interactor.JoinMemberAsync(request.InitiatorId, lobby.Id, roomIndex: 0);
 
         // assert

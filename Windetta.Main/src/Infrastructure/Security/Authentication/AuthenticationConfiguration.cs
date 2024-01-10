@@ -3,9 +3,9 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Windetta.Main.Infrastructure.Security;
 
-public static class AuthenticationExtensions
+public static class AuthenticationConfiguration
 {
-    public static void ConfigureAddAuthentication(this IServiceCollection services)
+    public static void Configure(IServiceCollection services)
     {
         var authBuilder = services.AddAuthentication(options =>
         {

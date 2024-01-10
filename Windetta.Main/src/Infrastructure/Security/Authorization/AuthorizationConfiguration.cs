@@ -1,8 +1,8 @@
 ﻿namespace Windetta.Main.Infrastructure.Security;
 
-internal static class AuthorizationExtensions
+internal static class AuthorizationConfiguration
 {
-    public static void ConfigureAddAuthorization(this IServiceCollection services)
+    public static void Configure(IServiceCollection services)
     {
         _ = services.AddAuthorization(options =>
         {

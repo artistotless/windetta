@@ -11,6 +11,7 @@ public sealed class Lobby : ILobby
     public bool IsPublic { get; init; }
     public DateTimeOffset CreatedAt { get; init; }
     public DateTimeOffset UpdatedAt { get; set; }
+    public IReadOnlyDictionary<string, string>? Properties { get; init; }
     public int MembersCount { get; private set; }
     public Bet Bet { get; init; }
     public Guid InitiatorId { get; init; }
@@ -45,6 +46,7 @@ public sealed class Lobby : ILobby
         GameId = options.GameId;
         Configuration = options.GameConfiguration;
         Bet = options.Bet;
+        Properties = options.Properties;
         _rooms = CreateRooms();
 
         _joinFilters = options.JoinFilters;
@@ -86,12 +88,9 @@ public sealed class Lobby : ILobby
         OnUpdated();
     }
 
-    public void Remove(Guid memberId)
+    public void Remove(Guid memberId, ushort roomIndex)
     {
-        var room = _rooms
-            .Where(x => x.Members
-            .Any(x => x.Id == memberId))
-            .FirstOrDefault();
+        var room = _rooms[roomIndex];
 
         if (room is null)
             return;

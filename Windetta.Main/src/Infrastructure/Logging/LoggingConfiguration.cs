@@ -1,8 +1,8 @@
 ﻿namespace Windetta.Main.Infrastructure.Logging;
 
-public static class Extensions
+public static class LoggingConfiguration
 {
-    public static void ConfigureAddLogging(this WebApplicationBuilder builder)
+    public static void ConfigureAddLogging(WebApplicationBuilder builder)
     {
         var config = builder.Configuration.GetSection("Logging");
 

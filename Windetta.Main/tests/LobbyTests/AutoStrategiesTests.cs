@@ -75,7 +75,7 @@ public class AutoStrategiesTests
 
 
         lobby.Disposed += callback;
-        await interactor.LeaveMemberAsync(request.InitiatorId, lobby.Id);
+        await interactor.LeaveMemberAsync(request.InitiatorId, lobby.Id, roomIndex: 0);
 
         // act
         await tcs.Task;
