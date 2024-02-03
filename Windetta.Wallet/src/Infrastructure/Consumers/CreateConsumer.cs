@@ -3,29 +3,26 @@ using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
 using Windetta.Wallet.Application.Services;
 using Windetta.Wallet.Exceptions;
-using Windetta.Wallet.Infrastructure.Consumers;
 
-namespace Windetta.Wallet.Infrastructure.Consumers
+namespace Windetta.Wallet.Infrastructure.Consumers;
+public class CreateConsumer : IConsumer<ICreateUserWallet>
 {
-    public class CreateConsumer : IConsumer<ICreateUserWallet>
+    private readonly IUserWalletService _walletService;
+
+    public CreateConsumer(IUserWalletService walletService)
     {
-        private readonly IUserWalletService _walletService;
+        _walletService = walletService;
+    }
 
-        public CreateConsumer(IUserWalletService walletService)
+    public async Task Consume(ConsumeContext<ICreateUserWallet> context)
+    {
+        await _walletService.CreateWalletAsync(context.Message.UserId);
+
+        await context.Publish<IUserWalletCreated>(new
         {
-            _walletService = walletService;
-        }
-
-        public async Task Consume(ConsumeContext<ICreateUserWallet> context)
-        {
-            await _walletService.CreateWalletAsync(context.Message.UserId);
-
-            await context.Publish<IUserWalletCreated>(new
-            {
-                context.Message.UserId,
-                TimeStamp = DateTime.UtcNow,
-            });
-        }
+            context.Message.UserId,
+            TimeStamp = DateTime.UtcNow,
+        });
     }
 }
 

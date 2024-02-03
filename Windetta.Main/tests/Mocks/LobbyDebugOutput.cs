@@ -14,6 +14,14 @@ public class LobbyDebugOutput : ILobbyObserverOutput
         _buffer = buffer;
     }
 
+    public async Task WriteLobbyAdded(ILobby lobby)
+    {
+        var text = $"Lobby added: {lobby.Id}";
+
+        _buffer.Enqueue(text);
+        await _output.WriteLineAsync(text);
+    }
+
     public async Task WriteLobbyDeleted(ILobby lobby)
     {
         var text = $"Lobby deleted: {lobby.Id}";

@@ -19,6 +19,13 @@ public class SignalRLobbyEventsOutput : ILobbyObserverOutput
         _context = context;
     }
 
+    public async Task WriteLobbyAdded(ILobby lobby)
+    {
+        _logger.LogDebug($"Lobby added: {lobby.Id}");
+
+        await _context.Clients.All.SendAsync("onAddedLobby", lobby.Id.ToString());
+    }
+
     public async Task WriteLobbyDeleted(ILobby lobby)
     {
         _logger.LogDebug($"Lobby deleted: {lobby.Id}");

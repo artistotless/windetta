@@ -1,13 +1,14 @@
-﻿using Windetta.Contracts;
-using Windetta.Common.Testing;
+﻿using Windetta.Common.Testing;
+using Windetta.Contracts;
 using Windetta.Main.Core.Services.Wallet;
 
 namespace Windetta.MainTests.Mocks;
-public class InMemoryWalletService : IWalletService
+
+public class TestInMemoryWalletService : IWalletService
 {
     private readonly List<Wallet.Domain.UserWallet> _wallets;
 
-    public InMemoryWalletService()
+    public TestInMemoryWalletService()
     {
         var balance = new Wallet.Domain.UserBalance()
         {
@@ -34,7 +35,7 @@ public class InMemoryWalletService : IWalletService
         var wallet = _wallets.Find(w => w.UserId == userId);
         var balance = wallet.Balances.Find(b => b.CurrencyId == currencyId);
 
-        return Task.FromResult(new UserBalance() { Amount = balance.Amount, HeldAmount = balance.HeldAmount });
+        return Task.FromResult(new UserBalance(balance.Amount, balance.HeldAmount));
     }
 
     public Task<bool> IsEqualOrGreater(Guid userId, FundsInfo funds)

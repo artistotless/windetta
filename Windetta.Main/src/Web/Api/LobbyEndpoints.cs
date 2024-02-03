@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Windetta.Main.Core.Lobbies;
 using Windetta.Main.Core.Services;
+using Windetta.Main.Web.Api.Dtos;
 
 namespace Windetta.Main.Web.Api
 {
@@ -8,6 +9,8 @@ namespace Windetta.Main.Web.Api
     {
         public static void UseLobbyEndpoints(this WebApplication web)
         {
+            var group = web.MapGroup("api/lobbies").RequireAuthorization();
+
             // Get lobbies
             web.MapGet("api/lobbies", async ([FromServices] ILobbies lobbies) =>
             {
@@ -15,20 +18,36 @@ namespace Windetta.Main.Web.Api
             });
 
             // Create lobby
-            web.MapPost("api/lobbies", async (
-                [FromBody] CreateLobbyRequest body,
+            group.MapPost("/", async (
+                [FromBody] CreateLobbyRequestDto body,
+                [FromServices] IUserIdService userIdProvider,
+                [FromServices] LobbyObserver observer,
                 [FromServices] LobbiesInteractor interactor) =>
             {
-                var lobby = await interactor.CreateAsync(body);
+                var createRequest = new CreateLobbyRequest()
+                {
+                    Bet = body.Bet,
+                    InitiatorId = userIdProvider.UserId,
+                    GameId = body.GameId,
+                    Private = body.Private,
+                    Properties = body.Properties,
+                    JoinFilters = body.JoinFilters,
+                    AutoDisposeStrategy = body.AutoDisposeStrategy,
+                    AutoReadyStrategy = body.AutoReadyStrategy,
+                };
+
+                var lobby = await interactor.CreateAsync(createRequest);
+
+                observer.AddToTracking(lobby);
 
                 return Results.Ok(lobby);
             });
 
             // Join room
-            web.MapPost("api/lobbies/{id:guid}/rooms/{roomIndex:int}", async (
+            group.MapPost("/{lobbyId:guid}/rooms/{roomIndex:int}", async (
                 [FromRoute] Guid lobbyId,
                 [FromRoute] ushort roomIndex,
-                [FromServices] IUserIdProvider userIdProvider,
+                [FromServices] IUserIdService userIdProvider,
                 [FromServices] LobbiesInteractor interactor) =>
             {
                 await interactor.JoinMemberAsync
@@ -38,10 +57,10 @@ namespace Windetta.Main.Web.Api
             });
 
             // Leave room
-            web.MapDelete("api/lobbies/{id:guid}/rooms/{roomIndex:int}", async (
+            group.MapDelete("/{lobbyId:guid}/rooms/{roomIndex:int}", async (
                 [FromRoute] Guid lobbyId,
                 [FromRoute] ushort roomIndex,
-                [FromServices] IUserIdProvider userIdProvider,
+                [FromServices] IUserIdService userIdProvider,
                 [FromServices] LobbiesInteractor interactor) =>
             {
                 await interactor.LeaveMemberAsync

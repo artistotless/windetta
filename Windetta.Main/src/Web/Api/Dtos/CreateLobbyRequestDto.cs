@@ -1,7 +1,7 @@
 ﻿using Windetta.Main.Core.Lobbies;
 using Windetta.Main.Core.Lobbies.Dtos;
 
-namespace Windetta.Main.Infrastructure.SignalR;
+namespace Windetta.Main.Web.Api.Dtos;
 
 public class CreateLobbyRequestDto
 {
@@ -9,6 +9,7 @@ public class CreateLobbyRequestDto
     public Bet Bet { get; init; }
     public bool Private { get; init; }
     public PluginSetDto? AutoReadyStrategy { get; init; }
+    public IReadOnlyDictionary<string, string>? Properties { get; init; }
     public PluginSetDto? AutoDisposeStrategy { get; init; }
     public IEnumerable<PluginSetDto>? JoinFilters { get; init; }
 }

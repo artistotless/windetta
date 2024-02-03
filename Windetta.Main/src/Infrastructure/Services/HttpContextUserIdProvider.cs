@@ -1,8 +1,10 @@
-﻿using Windetta.Main.Core.Services;
+﻿using System.Security.Authentication;
+using System.Security.Claims;
+using Windetta.Main.Core.Services;
 
 namespace Windetta.Main.Infrastructure.Services;
 
-public class HttpContextUserIdProvider : IUserIdProvider
+public class HttpContextUserIdProvider : IUserIdService
 {
     private readonly IHttpContextAccessor _contextAccessor;
 
@@ -19,7 +21,16 @@ public class HttpContextUserIdProvider : IUserIdProvider
                 throw new Exception
                     ("Cannot get userId from empty HttpContext");
 
-            if (!Guid.TryParse(_contextAccessor.HttpContext.User.Identity?.Name ?? string.Empty, out Guid id))
+            if (_contextAccessor.HttpContext.User.Identity == null ||
+                !_contextAccessor.HttpContext.User.Identity.IsAuthenticated)
+                throw new AuthenticationException();
+
+            var idClaim = _contextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (idClaim == null)
+                throw new Exception("Cannot get id claim from HttpContext");
+
+            if (!Guid.TryParse(idClaim.Value, out Guid id))
                 throw new Exception
                     ("Cannot parse Guid userId from HttpContext");
 

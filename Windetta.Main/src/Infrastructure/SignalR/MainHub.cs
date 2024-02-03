@@ -1,81 +1,54 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Windetta.Main.Core.Lobbies;
-using Windetta.Main.Core.Lobbies.Dtos;
+using Windetta.Main.Core.Services;
 
 namespace Windetta.Main.Infrastructure.SignalR;
 
 [Authorize(Policy = "NeedRealtimeScope")]
 public class MainHub : Hub
 {
-    private readonly LobbiesInteractor _interactor;
-    private readonly LobbyObserver _dispatcher;
+    private readonly ILobbyUsersAssociations _lobbiesUsersSets;
+    private readonly IUserIdService _userIdProvider;
 
-    public MainHub(LobbiesInteractor interactor, LobbyObserver dispatcher)
+    public MainHub(
+        ILobbyUsersAssociations lobbiesUsersSets,
+        IUserIdService userIdProvider)
     {
-        _interactor = interactor;
-        _dispatcher = dispatcher;
+        _lobbiesUsersSets = lobbiesUsersSets;
+        _userIdProvider = userIdProvider;
     }
 
-    public async Task CreateLobby(CreateLobbyRequestDto request)
+    public async Task Subscribe()
     {
-        var createRequest = new CreateLobbyRequest()
-        {
-            Bet = request.Bet,
-            InitiatorId = GetUserId(),
-            GameId = request.GameId,
-            Private = request.Private,
-            JoinFilters = request.JoinFilters,
-            AutoDisposeStrategy = request.AutoDisposeStrategy,
-            AutoReadyStrategy = request.AutoReadyStrategy,
-        };
-
-        var lobby = await _interactor.CreateAsync(createRequest);
-
-        _dispatcher.AddToTracking(lobby);
-
-        await Groups.AddToGroupAsync(Context.ConnectionId, lobby.Id.ToString());
-
-        await Clients.All.SendAsync("onAddedLobby", new LobbyDto(lobby));
-    }
-
-    public async Task JoinLobby(Guid lobbyId, ushort roomIndex)
-    {
-        await _interactor.JoinMemberAsync(GetUserId(), lobbyId, roomIndex);
-
-        await Groups.AddToGroupAsync(Context.ConnectionId, lobbyId.ToString());
-    }
-
-    public async Task LeaveLobby(Guid lobbyId, ushort roomIndex)
-    {
-        await _interactor.LeaveMemberAsync(GetUserId(), lobbyId, roomIndex);
-
-        await Groups.RemoveFromGroupAsync(Context.ConnectionId, lobbyId.ToString());
-    }
-
-    public async Task GetLobbies()
-    {
-        var lobbies = await _interactor.GetAllAsync();
-
-        await Clients.Caller.SendAsync("onReceivedLobbies", lobbies.ToArray());
+        await SubscribeOnCurrentLobbyEvents();
     }
 
     public override async Task OnConnectedAsync()
     {
-        var lobbyId = await _interactor.GetLobbyIdByUserIdAsync(GetUserId());
-
-        if (lobbyId.HasValue == true)
-            await Groups.AddToGroupAsync(Context.ConnectionId, lobbyId.Value.ToString());
-
-        // TODO: delete. test only
-        //Context.Items.Add("id", Guid.NewGuid());
+        await SubscribeOnCurrentLobbyEvents();
     }
 
-    private Guid GetUserId()
+    public override async Task OnDisconnectedAsync(Exception? exception)
     {
-        return Guid.Parse(Context.UserIdentifier!);
+        await UnSubscribeOnCurrentLobbyEvents();
+    }
 
-        // TODO: delete. test only
-        //return Context.Items.TryGetValue("id", out var value) ? (Guid)value : Guid.Parse(Context.UserIdentifier!);
+    private ValueTask SubscribeOnCurrentLobbyEvents()
+    {
+        var lobbyId = _lobbiesUsersSets.GetLobbyId(_userIdProvider.UserId);
+        if (!lobbyId.HasValue)
+            return ValueTask.CompletedTask;
+
+        return new ValueTask(Groups.AddToGroupAsync(Context.ConnectionId, lobbyId.Value.ToString()));
+    }
+
+    private ValueTask UnSubscribeOnCurrentLobbyEvents()
+    {
+        var lobbyId = _lobbiesUsersSets.GetLobbyId(_userIdProvider.UserId);
+        if (!lobbyId.HasValue)
+            return ValueTask.CompletedTask;
+
+        return new ValueTask(Groups.RemoveFromGroupAsync(Context.ConnectionId, lobbyId.Value.ToString()));
     }
 }

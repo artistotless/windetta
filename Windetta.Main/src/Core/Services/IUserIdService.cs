@@ -1,6 +1,6 @@
 ﻿namespace Windetta.Main.Core.Services;
 
-public interface IUserIdProvider
+public interface IUserIdService
 {
     Guid UserId { get; }
 }

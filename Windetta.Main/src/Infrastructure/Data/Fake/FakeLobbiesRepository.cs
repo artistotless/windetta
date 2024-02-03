@@ -23,9 +23,10 @@ public class FakeLobbiesRepository : ILobbies
             .AsEnumerable());
     }
 
-    public Task<ILobby> GetAsync(Guid lobbyId)
+    public Task<ILobby?> GetAsync(Guid lobbyId)
     {
-        return Task.FromResult(_lobbies.First(x => x.Id == lobbyId));
+        return Task.FromResult(_lobbies
+            .FirstOrDefault(x => x.Id == lobbyId));
     }
 
     public Task RemoveAsync(Guid lobbyId)

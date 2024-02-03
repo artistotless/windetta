@@ -98,7 +98,7 @@ public static class DependencyResolver
 
     private static void AddHttpContextUserIdProvider(this IServiceCollection services)
     {
-        services.AddScoped<Core.Services.IUserIdProvider, HttpContextUserIdProvider>();
+        services.AddScoped<Core.Services.IUserIdService, HttpContextUserIdProvider>();
     }
 
     private static void ConfigureAddLogging(this WebApplicationBuilder builder)

@@ -14,6 +14,7 @@ public static class MassTransitConfiguration
         services.AddReadyMassTransit(assembly, Svc.Main, cfg =>
         {
             cfg.AddRequestClient<IGameServerRequested>();
+            cfg.AddRequestClient<IGameServerRequested>();
             cfg.SetEntityFrameworkSagaRepositoryProvider(x =>
             {
                 x.ConcurrencyMode = ConcurrencyMode.Optimistic;
