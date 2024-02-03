@@ -16,7 +16,7 @@ public class NewUserMap : SagaClassMap<NewUserFlow>
 
 public class SagasDbContext : SagaDbContext
 {
-    public SagasDbContext(DbContextOptions options) : base(options) { }
+    public SagasDbContext(DbContextOptions<SagasDbContext> options) : base(options) { }
 
     protected override IEnumerable<ISagaClassMap> Configurations
     {

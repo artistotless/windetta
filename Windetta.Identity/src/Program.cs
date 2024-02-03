@@ -14,6 +14,8 @@ using Windetta.Identity.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.UseUrls("https://localhost:7159");
+
 IConfiguration configuration = builder.Configuration;
 IServiceCollection services = builder.Services;
 var assemby = Assembly.GetExecutingAssembly();

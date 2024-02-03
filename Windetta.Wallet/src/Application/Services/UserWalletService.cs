@@ -1,9 +1,9 @@
 ﻿using System.Data;
-using Windetta.Common.Constants;
-using Windetta.Common.Types;
+using Windetta.Contracts;
 using Windetta.Wallet.Application.DAL;
 using Windetta.Wallet.Application.Dto;
 using Windetta.Wallet.Domain;
+using Windetta.Wallet.Exceptions;
 
 namespace Windetta.Wallet.Application.Services;
 
@@ -11,13 +11,23 @@ public class UserWalletService : IUserWalletService
 {
     private readonly UnitOfWorkCommittable _uow;
 
-    public UserWalletService(UnitOfWorkCommittable ctx)
+    public UserWalletService(UnitOfWorkCommittable uow)
     {
-        _uow = ctx;
+        _uow = uow;
     }
-    public Task<UserBalance> GetBalance(Guid userId, int currencyId)
+    public async Task<UserBalance> GetBalance(Guid userId, int currencyId)
     {
-        throw new NotImplementedException();
+        var wallet = await _uow.Wallets.GetAsync(userId);
+
+        if (wallet is null)
+            throw new WalletNotFoundException();
+
+        var balance = wallet.GetBalance(currencyId);
+
+        if (balance is null)
+            throw new BalanceNotFoundException();
+
+        return balance;
     }
 
     public async Task CreateWalletAsync(Guid userId, IEnumerable<UserBalance>? initial = null)
@@ -25,7 +35,7 @@ public class UserWalletService : IUserWalletService
         var userWallet = new UserWallet()
         {
             UserId = userId,
-            Balances = initial?.ToList()
+            Balances = initial?.ToList() ?? new List<UserBalance>()
         };
 
         var foundWallet = await _uow.Wallets.GetAsync(userId);
@@ -43,9 +53,12 @@ public class UserWalletService : IUserWalletService
         var wallet = await _uow.Wallets.GetAsync(userId);
 
         if (wallet is null)
-            throw new WindettaException(Errors.Wallet.NotFound);
+            throw new WalletNotFoundException();
 
         var balance = wallet.GetBalance(funds.CurrencyId);
+
+        if (balance is null)
+            throw new BalanceNotFoundException();
 
         balance.Hold(funds.Amount);
 
@@ -60,12 +73,12 @@ public class UserWalletService : IUserWalletService
         var wallet = await _uow.Wallets.GetAsync(arg.userId);
 
         if (wallet is null)
-            throw new WindettaException(Errors.Wallet.NotFound);
+            throw new WalletNotFoundException();
 
         var balance = wallet.GetBalance(arg.funds.CurrencyId);
 
-        //using var transaction = _ctx.Database
-        //    .BeginTransaction(IsolationLevel.Serializable);
+        if (balance is null)
+            throw new BalanceNotFoundException();
 
         _uow.BeginTransaction(IsolationLevel.Serializable);
 
@@ -102,7 +115,7 @@ public class UserWalletService : IUserWalletService
         var user2Wallet = await _uow.Wallets.GetAsync(arg.destinationUserId);
 
         if (user1Wallet is null || user2Wallet is null)
-            throw new WindettaException(Errors.Wallet.NotFound);
+            throw new WalletNotFoundException();
 
         _uow.BeginTransaction(IsolationLevel.Serializable);
 
@@ -138,9 +151,12 @@ public class UserWalletService : IUserWalletService
         var wallet = await _uow.Wallets.GetAsync(arg.userId);
 
         if (wallet is null)
-            throw new WindettaException(Errors.Wallet.NotFound);
+            throw new WalletNotFoundException();
 
         var balance = wallet.GetBalance(arg.funds.CurrencyId);
+
+        if (balance is null)
+            throw new BalanceNotFoundException();
 
         _uow.BeginTransaction(IsolationLevel.Serializable);
 
@@ -177,9 +193,12 @@ public class UserWalletService : IUserWalletService
         var wallet = await _uow.Wallets.GetAsync(txn.UserId);
 
         if (wallet is null)
-            throw new WindettaException(Errors.Wallet.NotFound);
+            throw new WalletNotFoundException();
 
         var balance = wallet.GetBalance(txn.CurrencyId);
+
+        if (balance is null)
+            throw new BalanceNotFoundException();
 
         _uow.BeginTransaction(IsolationLevel.Serializable);
 
@@ -200,16 +219,39 @@ public class UserWalletService : IUserWalletService
         }
     }
 
-    public async Task UnHoldBalanceAsync(Guid userId, int currencyId)
+    public async Task UnHoldBalanceAsync(Guid userId, FundsInfo funds)
     {
         var wallet = await _uow.Wallets.GetAsync(userId);
 
         if (wallet is null)
-            throw new WindettaException(Errors.Wallet.NotFound);
+            throw new WalletNotFoundException();
 
-        var balance = wallet.GetBalance(currencyId);
+        var balance = wallet.GetBalance(funds.CurrencyId);
 
-        balance.UnHold();
+        if (balance is null)
+            throw new BalanceNotFoundException();
+
+        balance.UnHold(funds.Amount);
+
+        await _uow.SaveChangesAsync();
+    }
+
+    public async Task UnHoldBalanceAsync(IEnumerable<Guid> userIds, FundsInfo funds)
+    {
+        var wallets = await _uow.Wallets.GetAllAsync(userIds);
+        var usersCount = userIds.Count();
+
+        if (!wallets.Any() || wallets.Count() != usersCount)
+            throw new WalletNotFoundException();
+
+        var balances = wallets.SelectMany(w => w.Balances
+            .Where(b => b.CurrencyId == funds.CurrencyId));
+
+        if (balances.Count() != usersCount)
+            throw new BalanceNotFoundException();
+
+        foreach (var item in balances)
+            item.UnHold(funds.Amount);
 
         await _uow.SaveChangesAsync();
     }
@@ -217,12 +259,16 @@ public class UserWalletService : IUserWalletService
     public async Task HoldBalanceAsync(IEnumerable<Guid> userIds, FundsInfo funds)
     {
         var wallets = await _uow.Wallets.GetAllAsync(userIds);
+        var usersCount = userIds.Count();
 
-        if (!wallets.Any())
-            throw new WindettaException(Errors.Wallet.NotFound);
+        if (!wallets.Any() || wallets.Count() != usersCount)
+            throw new WalletNotFoundException();
 
         var balances = wallets.SelectMany(w => w.Balances
             .Where(b => b.CurrencyId == funds.CurrencyId));
+
+        if (balances.Count() != usersCount)
+            throw new BalanceNotFoundException();
 
         foreach (var item in balances)
             item.Hold(funds.Amount);

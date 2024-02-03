@@ -1,6 +1,6 @@
 ﻿namespace Windetta.Main.Core.Services.Wallet;
 
-public struct UserBalance
+public class UserBalance
 {
     public ulong Amount { get; init; }
     public ulong HeldAmount { get; init; }

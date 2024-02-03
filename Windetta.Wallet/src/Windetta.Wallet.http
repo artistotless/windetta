@@ -1,0 +1,7 @@
+﻿@Windetta.Wallet_HostAddress = https://localhost:7025
+@userId1 = 08dbc8b3-4170-4972-8728-c4ff931915f1
+@userId2 = 08dbc8b3-bf87-469c-8649-74c8d7b14255
+@currencyId = 1
+GET {{Windetta.Wallet_HostAddress}}/wallets/{{userId1}}/balances/{{currencyId}}
+
+###

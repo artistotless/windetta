@@ -1,5 +1,5 @@
 ﻿using MassTransit;
-using Windetta.Common.Messages;
+using Windetta.Contracts.Base;
 
 namespace Windetta.Common.MassTransit;
 
@@ -26,9 +26,9 @@ public class MyEndpointNameFormatter : DefaultEndpointNameFormatter
         return res;
     }
 
-    public override string Consumer<T>()
+    public string Consumer(Type consumerType)
     {
-        var messageType = typeof(T).GetInterfaces()[0].GenericTypeArguments[0];
+        var messageType = consumerType.GetInterfaces()[0].GenericTypeArguments[0];
         var genericArgumentType = messageType;
 
         if (messageType.IsGenericType && messageType.GetGenericTypeDefinition() == typeof(Batch<>))
@@ -45,11 +45,14 @@ public class MyEndpointNameFormatter : DefaultEndpointNameFormatter
         }
         else if (genericArgumentType.IsAssignableTo(typeof(IEvent)))
         {
-            consumerName = $"event.consumer.{typeof(T).Name.Replace("Consumer", string.Empty)}";
+            consumerName = $"event.consumer.{consumerType.Name.Replace("Consumer", string.Empty)}";
         }
 
         return $"{_defaultNamespace.ToLower()}.{consumerName.ToLower()}-{genericArgumentType.Name}";
     }
+
+    public override string Consumer<T>()
+        => Consumer(typeof(T));
 
     public static Uri CommandUri<T>(string serviceName)
     {

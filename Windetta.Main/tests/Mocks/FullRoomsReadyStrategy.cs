@@ -1,4 +1,4 @@
-﻿using Windetta.Main.Core.MatchHubs.Plugins;
+﻿using Windetta.Main.Core.Lobbies.Plugins;
 
 namespace Windetta.MainTests.Mocks;
 
@@ -10,9 +10,9 @@ public class FullRoomsReadyStrategy : AutoReadyStrategy
 
     protected override bool CheckReady()
     {
-        var count = Hub.Rooms.Select(x => x.MembersCount).Sum();
+        var count = Lobby.Rooms.Select(x => x.MembersCount).Sum();
 
-        if (count >= Hub.Configuration.MaxPlayers)
+        if (count >= Lobby.Configuration.MaxPlayers)
         {
             return true;
         }

@@ -1,7 +1,7 @@
 ﻿using MassTransit;
 using Windetta.Common.Constants;
 using Windetta.Common.MassTransit;
-using Windetta.Common.Types;
+using Windetta.Contracts;
 using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
 

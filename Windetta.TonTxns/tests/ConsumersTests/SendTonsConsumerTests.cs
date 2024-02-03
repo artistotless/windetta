@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Windetta.Common.Constants;
 using Windetta.Common.MassTransit;
-using Windetta.Common.Types;
+using Windetta.Contracts;
 using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
 using Windetta.TonTxns.Application.Models;
@@ -34,7 +34,7 @@ public class SendTonsConsumerTests : IUseHarness
             .AddScoped(x => new TxnsServiceMock(useExistingTxnCase: true).Mock.Object)
             .AddScoped(x => new Mock<IWithdrawService>().Object)
             .AddScoped(x => new Mock<IWalletCredentialSource>().Object)
-            .ConfigureMassTransit(Svc.TonTxns, this)
+            .ConfigureTestMassTransit(Svc.TonTxns, this)
             .BuildServiceProvider(true);
 
         var harness = provider.GetTestHarness();
@@ -74,7 +74,7 @@ public class SendTonsConsumerTests : IUseHarness
              .AddScoped(x => tonServiceMock.Object)
              .AddScoped(x => txnsServiceMock.Object)
              .AddScoped(x => walletCredentialSourceMock.Object)
-             .ConfigureMassTransit(Svc.TonTxns, this)
+             .ConfigureTestMassTransit(Svc.TonTxns, this)
              .BuildServiceProvider(true);
 
         var harness = provider.GetTestHarness();
@@ -123,7 +123,7 @@ public class SendTonsConsumerTests : IUseHarness
             .AddScoped(x => tonServiceMock.Object)
             .AddScoped(x => txnsServiceMock.Object)
             .AddScoped(x => walletCredentialSourceMock.Object)
-            .ConfigureMassTransit(Svc.TonTxns, this)
+            .ConfigureTestMassTransit(Svc.TonTxns, this)
             .BuildServiceProvider(true);
 
         var harness = provider.GetTestHarness();
@@ -159,7 +159,7 @@ public class SendTonsConsumerTests : IUseHarness
     {
         // arrange
         await using var provider = new ServiceCollection()
-            .ConfigureMassTransit(Svc.TonTxns, this)
+            .ConfigureTestMassTransit(Svc.TonTxns, this)
             .BuildServiceProvider(true);
 
         var harness = provider.GetTestHarness();

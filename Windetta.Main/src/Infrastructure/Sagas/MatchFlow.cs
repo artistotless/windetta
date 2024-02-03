@@ -1,24 +1,26 @@
-﻿using MassTransit;
+﻿using LSPM.Models;
+using MassTransit;
 using Windetta.Common.Constants;
 using Windetta.Common.MassTransit;
-using Windetta.Common.Types;
+using Windetta.Contracts;
 using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
 using Windetta.Main.Core.Exceptions;
-using Windetta.Main.Core.Matches;
-using Windetta.Main.Core.MatchHubs;
-using Windetta.Main.Core.Services.LSPM;
+using Windetta.Main.Core.Lobbies;
 
-namespace Windetta.Operations.Sagas;
+namespace Windetta.Main.Infrastructure.Sagas;
 
 public class MatchFlow : SagaStateMachineInstance
 {
     public Guid CorrelationId { get; set; }
     public IEnumerable<Player> Players { get; set; }
+    public IReadOnlyDictionary<Guid, string>? Tickets { get; set; }
+    public IReadOnlyDictionary<string, string>? Properties { get; set; }
     public Guid GameId { get; set; }
-    public string Endpoint { get; set; }
+    public string? Endpoint { get; set; }
     public DateTimeOffset Created { get; set; }
-    public Bet Bet { get; set; }
+    public int BetCurrencyId { get; set; }
+    public ulong BetAmount { get; set; }
     public int CurrentState { get; set; }
     public string? CanceledReason { get; set; }
 }
@@ -26,76 +28,92 @@ public class MatchFlow : SagaStateMachineInstance
 public enum MatchFlowState : int
 {
     AwaitingHoldBalances = 3,
-    GameServerSearch = 4,
-    GameServerSearchExpired = 5,
-    Running = 6,
-    ProcessingWinnings = 7,
-    Canceled = 8
+    GameServerSearching = 4,
+    Running = 5,
+    ProcessingWinnings = 6,
+    ProcessingWinningsFail = 7,
+    ServerFound = 8,
 }
 
 public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
 {
-    public MatchFlowStateMachine(IMatchHubs hubs)
+    public MatchFlowStateMachine(ILobbies lobbies)
     {
-        Event(() => MatchHubReady, x => x.CorrelateById(ctx => ctx.Message.CorrelationId));
-        Event(() => GameServerPrepared, x => x.CorrelateById(ctx => ctx.Message.CorrelationId));
-        Event(() => CancellationRequested, x => x.CorrelateById(ctx => ctx.Message.CorrelationId));
-        Event(() => MatchCompleted, x => x.CorrelateById(ctx => ctx.Message.CorrelationId));
-        Event(() => GameServerReservationPeriodExpired, x => x.CorrelateById(ctx => ctx.Message.CorrelationId));
-
         InstanceState(instance => instance.CurrentState);
 
         Initially(
-            When(MatchHubReady)
-                .CopyDataToInstance(hubs)
+            When(LobbyReady)
+                .CopyDataToInstance(lobbies)
                 .HoldBalances()
                 .TransitionTo(AwaitingHoldBalances));
 
         During(AwaitingHoldBalances,
             When(BalancesHeld)
                 .StartGameServerSearching()
-                .TransitionTo(GameServerSearch),
+                .TransitionTo(GameServerSearching),
             When(HoldBalancesFailed)
-                .NotifyMatchCanceled(x => "One of the players has insufficient balance")
-                .Finalize());
+                .CancelMatch(reason => "One of the players has insufficient balance"));
 
-        During(GameServerSearch,
-            Ignore(MatchHubReady),
-            When(GameServerPrepared)
-                .NotifyMatchBegun()
-                .TransitionTo(Running),
-            When(GameServerReservationPeriodExpired)
-                .TransitionTo(GameServerSearchExpired)
-                .NotifyMatchAwaitingExpired(),
+        During(GameServerSearching,
+            When(GameServerReservationFailed)
+                .NotifyMatchAwaitingExpired()
+                .CancelMatch(reason => "GameServers unavailable"),
+            When(GameServerFound)
+                .NotifyServerFound()
+                .SaveGameServerInfo()
+                .If(condition => condition.Saga.CurrentState != (int)MatchFlowState.Running,
+                 callback => callback.TransitionTo(ServerFound)),
             When(CancellationRequested)
-                .SetCanceledReason(x => x.Reason)
-                .TransitionTo(Canceled));
+                .CancelMatch(reason => reason.Reason));
+
+        During(ServerFound, GameServerSearching,
+            When(ReadyAcceptConnections)
+                .NotifyMatchBegun()
+                .TransitionTo(Running));
 
         During(Running,
+            Ignore(GameServerFound),
             When(CancellationRequested)
-                .SetCanceledReason(x => x.Reason)
-                .TransitionTo(Canceled),
+                .CancelMatch(reason => reason.Reason),
             When(MatchCompleted)
                 .TransitionTo(ProcessingWinnings)
                 .ProcessWinnings());
+
+        During(ProcessingWinnings,
+            When(WinningsProcessed)
+                .Finalize(),
+            When(ProcessingWinningsFailed)
+                .NotifyProccessingWinningsFailed()
+                .TransitionTo(ProcessingWinningsFail));
+
+        WhenEnter(Final, x =>
+        {
+            // TODO: add match to archive/history service
+            return x;
+        });
 
         SetCompletedWhenFinalized();
     }
 
     public State AwaitingHoldBalances { get; set; }
-    public State GameServerSearch { get; set; }
-    public State GameServerSearchExpired { get; set; }
+    public State GameServerSearching { get; set; }
     public State Running { get; set; }
     public State ProcessingWinnings { get; set; }
-    public State Canceled { get; set; }
+    public State ProcessingWinningsFail { get; set; }
+    public State ServerFound { get; set; }
 
-    public Event<IMatchHubReady> MatchHubReady { get; }
+    public Event<ILobbyReady> LobbyReady { get; }
     public Event<IBalancesHeld> BalancesHeld { get; }
-    public Event<Fault<IHoldBalances>> HoldBalancesFailed { get; }
-    public Event<IGameServerReservationPeriodExpired> GameServerReservationPeriodExpired { get; }
-    public Event<IGameServerPrepared> GameServerPrepared { get; }
+    public Event<IWinningsProcessed> WinningsProcessed { get; }
+    public Event<IGameServerFound> GameServerFound { get; }
+    public Event<IGameServeReadyAcceptConnections> ReadyAcceptConnections { get; }
     public Event<ICancellationMatchRequested> CancellationRequested { get; }
     public Event<IMatchCompleted> MatchCompleted { get; }
+
+    // Faults
+    public Event<Fault<IHoldBalances>> HoldBalancesFailed { get; }
+    public Event<Fault<ISearchGameServer>> GameServerReservationFailed { get; }
+    public Event<Fault<IProcessWinnings>> ProcessingWinningsFailed { get; }
 }
 
 public class MatchFlowDefinition : SagaDefinition<MatchFlow>
@@ -108,8 +126,7 @@ public class MatchFlowDefinition : SagaDefinition<MatchFlow>
         sagaConfigurator.UseInMemoryOutbox(context);
         sagaConfigurator.UseMessageRetry(c =>
         {
-            c.Interval(10, TimeSpan.FromSeconds(10));
-            c.Ignore<LspmException>(e => e.ErrorCode == Errors.Main.LspmNotFound);
+            c.Interval(6, TimeSpan.FromSeconds(10));
         });
     }
 }
@@ -117,21 +134,21 @@ public class MatchFlowDefinition : SagaDefinition<MatchFlow>
 #region Extension methods
 public static class MatchFlowStateMachineExtensions
 {
-    public static EventActivityBinder<MatchFlow, IMatchHubReady> CopyDataToInstance(
-        this EventActivityBinder<MatchFlow, IMatchHubReady> binder, IMatchHubs hubs)
+    public static EventActivityBinder<MatchFlow, ILobbyReady> CopyDataToInstance(
+        this EventActivityBinder<MatchFlow, ILobbyReady> binder, ILobbies lobbies)
     {
-
         return binder.Then(async ctx =>
         {
-            var hub = await hubs.GetAsync(ctx.Message.CorrelationId);
+            var lobby = await lobbies.GetAsync(ctx.Message.CorrelationId);
 
-            if (hub is null)
-                throw MatchHubException.NotFound;
+            if (lobby is null)
+                throw LobbyException.NotFound;
 
-            ctx.Saga.Bet = hub.Bet;
-            ctx.Saga.GameId = hub.GameId;
-            ctx.Saga.Players = hub.Rooms.SelectMany(r => r.Members,
-                (r, m) => new Player(m.Id, "Nick", r.Index));
+            ctx.Saga.BetCurrencyId = lobby.Bet.CurrencyId;
+            ctx.Saga.BetAmount = lobby.Bet.Amount;
+            ctx.Saga.GameId = lobby.GameId;
+            ctx.Saga.Players = lobby.Rooms.SelectMany(r => r.Members,
+                (r, m) => new Player(m.Id, m.Name, r.Index));
             ctx.Saga.CorrelationId = ctx.Message.CorrelationId;
             ctx.Saga.Created = ctx.Message.TimeStamp;
         });
@@ -140,50 +157,83 @@ public static class MatchFlowStateMachineExtensions
     public static EventActivityBinder<MatchFlow, IBalancesHeld> StartGameServerSearching(
     this EventActivityBinder<MatchFlow, IBalancesHeld> binder)
     {
-        return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<StartSearchingGameServer>(new
+        return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<ISearchGameServer>(new
         {
             ctx.Message.CorrelationId,
             ctx.Saga.GameId,
-            ctx.Saga.Players
+            ctx.Saga.Players,
+            ctx.Saga.Properties
         }));
     }
 
-    public static EventActivityBinder<MatchFlow, IMatchHubReady> HoldBalances(
-    this EventActivityBinder<MatchFlow, IMatchHubReady> binder)
+    public static EventActivityBinder<MatchFlow, ILobbyReady> HoldBalances(
+    this EventActivityBinder<MatchFlow, ILobbyReady> binder)
     {
-        return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<IHoldBalances>(new
+        return binder.SendCommandAsync(Svc.Wallet, ctx => ctx.Init<IHoldBalances>(new
         {
-            Funds = new FundsInfo(ctx.Saga.Bet.CurrencyId, ctx.Saga.Bet.Amount),
+            ctx.Message.CorrelationId,
+            Funds = new FundsInfo(ctx.Saga.BetCurrencyId, ctx.Saga.BetAmount),
             UsersIds = ctx.Saga.Players.Select(x => x.Id)
         }));
     }
 
-    public static EventActivityBinder<MatchFlow, IGameServerPrepared> NotifyMatchBegun(
-    this EventActivityBinder<MatchFlow, IGameServerPrepared> binder)
+    public static EventActivityBinder<MatchFlow, IGameServeReadyAcceptConnections> NotifyMatchBegun(
+    this EventActivityBinder<MatchFlow, IGameServeReadyAcceptConnections> binder)
     {
         return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<INotifyMatchBegun>(new
         {
             ctx.Message.CorrelationId,
-            ctx.Message.Endpoint,
-            ctx.Message.Tickets
+            ctx.Saga.Endpoint,
+            ctx.Saga.Tickets
         }));
     }
 
-    public static EventActivityBinder<MatchFlow, TData> NotifyMatchCanceled<TData>(
-    this EventActivityBinder<MatchFlow, TData> binder, Func<TData, string> selectReason)
-    where TData : class
+    public static EventActivityBinder<MatchFlow, IGameServerFound> NotifyServerFound(
+    this EventActivityBinder<MatchFlow, IGameServerFound> binder)
     {
-        return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<INotifyMatchCanceled>(new
+        return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<INotifyServerFound>(new
         {
-            Reason = selectReason.Invoke(ctx.Message)
+            ctx.Message.CorrelationId,
         }));
     }
 
-    public static EventActivityBinder<MatchFlow, TData> SetCanceledReason<TData>(
+    public static EventActivityBinder<MatchFlow, IGameServerFound> SaveGameServerInfo(
+    this EventActivityBinder<MatchFlow, IGameServerFound> binder)
+    {
+        return binder.Then(x =>
+        {
+            x.Saga.Endpoint = x.Message.Endpoint.ToString();
+            x.Saga.Tickets = x.Message.Tickets;
+        });
+    }
+
+    public static EventActivityBinder<MatchFlow, TData> CancelMatch<TData>(
     this EventActivityBinder<MatchFlow, TData> binder, Func<TData, string> selectReason)
     where TData : class
     {
-        return binder.Then(x => x.Saga.CanceledReason = selectReason(x.Message));
+        return binder
+            .SendCommandAsync(Svc.Main, ctx => ctx.Init<INotifyMatchCanceled>(new
+            {
+                ctx.Saga.CorrelationId,
+                Reason = selectReason.Invoke(ctx.Message)
+            }))
+            .SendCommandAsync(Svc.Wallet, ctx => ctx.Init<IUnHoldBalances>(new
+            {
+                Funds = new FundsInfo(ctx.Saga.BetCurrencyId, ctx.Saga.BetAmount),
+                UsersIds = ctx.Saga.Players.Select(x => x.Id)
+            }))
+            .Then(x => x.Saga.CanceledReason = selectReason(x.Message))
+            .Finalize();
+    }
+
+    public static EventActivityBinder<MatchFlow, Fault<IProcessWinnings>> NotifyProccessingWinningsFailed(
+    this EventActivityBinder<MatchFlow, Fault<IProcessWinnings>> binder)
+    {
+        return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<INotifyProccessingWinningsFailed>(new
+        {
+            ctx.Message.Message.CorrelationId,
+            FaultMessage = ctx.Message
+        }));
     }
 
     public static EventActivityBinder<MatchFlow, IMatchCompleted> ProcessWinnings(
@@ -191,19 +241,18 @@ public static class MatchFlowStateMachineExtensions
     {
         return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<IProcessWinnings>(new
         {
-            ctx.Message.CorrelationId,
+            Funds = new FundsInfo(ctx.Saga.BetCurrencyId, ctx.Saga.BetAmount),
             ctx.Message.Winners,
-            ctx.Saga.Bet.Amount,
-            ctx.Saga.Bet.CurrencyId,
+            ctx.Message.CorrelationId
         }));
     }
 
-    public static EventActivityBinder<MatchFlow, IGameServerReservationPeriodExpired> NotifyMatchAwaitingExpired(
-    this EventActivityBinder<MatchFlow, IGameServerReservationPeriodExpired> binder)
+    public static EventActivityBinder<MatchFlow, Fault<ISearchGameServer>> NotifyMatchAwaitingExpired(
+    this EventActivityBinder<MatchFlow, Fault<ISearchGameServer>> binder)
     {
         return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<INotifyMatchAwaitingExpired>(new
         {
-            ctx.Message.CorrelationId,
+            ctx.Message.Message.CorrelationId,
         }));
     }
     #endregion

@@ -1,4 +1,4 @@
-﻿using Windetta.Main.Core.MatchHubs.Plugins;
+﻿using Windetta.Main.Core.Lobbies.Plugins;
 
 namespace Windetta.MainTests.Mocks;
 
@@ -13,7 +13,7 @@ public class DateDisposeStrategy : AutoDisposeStrategy
 
     protected override bool CheckDispose()
     {
-        if ((DateTimeOffset.UtcNow - _created).TotalSeconds > 2 && Hub.Rooms.Sum(x => x.MembersCount) <= 0)
+        if ((DateTimeOffset.UtcNow - _created).TotalSeconds > 2 && Lobby.Rooms.Sum(x => x.MembersCount) <= 0)
             return true;
         else return false;
     }

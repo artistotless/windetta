@@ -8,7 +8,7 @@ namespace Windetta.Common.MassTransit;
 
 public static class TestingExtensions
 {
-    public static IServiceCollection ConfigureMassTransit(this IServiceCollection services, string serviceName, IUseHarness? userCfg = null)
+    public static IServiceCollection ConfigureTestMassTransit(this IServiceCollection services, string serviceName, IUseHarness? userCfg = null)
     {
         services.AddQuartz(x =>
         {

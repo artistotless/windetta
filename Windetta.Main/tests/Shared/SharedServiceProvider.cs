@@ -1,9 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Windetta.Main.Core.Games;
-using Windetta.Main.Core.MatchHubs;
-using Windetta.Main.Core.MatchHubs.Plugins;
-using Windetta.Main.Core.MatchHubs.UseCases;
+using Windetta.Main.Core.Lobbies;
+using Windetta.Main.Core.Lobbies.Plugins;
+using Windetta.Main.Core.Lobbies.UseCases;
 using Windetta.MainTests.Mocks;
 
 namespace Windetta.MainTests.Shared;
@@ -21,28 +21,28 @@ public static class SharedServiceProvider
         // dependencies
         services.TryAddScoped(p => new WalletServiceMock().Mock.Object);
         services.TryAddSingleton<IGames, InMemoryGamesRepository>();
-        services.TryAddSingleton<IMatchHubs, InMemoryMatchHubsStorage>();
-        services.TryAddSingleton<IMatchHubUsersAssociations, InMemoryMatchHubUsersAssociations>();
+        services.TryAddSingleton<ILobbies, InMemoryLobbiesStorage>();
+        services.TryAddSingleton<ILobbyUsersAssociations, InMemoryLobbyUsersAssociations>();
 
         // plugins
-        services.AddIfNotAddedScoped<IMatchHubPlugin, MinUserBalanceJoinFilter>(provider);
-        services.AddIfNotAddedScoped<IMatchHubPlugin, AlwaysFalseJoinFilter>(provider);
-        services.AddIfNotAddedScoped<IMatchHubPlugin, FullRoomsReadyStrategy>(provider);
-        services.AddIfNotAddedScoped<IMatchHubPlugin, DateDisposeStrategy>(provider);
+        services.AddIfNotAddedScoped<ILobbyPlugin, MinUserBalanceJoinFilter>(provider);
+        services.AddIfNotAddedScoped<ILobbyPlugin, AlwaysFalseJoinFilter>(provider);
+        services.AddIfNotAddedScoped<ILobbyPlugin, FullRoomsReadyStrategy>(provider);
+        services.AddIfNotAddedScoped<ILobbyPlugin, DateDisposeStrategy>(provider);
 
         // use cases
-        services.AddIfNotAddedScoped<IMatchHubUseCase, GetHubIdByUserId>(provider);
-        services.AddIfNotAddedScoped<IMatchHubUseCase, Create>(provider);
-        services.AddIfNotAddedScoped<IMatchHubUseCase, Delete>(provider);
-        services.AddIfNotAddedScoped<IMatchHubUseCase, Get>(provider);
-        services.AddIfNotAddedScoped<IMatchHubUseCase, GetAll>(provider);
-        services.AddIfNotAddedScoped<IMatchHubUseCase, LeaveMember>(provider);
-        services.AddIfNotAddedScoped<IMatchHubUseCase, JoinMember>(provider);
+        services.AddIfNotAddedScoped<ILobbyUseCase, GetLobbyIdByUserId>(provider);
+        services.AddIfNotAddedScoped<ILobbyUseCase, Create>(provider);
+        services.AddIfNotAddedScoped<ILobbyUseCase, Delete>(provider);
+        services.AddIfNotAddedScoped<ILobbyUseCase, Get>(provider);
+        services.AddIfNotAddedScoped<ILobbyUseCase, GetAll>(provider);
+        services.AddIfNotAddedScoped<ILobbyUseCase, LeaveMember>(provider);
+        services.AddIfNotAddedScoped<ILobbyUseCase, JoinMember>(provider);
 
-        services.TryAddScoped<IMatchHubPluginsFactory, DefaultMatchHubPluginsFactory>();
-        services.TryAddScoped<IMatchHubUseCasesFactory, DefaultMatchHubsUseCaseFactory>();
+        services.TryAddScoped<ILobbyPluginsFactory, DefaultLobbyPluginsFactory>();
+        services.TryAddScoped<ILobbyUseCasesFactory, DefaultLobbiesUseCaseFactory>();
 
-        services.TryAddScoped<MatchHubsInteractor>();
+        services.TryAddScoped<LobbiesInteractor>();
 
         return services.BuildServiceProvider();
     }

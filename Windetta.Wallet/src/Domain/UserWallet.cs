@@ -1,5 +1,4 @@
-﻿using Windetta.Common.Constants;
-using Windetta.Common.Types;
+﻿using Windetta.Contracts;
 
 namespace Windetta.Wallet.Domain;
 
@@ -17,17 +16,10 @@ public class UserWallet
         balanceTo?.Increase(funds.Amount);
     }
 
-    public UserBalance GetBalance(int currencyId)
+    public UserBalance? GetBalance(int currencyId)
     {
         var balance = Balances?
             .FirstOrDefault(x => currencyId == x.CurrencyId);
-
-        if (balance is null)
-        {
-            throw new WindettaException(
-                Errors.Wallet.BalanceNotFound,
-                nameof(Errors.Wallet.BalanceNotFound));
-        }
 
         return balance;
     }

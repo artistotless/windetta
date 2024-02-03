@@ -1,9 +1,9 @@
 ﻿using MassTransit;
-using Windetta.Common.Messages;
+using Windetta.Contracts.Base;
 
 namespace Windetta.Contracts.Commands;
 
-public interface ICreateUserWallet : ICommand, CorrelatedBy<Guid>
+public interface ICreateUserWallet : CorrelatedBy<Guid>, ICommand
 {
     public Guid UserId { get; set; }
 }

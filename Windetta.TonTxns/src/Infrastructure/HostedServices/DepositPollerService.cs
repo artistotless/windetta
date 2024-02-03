@@ -1,7 +1,7 @@
 ﻿using MassTransit;
 using Polly;
 using Windetta.Common.Constants;
-using Windetta.Common.Types;
+using Windetta.Contracts;
 using Windetta.Contracts.Events;
 using Windetta.TonTxns.Application.Services;
 

@@ -1,6 +1,5 @@
 ﻿using MassTransit;
-using Windetta.Common.Messages;
-using Windetta.Common.Types;
+using Windetta.Contracts.Base;
 
 namespace Windetta.Contracts.Commands;
 

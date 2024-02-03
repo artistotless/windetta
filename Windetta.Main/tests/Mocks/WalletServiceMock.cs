@@ -1,5 +1,5 @@
 ﻿using Windetta.Common.Testing;
-using Windetta.Common.Types;
+using Windetta.Contracts;
 using Windetta.Main.Core.Services.Wallet;
 
 namespace Windetta.MainTests.Mocks;
@@ -11,12 +11,6 @@ public class WalletServiceMock : MockInitializator<IWalletService>
 
     protected override void Setup(Mock<IWalletService> mock)
     {
-        mock
-            .Setup(x => x.HoldBalance(It.IsAny<Guid>(), It.IsAny<FundsInfo>()))
-            .Returns(Task.CompletedTask);
-        mock
-            .Setup(x => x.UnHoldBalance(It.IsAny<Guid>(), It.IsAny<int>()))
-            .Returns(Task.CompletedTask);
         mock
             .Setup(x => x.IsEqualOrGreater(It.IsAny<Guid>(), It.IsAny<FundsInfo>()))
             .ReturnsAsync(ReturnIsEqualOrGreater);

@@ -9,7 +9,10 @@ namespace Windetta.Common.Database;
 
 public static class Extensions
 {
-    public static void AddMysqlDbContext<T>(this IServiceCollection services, Assembly assembly) where T : DbContext
+    public static void AddMysqlDbContext<T>(
+        this IServiceCollection services,
+        Assembly assembly,
+        bool enableSensitiveDataLogging = false) where T : DbContext
     {
         using var provider = services.BuildServiceProvider();
 
@@ -21,7 +24,8 @@ public static class Extensions
         var connString = settings.GetConnectionString();
 
         services.AddDbContext<T>(options => options.UseMySql(connString, new MySqlServerVersion(settings.Version),
-             b => b.MigrationsAssembly(assembly.FullName)));
+             b => b.MigrationsAssembly(assembly.FullName))
+             .EnableSensitiveDataLogging(enableSensitiveDataLogging));
     }
 
     public static string GetConnectionString(this MysqlSettings settings)

@@ -4,7 +4,7 @@ namespace Windetta.Main.Infrastructure.Data.Mongo;
 
 public class RoomDbModel
 {
-    public Guid Id { get; set; }
+    public ushort Index { get; set; }
     public IEnumerable<RoomMember> Members { get; set; }
     public uint MaxMembers { get; set; }
 
@@ -12,7 +12,7 @@ public class RoomDbModel
     {
         return new RoomDbModel()
         {
-            Id = room.Id,
+            Index = room.Index,
             MaxMembers = room.MaxMembers,
             Members = room.Members
         };
@@ -20,6 +20,6 @@ public class RoomDbModel
 
     public static Room MapTo(RoomDbModel dbModel)
     {
-        return new Room(dbModel.Id, dbModel.MaxMembers, dbModel.Members);
+        return new Room(dbModel.Index, dbModel.MaxMembers, dbModel.Members);
     }
 }

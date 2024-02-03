@@ -6,9 +6,9 @@ public class InMemoryLspms : ILspms
 {
     private readonly IList<Lspm> _items;
 
-    public InMemoryLspms()
+    public InMemoryLspms(List<Lspm>? initial = null)
     {
-        _items = new List<Lspm>();
+        _items = initial ?? new List<Lspm>();
     }
 
     public Task<IEnumerable<Lspm>> GetAllAsync()

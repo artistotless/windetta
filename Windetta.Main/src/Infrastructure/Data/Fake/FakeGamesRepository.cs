@@ -7,7 +7,7 @@ public class FakeGamesRepository : IGames
 {
     private readonly List<Game> _games;
 
-    public static Guid ExampleId = Guid.Parse("b15739de-8d5b-4759-a20c-75389b14ecb8");
+    public static Guid ExampleId = Guid.Parse("accea9d1-7f70-40e2-8a8d-a90d3a79842b");
 
     public FakeGamesRepository()
     {
@@ -18,9 +18,12 @@ public class FakeGamesRepository : IGames
                 Id = ExampleId,
                 Description = "Sea battle",
                 IconPath = "/seabattle.png",
-                Configuration = new GameConfiguration() { MaxPlayers = 2, MinPlayers = 1 },
+                Configuration = new GameConfiguration(2,1),
                 Title = "Sea battle",
-                SupportedCurrencies = new[] { new SupportedCurrency() { CurrencyId = 1, MaxBet = 1000, MinBet = 100 } }
+                SupportedCurrencies = new[] {
+                    new SupportedCurrency() {
+                        CurrencyId = 1, MaxBet = 1000, MinBet = 100
+                    }}
             }
         };
     }

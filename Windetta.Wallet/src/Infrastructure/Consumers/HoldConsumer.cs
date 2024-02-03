@@ -2,9 +2,10 @@
 using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
 using Windetta.Wallet.Application.Services;
+using Windetta.Wallet.Domain.Exceptions;
+using Windetta.Wallet.Exceptions;
 
 namespace Windetta.Wallet.Infrastructure.Consumers;
-
 public class HoldConsumer : IConsumer<IHoldBalances>
 {
     private readonly IUserWalletService _walletService;
@@ -36,6 +37,7 @@ public class HoldConsumerDefinition : ConsumerDefinition<HoldConsumer>
         consumerConfigurator.UseInMemoryOutbox(context);
         consumerConfigurator.UseMessageRetry(r =>
         {
+            r.Ignore<WalletException>();
             r.Interval(retryCount: 3, interval: TimeSpan.FromSeconds(5));
         });
     }

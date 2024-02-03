@@ -6,16 +6,16 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using Windetta.Common.Configuration;
-using Windetta.Common.Messages;
+using Windetta.Contracts.Base;
 
 namespace Windetta.Common.MassTransit;
-
 public static class Extensions
 {
     public static void AddReadyMassTransit(this IServiceCollection services,
         Assembly assembly,
         string serviceName,
-        Action<IBusRegistrationConfigurator>? cfg = null)
+        Action<IBusRegistrationConfigurator>? regCfg = null,
+        Action<IRabbitMqBusFactoryConfigurator, IBusRegistrationContext>? busCfg = null)
     {
         var provider = services.BuildServiceProvider();
         var configuration = provider.GetRequiredService<IConfiguration>();
@@ -24,7 +24,7 @@ public static class Extensions
 
         services.AddMassTransit(x =>
         {
-            cfg?.Invoke(x);
+            regCfg?.Invoke(x);
             x.SetEndpointNameFormatter(new MyEndpointNameFormatter(serviceName));
             x.AddSagaStateMachines(assembly);
             x.AddSagas(assembly);
@@ -41,11 +41,12 @@ public static class Extensions
 
                 foreach (var item in data)
                 {
-                    var formatter = Activator
-                        .CreateInstance(typeof(FormatterWrapper<>)
-                        .MakeGenericType(item.Item1), serviceName) as IFormatterWrapper;
+                    if (HasExcludeRegisterAttribute(item.Item1))
+                        continue;
 
-                    cfg.ReceiveEndpoint(formatter.Consume(), e =>
+                    var formatter = new MyEndpointNameFormatter(serviceName);
+
+                    cfg.ReceiveEndpoint(formatter.Consumer(item.Item1), e =>
                     {
                         e.ConfigureConsumer(context, item.Item1);
 
@@ -53,15 +54,16 @@ public static class Extensions
                             e.ConfigureConsumeTopology = false;
                     });
                 }
-
+                busCfg?.Invoke(cfg, context);
                 cfg.ConfigureEndpoints(context);
             });
         });
     }
 
-    private interface IFormatterWrapper
+    private static bool HasExcludeRegisterAttribute(Type consumerType)
     {
-        public string Consume();
+        return consumerType.GetCustomAttribute
+            <ExcludeFromAutoRegisterConsumerAttribute>() is not null;
     }
 
     public static EventActivityBinder<TSaga, TData> SendCommandAsync<TSaga, TData, TMessage>(this EventActivityBinder<TSaga, TData> source,
@@ -94,19 +96,6 @@ public static class Extensions
         var endpoint = await ctx.GetSendEndpoint(uri);
 
         await endpoint.Send<TMessage>(values);
-    }
-
-    private class FormatterWrapper<T> : IFormatterWrapper where T : class, IConsumer
-    {
-        private IEndpointNameFormatter _formatter;
-
-        public FormatterWrapper(string serviceName)
-        {
-            _formatter = new MyEndpointNameFormatter(serviceName);
-        }
-
-        public string Consume()
-          => _formatter.Consumer<T>();
     }
 
     private enum MessageType { Command, Event }
