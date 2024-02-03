@@ -10,6 +10,9 @@
     <PackageReference Include="Autofac" Version="7.0.1" />
     <PackageReference Include="JustCRC32C" Version="1.1.0" />
     <PackageReference Include="Polly" Version="8.1.0" />
+    <PackageReference Include="TonSdk.Client" Version="0.2.7" />
+    <PackageReference Include="TonSdk.Contracts" Version="0.2.4" />
+    <PackageReference Include="TonSdk.Core" Version="0.2.8" />
     <PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
   </ItemGroup>
   <ItemGroup>
@@ -23,18 +26,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="7.0.0" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Reference Include="TonSdk.Client">
-      <HintPath>..\..\..\TonSdk.Net-fork\TonSdk.NET\TonSdk.Client\src\bin\Debug\net7.0\TonSdk.Client.dll</HintPath>
-    </Reference>
-    <Reference Include="TonSdk.Contracts">
-      <HintPath>..\..\..\TonSdk.Net-fork\TonSdk.NET\TonSdk.Contracts\src\bin\Debug\net7.0\TonSdk.Contracts.dll</HintPath>
-    </Reference>
-    <Reference Include="TonSdk.Core">
-      <HintPath>..\..\..\TonSdk.Net-fork\TonSdk.NET\TonSdk.Core\src\bin\Debug\net7.0\TonSdk.Core.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
   <ItemGroup>

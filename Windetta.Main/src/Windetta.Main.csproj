@@ -28,13 +28,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="LSPM.Models">
-      <HintPath>..\..\..\lspm-models\bin\Release\net8.0\LSPM.Models.dll</HintPath>
-    </Reference>
+    <Folder Include="Web\Client\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Web\Client\" />
+    <Reference Include="LSPM.Models">
+      <HintPath>..\..\..\lspm\LSPM.Models\bin\Debug\net8.0\LSPM.Models.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

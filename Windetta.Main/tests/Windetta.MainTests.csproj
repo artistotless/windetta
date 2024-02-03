@@ -34,7 +34,7 @@
 
   <ItemGroup>
     <Reference Include="LSPM.Models">
-      <HintPath>..\..\..\lspm-models\bin\Release\net8.0\LSPM.Models.dll</HintPath>
+      <HintPath>..\..\..\lspm\LSPM.Models\bin\Debug\net8.0\LSPM.Models.dll</HintPath>
     </Reference>
   </ItemGroup>
 
