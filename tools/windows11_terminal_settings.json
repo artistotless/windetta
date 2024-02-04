@@ -47,6 +47,10 @@
                     "type": "profile"
                 },
                 {
+                    "profile": "{c9ca446d-187b-4ced-b41f-ec450b999f31}",
+                    "type": "profile"
+                },
+                {
                     "profile": "{2aa3e463-297a-482e-904f-bfe11eef4a3b}",
                     "type": "profile"
                 },
@@ -103,46 +107,52 @@
                 "source": "VSDebugConsole"
             },
             {
-                "commandline": "cmd /k \"C: && cd C:\\Projects\\windetta\\Windetta.Main\\src\\bin\\Debug\\net8.0\\ && dotnet Windetta.Main.dll \"",
+                "commandline": "cmd /k \"C: && set ASPNETCORE_ENVIRONMENT=Development && cd C:\\Projects\\windetta\\Windetta.Main\\src\\bin\\Debug\\net8.0\\ && dotnet Windetta.Main.dll \"",
                 "guid": "{ddb5e3ae-fe16-4961-b04d-4b313198a086}",
                 "hidden": false,
                 "name": "Main"
             },
             {
-                "commandline": "cmd /k \"C: && cd C:\\Projects\\lspm\\src\\bin\\Debug\\net8.0\\ && dotnet LSPM.dll \"",
+                "commandline": "cmd /k \"C: && set ASPNETCORE_ENVIRONMENT=Development && cd C:\\Projects\\lspm\\src\\bin\\Debug\\net8.0\\ && dotnet LSPM.dll \"",
                 "guid": "{8d10a177-4fa3-4ba7-a207-3c9f0ede3530}",
                 "hidden": false,
                 "name": "Lspm"
             },
             {
-                "commandline": "cmd /k \"C: && cd C:\\Projects\\windetta\\Windetta.TonTxns\\src\\bin\\Debug\\net8.0\\ && dotnet Windetta.TonTxns.dll \"",
+                "commandline": "cmd /k \"C: && set ASPNETCORE_ENVIRONMENT=Development && set TEST_MODE=Enabled && cd C:\\Projects\\lspm\\src\\bin\\Debug\\net8.0\\ && dotnet LSPM.dll \"",
+                "guid": "{c9ca446d-187b-4ced-b41f-ec450b999f31}",
+                "hidden": false,
+                "name": "Lspm (TestMode)"
+            },
+            {
+                "commandline": "cmd /k \"C: && set ASPNETCORE_ENVIRONMENT=Development && cd C:\\Projects\\windetta\\Windetta.TonTxns\\src\\bin\\Debug\\net8.0\\ && dotnet Windetta.TonTxns.dll \"",
                 "guid": "{2aa3e463-297a-482e-904f-bfe11eef4a3b}",
                 "hidden": false,
                 "name": "TonTxns"
             },
             {
-                "commandline": "cmd /k \"C: && cd C:\\Projects\\windetta\\Windetta.Wallet\\src\\bin\\Debug\\net8.0\\ && dotnet Windetta.Wallet.dll \"",
+                "commandline": "cmd /k \"C: && set ASPNETCORE_ENVIRONMENT=Development && cd C:\\Projects\\windetta\\Windetta.Wallet\\src\\bin\\Debug\\net8.0\\ && dotnet Windetta.Wallet.dll \"",
                 "guid": "{5a182624-c061-4488-98f4-8c5b75eeab10}",
                 "hidden": false,
                 "name": "Wallet"
             },
             {
-                "commandline": "cmd /k \"C: && cd C:\\Projects\\windetta\\Windetta.Identity\\src\\bin\\Debug\\net8.0\\ && dotnet Windetta.Identity.dll \"",
+                "commandline": "cmd /k \"C: && set ASPNETCORE_ENVIRONMENT=Development && cd C:\\Projects\\windetta\\Windetta.Identity\\src\\bin\\Debug\\net8.0\\ && dotnet Windetta.Identity.dll \"",
                 "guid": "{cfb8460a-031c-487c-b9f7-6e1a61ba44e4}",
                 "hidden": false,
                 "name": "Identity"
             },
             {
-                "commandline": "cmd /k \"C: && cd C:\\Projects\\windetta-mvc\\src\\bin\\Debug\\net7.0\\ && dotnet TestWindettaMvc.dll \"",
+                "commandline": "cmd /k \"C: && set ASPNETCORE_ENVIRONMENT=Development && cd C:\\Projects\\windetta-mvc\\src\\bin\\Debug\\net7.0\\ && dotnet TestWindettaMvc.dll \"",
                 "guid": "{9307f793-33b1-4334-8e69-6598e975dff6}",
                 "hidden": false,
                 "name": "Mvc"
             },
             {
-                "commandline": "cmd /k \"C: && cd C:\\Projects\\gameservers\\sea-battle\\src\\bin\\Debug\\net8.0\\ && dotnet SeaBattle.dll \"",
+                "commandline": "cmd /k \"C: && set ASPNETCORE_ENVIRONMENT=Development && set TEST_MODE=Enabled && cd C:\\Projects\\gameservers\\sea-battle\\src\\bin\\Debug\\net8.0\\ && dotnet SeaBattle.dll \"",
                 "guid": "{8e46d6cb-b2e9-498a-9240-fcfe78146770}",
                 "hidden": false,
-                "name": "Games.SeaBattle"
+                "name": "Games.SeaBattle (TestMode)"
             },
             {
                 "guid": "{444d9531-ca5a-50c2-ae2d-64ae64b006fe}",
