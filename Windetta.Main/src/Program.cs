@@ -1,21 +1,22 @@
 ﻿using Autofac.Extensions.DependencyInjection;
+using Windetta.Common.Configuration;
 using Windetta.Common.Types;
 using Windetta.Main.Infrastructure;
 using Windetta.Main.Infrastructure.SignalR;
 using Windetta.Main.Web.Api;
 
-var webHost = WebApplication.CreateBuilder(args);
-var services = webHost.Services;
+var builder = WebApplication.CreateBuilder(args);
 
-webHost.AddInfrastructureLayer();
+builder.ConfigureComponentLaunchSettings();
+builder.AddInfrastructureLayer();
 
-webHost.Host.UseServiceProviderFactory(
+builder.Host.UseServiceProviderFactory(
     new AutofacServiceProviderFactory(builder =>
     {
         builder.ResolveDependenciesFromAssembly();
     }));
 
-var app = webHost.Build();
+var app = builder.Build();
 
 app.UseCors("allow_any_origins");
 app.UseAuthentication();

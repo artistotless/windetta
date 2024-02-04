@@ -1,6 +1,7 @@
 using Autofac.Extensions.DependencyInjection;
 using MassTransit;
 using System.Reflection;
+using Windetta.Common.Configuration;
 using Windetta.Common.Constants;
 using Windetta.Common.Database;
 using Windetta.Common.MassTransit;
@@ -12,23 +13,24 @@ using Windetta.TonTxns.Infrastructure.HostedServices;
 using Windetta.TonTxns.Infrastructure.Sagas;
 
 var builder = WebApplication.CreateBuilder(args);
-var services = builder.Services;
-var configuration = builder.Configuration;
+
+builder.ConfigureComponentLaunchSettings();
+
 var assembly = Assembly.GetExecutingAssembly();
 
-services.AddMysqlDbContext<TonDbContext>(assembly);
-services.AddMysqlDbContext<SagasDbContext>(assembly);
-services.AddHostedService<DepositPollerService>();
-services.AddDepositAddress();
-services.AddHttpTonApi();
+builder.Services.AddMysqlDbContext<TonDbContext>(assembly);
+builder.Services.AddMysqlDbContext<SagasDbContext>(assembly);
+builder.Services.AddHostedService<DepositPollerService>();
+builder.Services.AddDepositAddress();
+builder.Services.AddHttpTonApi();
 
 {
-    services.AddScoped<IDepositsRepository, InMemoryDepositsRepository>();
-    services.AddScoped<IWithdrawalsRepository, InMemoryWithdrawalsRepository>();
-    services.AddScoped<IUnitOfWork, InMemoryUnitOfWork>();
+    builder.Services.AddScoped<IDepositsRepository, InMemoryDepositsRepository>();
+    builder.Services.AddScoped<IWithdrawalsRepository, InMemoryWithdrawalsRepository>();
+    builder.Services.AddScoped<IUnitOfWork, InMemoryUnitOfWork>();
 }
 
-services.AddReadyMassTransit(assembly, Svc.TonTxns, cfg =>
+builder.Services.AddReadyMassTransit(assembly, Svc.TonTxns, cfg =>
 {
     cfg.SetEntityFrameworkSagaRepositoryProvider(x =>
     {
