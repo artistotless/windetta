@@ -28,8 +28,8 @@ public static class DependencyResolver
         builder.ConfigureAddLogging();
         services.AddHttpContextUserIdProvider();
         services.AddDefaultInstanceIdProvider();
-        services.AddConfigureAuthentication();
         services.AddConfigureAuthorization();
+        services.AddConfigureAuthentication();
         services.ConfigureAddSignalR();
         services.AddHttpContextAccessor();
         services.AddConfigureCors();

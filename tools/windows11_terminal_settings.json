@@ -137,13 +137,13 @@
                 "name": "Wallet"
             },
             {
-                "commandline": "cmd /k \"C: && set ASPNETCORE_ENVIRONMENT=Development && cd C:\\Projects\\windetta\\Windetta.Identity\\src\\bin\\Debug\\net8.0\\ && dotnet Windetta.Identity.dll \"",
+                "commandline": "cmd /k \"C: && set ASPNETCORE_ENVIRONMENT=Development && cd C:\\Projects\\windetta\\Windetta.Identity\\src\\bin\\Debug\\net8.0\\ && dotnet Identity.dll \"",
                 "guid": "{cfb8460a-031c-487c-b9f7-6e1a61ba44e4}",
                 "hidden": false,
                 "name": "Identity"
             },
             {
-                "commandline": "cmd /k \"C: && set ASPNETCORE_ENVIRONMENT=Development && cd C:\\Projects\\windetta-mvc\\src\\bin\\Debug\\net7.0\\ && dotnet TestWindettaMvc.dll \"",
+                "commandline": "cmd /k \"C: && set ASPNETCORE_ENVIRONMENT=Development && cd C:\\Projects\\windetta-mvc\\src\\bin\\Debug\\net8.0\\ && dotnet TestWindettaMvc.dll \"",
                 "guid": "{9307f793-33b1-4334-8e69-6598e975dff6}",
                 "hidden": false,
                 "name": "Mvc"

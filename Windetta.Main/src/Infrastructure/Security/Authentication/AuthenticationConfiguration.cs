@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Windetta.Main.Infrastructure.Security;
@@ -16,6 +17,8 @@ public static class AuthenticationConfiguration
         authBuilder.AddJwtBearer(options =>
         {
             options.Authority = "https://localhost:7159";
+            //options.Configuration = new OpenIdConnectConfiguration();
+            options.RequireHttpsMetadata = false;
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateAudience = false
@@ -25,12 +28,13 @@ public static class AuthenticationConfiguration
                 OnMessageReceived = context =>
                 {
                     var accessTokenFromQuery = context.Request.Query["access_token"].ToString();
+                    var accessTokenFromHeader = context.Request.Headers.Authorization.ToString()
+                    .Replace("Bearer ", string.Empty);
 
-                    if (!string.IsNullOrEmpty(accessTokenFromQuery))
-                    {
-                        // Read the token out of the query string
+                    if (string.IsNullOrEmpty(accessTokenFromQuery))
+                        context.Token = accessTokenFromHeader;
+                    else
                         context.Token = accessTokenFromQuery;
-                    }
 
                     return Task.CompletedTask;
                 }
