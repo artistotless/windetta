@@ -48,10 +48,10 @@
       <HintPath>..\..\is4dlls\IdentityServer4.dll</HintPath>
     </Reference>
     <Reference Include="IdentityServer4.EntityFramework">
-      <HintPath>..\..\is4dlls\IdentityServer4.EntityFramework.dll</HintPath>
+      <HintPath>..\dlls\IdentityServer4.EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="IdentityServer4.EntityFramework.Storage">
-      <HintPath>..\..\is4dlls\IdentityServer4.EntityFramework.Storage.dll</HintPath>
+      <HintPath>..\dlls\IdentityServer4.EntityFramework.Storage.dll</HintPath>
     </Reference>
   </ItemGroup>
 
