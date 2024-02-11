@@ -92,7 +92,7 @@ public class ExternalLoginHandler : IRequestHandler<ExternalLoginRequest, Author
 
         var claims = new List<Claim>()
         {
-            new(JwtClaimTypes.Picture, identity.ImageUrl),
+            new(JwtClaimTypes.Picture, identity.ImageUrl??string.Empty),
         };
 
         (await _signinManager.UserManager.AddClaimsAsync(user, claims))

@@ -6,7 +6,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 using Windetta.Common.Configuration;
+using Windetta.Common.Types;
 using Windetta.Contracts.Base;
+using Windetta.Contracts.Responses;
 
 namespace Windetta.Common.MassTransit;
 public static class Extensions
@@ -121,5 +123,17 @@ public static class Extensions
 
             yield return (item, type);
         }
+    }
+    public static async Task<TResponse> GetResponseOrThrow<TRequest, TResponse>(this IRequestClient<TRequest> client, object values, CancellationToken cancellationToken = default, RequestTimeout timeout = default)
+            where TRequest : class
+            where TResponse : ServiceResponse
+
+    {
+        var response = await client.GetResponse<TResponse>(values);
+
+        if (!response.Message.Success)
+            throw new WindettaException(response.Message.ErrorCode, response.Message.Error);
+        else
+            return response.Message;
     }
 }

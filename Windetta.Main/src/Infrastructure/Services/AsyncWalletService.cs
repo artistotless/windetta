@@ -1,4 +1,6 @@
 ﻿using MassTransit;
+using Windetta.Common.MassTransit;
+using Windetta.Common.Types;
 using Windetta.Contracts;
 using Windetta.Contracts.Events;
 using Windetta.Contracts.Responses;
@@ -6,6 +8,7 @@ using Windetta.Main.Core.Services.Wallet;
 
 namespace Windetta.Main.Infrastructure.Services;
 
+[AutoInjectExclude]
 public class AsyncWalletService : IWalletService
 {
     private readonly IRequestClient<IBalanceRequested> _client;
@@ -28,15 +31,12 @@ public class AsyncWalletService : IWalletService
 
     public async Task<bool> IsEqualOrGreater(Guid userId, FundsInfo funds)
     {
-        var response = await _client.GetResponse<UserBalanceResponse>(new
+        var response = await _client.GetResponseOrThrow<IBalanceRequested, UserBalanceResponse>(new
         {
             UserId = userId,
             funds.CurrencyId,
         });
 
-        if (response.Message.Success)
-            return response.Message.AvailableAmount >= funds.Amount;
-        else
-            return false;
+        return response.AvailableAmount >= funds.Amount;
     }
 }

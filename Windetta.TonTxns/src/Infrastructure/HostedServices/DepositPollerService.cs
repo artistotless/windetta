@@ -72,7 +72,7 @@ public class DepositPollerService : BackgroundService
         var batchEvents = result.Values.Select(x => new FundsAddedImpl()
         {
             UserId = x.UserId,
-            Funds = new FundsInfo((int)Currencies.Ton, x.Amount)
+            Funds = new FundsInfo((int)Currency.Ton, x.Amount)
         });
 
         if (batchEvents.Any())

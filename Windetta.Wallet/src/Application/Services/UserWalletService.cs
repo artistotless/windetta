@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using Windetta.Common.Constants;
 using Windetta.Contracts;
 using Windetta.Wallet.Application.DAL;
 using Windetta.Wallet.Application.Dto;
@@ -36,6 +37,13 @@ public class UserWalletService : IUserWalletService
         {
             UserId = userId,
             Balances = initial?.ToList() ?? new List<UserBalance>()
+            {
+                new()
+                {
+                    CurrencyId = (int)Currency.Ton,
+                    WalletId = userId,
+                }
+            }
         };
 
         var foundWallet = await _uow.Wallets.GetAsync(userId);
