@@ -1,4 +1,6 @@
 ﻿using MassTransit;
+using Windetta.Common.Constants;
+using Windetta.Common.MassTransit;
 using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
 
@@ -10,6 +12,12 @@ public class NewUserFlow : SagaStateMachineInstance
     public string Email { get; set; }
     public int CurrentState { get; set; }
     public Guid CorrelationId { get; set; }
+}
+
+public enum NewUserFlowState : int
+{
+    AwaitingConfirmation = 3,
+    Confirmed = 4,
 }
 
 public class NewUserFlowStateMachine : MassTransitStateMachine<NewUserFlow>
@@ -35,12 +43,9 @@ public class NewUserFlowStateMachine : MassTransitStateMachine<NewUserFlow>
 
         During(AwaitingConfirmation,
             When(EmailConfirmed)
-            .TransitionTo(Confirmed),
-            Ignore(UserCreated));
+            .Finalize());
 
-        During(Confirmed,
-            Ignore(EmailConfirmed),
-            Ignore(UserCreated));
+        SetCompletedWhenFinalized();
     }
 
     public State AwaitingConfirmation { get; set; }
@@ -48,38 +53,39 @@ public class NewUserFlowStateMachine : MassTransitStateMachine<NewUserFlow>
 
     public Event<IUserCreated> UserCreated { get; }
     public Event<IUserEmailConfirmed> EmailConfirmed { get; }
-
 }
 
 public static class NewUserFlowStateMachineExtensions
 {
-    public static EventActivityBinder<NewUserFlow, T> CreateWallet<T>(
-       this EventActivityBinder<NewUserFlow, T> binder) where T : class
+    public static EventActivityBinder<NewUserFlow, IUserCreated> CreateWallet(
+       this EventActivityBinder<NewUserFlow, IUserCreated> binder)
     {
-        return binder.SendAsync(context => context.Init<ICreateUserWallet>(new
+        return binder.SendCommandAsync(Svc.Wallet, ctx => ctx.Init<ICreateUserWallet>(new
         {
-            context.Saga.UserId,
+            ctx.Saga.UserId,
         }));
     }
 
-    public static EventActivityBinder<NewUserFlow, T> NotifyEmailConfirmation<T>(
-        this EventActivityBinder<NewUserFlow, T> binder) where T : class
+    public static EventActivityBinder<NewUserFlow, IUserCreated> NotifyEmailConfirmation(
+        this EventActivityBinder<NewUserFlow, IUserCreated> binder)
     {
-        return binder.SendAsync(context => context.Init<INotifyEmailConfirmation>(new
+        return binder.SendCommandAsync(Svc.Notifications, ctx => ctx.Init<INotifyEmailConfirmation>(new
         {
-            context.Saga.UserId,
-            context.Saga.Email,
+            UserId = ctx.Message.Id,
+            ctx.Message.Email
         }));
     }
 
     public static EventActivityBinder<NewUserFlow, IUserCreated> NotifyUserCreated(
         this EventActivityBinder<NewUserFlow, IUserCreated> binder)
     {
-        return binder.SendAsync(context => context.Init<INotifyUserCreated>(new
+        return binder.SendCommandAsync(Svc.Notifications, ctx => ctx.Init<INotifyUserCreated>(new
         {
-            UserId = context.Message.Id,
-            context.Message.Email,
-            context.Message.TimeStamp
+            UserId = ctx.Message.Id,
+            ctx.Message.Email,
+            ctx.Message.TimeStamp
         }));
+
+
     }
 }

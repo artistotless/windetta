@@ -11,4 +11,5 @@ public interface IGameServerRequested : CorrelatedBy<Guid>, IEvent
     public IEnumerable<Player> Players { get; set; }
     public Dictionary<string, string>? Properties { get; set; }
     public string LspmIp { get; set; }
+    public DateTimeOffset TimeStamp { get; set; }
 }

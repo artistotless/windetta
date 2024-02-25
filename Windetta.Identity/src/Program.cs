@@ -1,6 +1,8 @@
 using Autofac.Extensions.DependencyInjection;
 using MassTransit;
+using Serilog;
 using System.Reflection;
+using Windetta.Common.Configuration;
 using Windetta.Common.Constants;
 using Windetta.Common.Database;
 using Windetta.Common.MassTransit;
@@ -14,25 +16,28 @@ using Windetta.Identity.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.UseUrls("https://localhost:7159");
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .CreateLogger();
 
-IConfiguration configuration = builder.Configuration;
-IServiceCollection services = builder.Services;
+builder.Host.UseSerilog();
+builder.ConfigureComponentLaunchSettings();
+
 var assemby = Assembly.GetExecutingAssembly();
 
-services.AddMysqlDbContext<IdentityDbContext>(assemby);
-services.AddMysqlDbContext<SagasDbContext>(assemby);
-services.AddIdentityStore();
-services.AddControllersWithViews();
-services.AddIdentityServer4();
-services.AddAuthorization();
-services.AddControllers();
-services.AddHttpContextAccessor();
-services.AddRedis();
-services.AddAuthenticationMethods(); // Adding vk, google .. external auth providers
-services.ConfigureCustomViewsRouting();
+builder.Services.AddMysqlDbContext<IdentityDbContext>(assemby);
+builder.Services.AddMysqlDbContext<SagasDbContext>(assemby);
+builder.Services.AddIdentityStore();
+builder.Services.AddControllersWithViews();
+builder.Services.AddIdentityServer4();
+builder.Services.AddAuthorization();
+builder.Services.AddControllers();
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddRedis();
+builder.Services.AddAuthenticationMethods(); // Adding vk, google .. external auth providers
+builder.Services.ConfigureCustomViewsRouting();
 
-services.AddReadyMassTransit(assemby, Svc.Identity, cfg =>
+builder.Services.AddReadyMassTransit(assemby, Svc.Identity, cfg =>
 {
     cfg.SetEntityFrameworkSagaRepositoryProvider(x =>
     {

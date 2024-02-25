@@ -1,5 +1,4 @@
-﻿using LSPM.Models;
-using MassTransit;
+﻿using MassTransit;
 using Windetta.Contracts.Base;
 
 namespace Windetta.Contracts.Events;

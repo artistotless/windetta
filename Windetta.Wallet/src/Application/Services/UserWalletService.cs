@@ -1,4 +1,6 @@
 ﻿using System.Data;
+using Windetta.Common.Constants;
+using Windetta.Common.Types;
 using Windetta.Contracts;
 using Windetta.Wallet.Application.DAL;
 using Windetta.Wallet.Application.Dto;
@@ -7,6 +9,7 @@ using Windetta.Wallet.Exceptions;
 
 namespace Windetta.Wallet.Application.Services;
 
+[AutoInjectExclude]
 public class UserWalletService : IUserWalletService
 {
     private readonly UnitOfWorkCommittable _uow;
@@ -36,6 +39,13 @@ public class UserWalletService : IUserWalletService
         {
             UserId = userId,
             Balances = initial?.ToList() ?? new List<UserBalance>()
+            {
+                new()
+                {
+                    CurrencyId = (int)Currency.Ton,
+                    WalletId = userId,
+                }
+            }
         };
 
         var foundWallet = await _uow.Wallets.GetAsync(userId);

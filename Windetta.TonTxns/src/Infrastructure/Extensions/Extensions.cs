@@ -1,4 +1,5 @@
-﻿using TonSdk.Contracts.Wallet;
+﻿using TonSdk.Client;
+using TonSdk.Contracts.Wallet;
 using TonSdk.Core;
 using TonSdk.Core.Block;
 using Windetta.TonTxns.Application.Models;
@@ -29,5 +30,10 @@ public static class Extensions
     {
         foreach (var item in msg)
             yield return item.ToWalletTransfer();
+    }
+
+    public static bool IsInitiator(this TransactionsInformationResult result)
+    {
+        return result.OutMsgs.Any();
     }
 }

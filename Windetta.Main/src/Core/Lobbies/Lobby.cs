@@ -1,4 +1,5 @@
-﻿using Windetta.Main.Core.Games;
+﻿using Windetta.Main.Core.Exceptions;
+using Windetta.Main.Core.Games;
 using Windetta.Main.Core.Lobbies.Plugins;
 using Windetta.Main.Core.Rooms;
 
@@ -96,7 +97,10 @@ public sealed class Lobby : ILobby
             return;
 
         var member = room.Members
-            .First(x => x.Id == memberId);
+            .FirstOrDefault(x => x.Id == memberId);
+
+        if(member is null)
+            throw LobbyException.MemberAreNotInRoom;
 
         member.LeaveRoom();
 

@@ -4,6 +4,7 @@ using TonSdk.Client;
 using TonSdk.Core;
 using Windetta.TonTxns.Application.Models;
 using Windetta.TonTxns.Application.Services;
+using Windetta.TonTxns.Infrastructure.Extensions;
 
 namespace Windetta.TonTxns.Infrastructure.Services;
 
@@ -29,7 +30,7 @@ public class TransactionLoader : ITransactionsLoader
         var txns = (await _client.GetTransactions(
             _depositAddress, limit: 100, to_lt: ConvertToLt(lastId)))
             .OrderBy(x => x.Utime)
-            .Where(x => x.IsInitiator == false);
+            .Where(x => x.IsInitiator() == false);
 
         return txns.Select(MapToTransaction)
             .Where(x => x.Amount > 0);

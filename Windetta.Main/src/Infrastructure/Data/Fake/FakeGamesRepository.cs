@@ -1,4 +1,5 @@
-﻿using Windetta.Main.Core.Exceptions;
+﻿using Windetta.Common.Testing;
+using Windetta.Main.Core.Exceptions;
 using Windetta.Main.Core.Games;
 
 namespace Windetta.Main.Infrastructure.Data.Fake;
@@ -7,15 +8,13 @@ public class FakeGamesRepository : IGames
 {
     private readonly List<Game> _games;
 
-    public static Guid ExampleId = Guid.Parse("accea9d1-7f70-40e2-8a8d-a90d3a79842b");
-
     public FakeGamesRepository()
     {
         _games = new List<Game>
         {
             new Game()
             {
-                Id = ExampleId,
+                Id = ExampleGuids.GameId,
                 Description = "Sea battle",
                 IconPath = "/seabattle.png",
                 Configuration = new GameConfiguration(2,1),

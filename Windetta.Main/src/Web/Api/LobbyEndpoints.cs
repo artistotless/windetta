@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Windetta.Main.Core.Lobbies;
+using Windetta.Main.Core.Lobbies.Dtos;
 using Windetta.Main.Core.Services;
+using Windetta.Main.Infrastructure.SignalR;
 using Windetta.Main.Web.Api.Dtos;
 
 namespace Windetta.Main.Web.Api
@@ -9,7 +12,7 @@ namespace Windetta.Main.Web.Api
     {
         public static void UseLobbyEndpoints(this WebApplication web)
         {
-            var group = web.MapGroup("api/lobbies").RequireAuthorization();
+            var group = web.MapGroup("api/lobbies")/*.RequireAuthorization()*/;
 
             // Get lobbies
             web.MapGet("api/lobbies", async ([FromServices] ILobbies lobbies) =>
@@ -24,7 +27,7 @@ namespace Windetta.Main.Web.Api
                 [FromServices] LobbyObserver observer,
                 [FromServices] LobbiesInteractor interactor) =>
             {
-                var createRequest = new CreateLobbyRequest()
+                var createRequest = new CreateLobbyDto()
                 {
                     Bet = body.Bet,
                     InitiatorId = userIdProvider.UserId,

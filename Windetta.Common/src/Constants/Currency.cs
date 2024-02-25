@@ -1,6 +1,6 @@
 ﻿namespace Windetta.Common.Constants;
 
-public enum Currencies : int
+public enum Currency : int
 {
     Ton = 1
 }

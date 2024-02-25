@@ -4,7 +4,7 @@ using Windetta.Common.Types;
 
 namespace Windetta.Main.Core.Rooms;
 
-public sealed class RoomMember
+public sealed class RoomMember : IEquatable<RoomMember>
 {
     public Guid Id { get; init; }
     public string Name { get; init; }
@@ -34,4 +34,7 @@ public sealed class RoomMember
 
         _room.Remove(this);
     }
+
+    public bool Equals(RoomMember? other)
+        => Id == other?.Id;
 }

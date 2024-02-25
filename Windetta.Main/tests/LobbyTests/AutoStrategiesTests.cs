@@ -13,7 +13,7 @@ public class AutoStrategiesTests
     public async Task TestFullRoomsReadyStrategy()
     {
         // arrange
-        var request = new CreateLobbyRequest()
+        var request = new CreateLobbyDto()
         {
             Bet = new Bet(1, 1000),
             AutoReadyStrategy = new PluginSetDto(nameof(FullRoomsReadyStrategy)),
@@ -52,7 +52,7 @@ public class AutoStrategiesTests
     public async Task TestAutoDisposeStrategy()
     {
         // arrange
-        var request = new CreateLobbyRequest()
+        var request = new CreateLobbyDto()
         {
             Bet = new Bet(1, 800),
             AutoDisposeStrategy = new PluginSetDto(nameof(DateDisposeStrategy)),

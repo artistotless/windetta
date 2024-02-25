@@ -1,6 +1,8 @@
 ﻿using MassTransit;
 using Windetta.Contracts.Events;
+using Windetta.Contracts.Responses;
 using Windetta.Wallet.Application.Services;
+using Windetta.Wallet.Exceptions;
 
 namespace Windetta.Wallet.Infrastructure.Consumers;
 
@@ -15,9 +17,19 @@ public class GetBalanceConsumer : IConsumer<IBalanceRequested>
 
     public async Task Consume(ConsumeContext<IBalanceRequested> context)
     {
-        var balance = await _walletService.GetBalance
-            (context.Message.UserId, context.Message.CurrencyId);
+        try
+        {
+            var balance = await _walletService.GetBalance
+                (context.Message.UserId, context.Message.CurrencyId);
 
-        await context.RespondAsync(balance);
+            await context.RespondAsync(new UserBalanceResponse(balance.Amount, balance.HeldAmount));
+        }
+        catch (WalletException e)
+        {
+            await context.RespondAsync(new UserBalanceResponse(0, 0)
+            {
+                Error = e.Message
+            });
+        }
     }
 }

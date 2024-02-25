@@ -7,7 +7,7 @@ namespace Windetta.Main.Infrastructure.Sagas;
 public class PlayersDbModelConverter : ValueConverter<IEnumerable<Player>, string>
 {
     private static string ToString(IEnumerable<Player> players)
-        => JsonSerializer.Serialize(players);
+     => JsonSerializer.Serialize(players);
 
     private static IEnumerable<Player> ToCollection(string serializedData)
      => JsonSerializer.Deserialize<IEnumerable<Player>>(serializedData)!;

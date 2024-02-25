@@ -1,22 +1,31 @@
 ﻿using Autofac.Extensions.DependencyInjection;
+using Serilog;
+using Windetta.Common.Configuration;
+using Windetta.Common.Middlewares;
 using Windetta.Common.Types;
 using Windetta.Main.Infrastructure;
 using Windetta.Main.Infrastructure.SignalR;
 using Windetta.Main.Web.Api;
 
-var webHost = WebApplication.CreateBuilder(args);
-var services = webHost.Services;
+var builder = WebApplication.CreateBuilder(args);
 
-webHost.AddInfrastructureLayer();
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .CreateLogger();
 
-webHost.Host.UseServiceProviderFactory(
+builder.Host.UseSerilog();
+builder.ConfigureComponentLaunchSettings();
+builder.AddInfrastructureLayer();
+
+builder.Host.UseServiceProviderFactory(
     new AutofacServiceProviderFactory(builder =>
     {
         builder.ResolveDependenciesFromAssembly();
     }));
 
-var app = webHost.Build();
+var app = builder.Build();
 
+app.UseMiddleware<ErrorHandlerMiddleware>();
 app.UseCors("allow_any_origins");
 app.UseAuthentication();
 app.UseAuthorization();

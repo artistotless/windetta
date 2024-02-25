@@ -20,13 +20,25 @@ public class MatchBegunNotifier : IConsumer<INotifyMatchBegun>
         _context = context;
     }
 
-    public Task Consume(ConsumeContext<INotifyMatchBegun> context)
+    public async Task Consume(ConsumeContext<INotifyMatchBegun> context)
     {
         _logger.LogDebug("Saga Event: {event}", "match_begun");
 
-        return _context.Clients
-            .Group(context.Message.CorrelationId.ToString())
-            .SendAsync("onMatchBegun", context.Message);
+        Task GetPersonalNotifyTask(Guid userId, string ticket)
+        {
+            return _context.Clients
+             .Group(userId.ToString())
+             .SendAsync("onMatchBegun", new
+             {
+                 Ticket = ticket,
+                 context.Message.Endpoint
+             });
+        }
+
+        var notifyTasks = context.Message.Tickets
+            .Select(x => GetPersonalNotifyTask(x.Key, x.Value));
+
+        await Task.WhenAll(notifyTasks);
     }
 }
 
@@ -72,7 +84,7 @@ public class MatchCanceledNotifier : IConsumer<INotifyMatchCanceled>
 
         return _context.Clients
             .Group(context.Message.CorrelationId.ToString())
-            .SendAsync("onServerFound");
+            .SendAsync("onMatchCanceled");
     }
 }
 

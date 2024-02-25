@@ -144,7 +144,7 @@ public static class BalanceWithdrawFlowStateMachineExtensions
             ctx => ctx.Init<IDeductBalance>(new
             {
                 Amount = ctx.Message.Nanotons,
-                CurrencyId = (int)Currencies.Ton,
+                CurrencyId = (int)Currency.Ton,
                 ctx.Message.CorrelationId,
                 ctx.Message.UserId,
             }));

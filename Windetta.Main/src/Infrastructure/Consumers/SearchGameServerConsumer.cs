@@ -14,6 +14,8 @@ public class SearchGameServerConsumer : IConsumer<ISearchGameServer>
     private readonly IRequestClient<IGameServerRequested> client;
     private readonly ResiliencePipelineProvider<Type>? retryPolicy;
 
+    private const int REQUEST_TIMEOUT_SECONDS = 10;
+
     public SearchGameServerConsumer(
         ILspms lspms,
         IRequestClient<IGameServerRequested> client,
@@ -60,6 +62,7 @@ public class SearchGameServerConsumer : IConsumer<ISearchGameServer>
             GameId = message.GameId,
             Players = message.Players,
             Properties = message.Properties,
+            TimeStamp = DateTimeOffset.UtcNow,
         };
 
         foreach (var item in allLspms)
@@ -81,12 +84,9 @@ public class SearchGameServerConsumer : IConsumer<ISearchGameServer>
     private async Task<Response<RequestingGameServerResult>?> SendDurableRequest
         (IGameServerRequested request)
     {
-        var requestTimeoutSeconds = 10;
-
         Action<SendContext<IGameServerRequested>> requestExpirationHeader = (context) =>
         {
-            context.Headers.Set("expires",
-                DateTimeOffset.UtcNow.AddSeconds(requestTimeoutSeconds));
+            context.Headers.Set("expires", REQUEST_TIMEOUT_SECONDS);
         };
 
         Response<RequestingGameServerResult> response;
@@ -95,7 +95,7 @@ public class SearchGameServerConsumer : IConsumer<ISearchGameServer>
         {
             response = await client.GetResponse<RequestingGameServerResult>
             (request, x => x.UseExecute(requestExpirationHeader),
-            timeout: RequestTimeout.After(s: requestTimeoutSeconds));
+            timeout: RequestTimeout.After(s: REQUEST_TIMEOUT_SECONDS));
         }
         catch { return null; }
 
@@ -109,5 +109,6 @@ public class SearchGameServerConsumer : IConsumer<ISearchGameServer>
         public IEnumerable<Player> Players { get; set; }
         public Dictionary<string, string>? Properties { get; set; }
         public string LspmIp { get; set; }
+        public DateTimeOffset TimeStamp { get; set; }
     }
 }

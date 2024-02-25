@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.Connections.Features;
 using Microsoft.AspNetCore.SignalR;
 using Windetta.Main.Core.Lobbies;
-using Windetta.Main.Core.Services;
+using Windetta.Main.Infrastructure.Services;
 
 namespace Windetta.Main.Infrastructure.SignalR;
 
@@ -9,11 +10,11 @@ namespace Windetta.Main.Infrastructure.SignalR;
 public class MainHub : Hub
 {
     private readonly ILobbyUsersAssociations _lobbiesUsersSets;
-    private readonly IUserIdService _userIdProvider;
+    private readonly FromHeaderUserIdProvider _userIdProvider;
 
     public MainHub(
         ILobbyUsersAssociations lobbiesUsersSets,
-        IUserIdService userIdProvider)
+        FromHeaderUserIdProvider userIdProvider)
     {
         _lobbiesUsersSets = lobbiesUsersSets;
         _userIdProvider = userIdProvider;
@@ -34,21 +35,34 @@ public class MainHub : Hub
         await UnSubscribeOnCurrentLobbyEvents();
     }
 
-    private ValueTask SubscribeOnCurrentLobbyEvents()
+    private async Task SubscribeOnCurrentLobbyEvents()
     {
-        var lobbyId = _lobbiesUsersSets.GetLobbyId(_userIdProvider.UserId);
-        if (!lobbyId.HasValue)
-            return ValueTask.CompletedTask;
+        await Groups.AddToGroupAsync(Context.ConnectionId, GetUserId().ToString());
 
-        return new ValueTask(Groups.AddToGroupAsync(Context.ConnectionId, lobbyId.Value.ToString()));
+        var lobbyId = _lobbiesUsersSets.GetLobbyId(GetUserId());
+        if (!lobbyId.HasValue)
+            return;
+
+        await Groups.AddToGroupAsync(Context.ConnectionId, lobbyId.Value.ToString());
     }
 
-    private ValueTask UnSubscribeOnCurrentLobbyEvents()
+    private async Task UnSubscribeOnCurrentLobbyEvents()
     {
-        var lobbyId = _lobbiesUsersSets.GetLobbyId(_userIdProvider.UserId);
-        if (!lobbyId.HasValue)
-            return ValueTask.CompletedTask;
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, GetUserId().ToString());
 
-        return new ValueTask(Groups.RemoveFromGroupAsync(Context.ConnectionId, lobbyId.Value.ToString()));
+        var lobbyId = _lobbiesUsersSets.GetLobbyId(GetUserId());
+        if (!lobbyId.HasValue)
+            return;
+
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, lobbyId.Value.ToString());
+    }
+
+    private Guid GetUserId()
+    {
+        var feature = Context.Features
+            .First(x => x.Key.Equals(typeof(IHttpContextFeature)))
+            .Value as IHttpContextFeature;
+
+        return _userIdProvider.FromContext(feature?.HttpContext);
     }
 }
