@@ -11,8 +11,6 @@ public class MatchesMap : SagaClassMap<MatchFlow>
         entity.Property(x => x.CurrentState)
             .HasColumnType("TINYINT");
         entity.HasIndex(x => x.CorrelationId);
-        entity.Property(x => x.CanceledReason)
-            .HasColumnType("VARCHAR(32)");
         entity.Property(x => x.Endpoint)
             .UseCollation("latin1_general_ci")
             .HasColumnType("VARCHAR(42)");

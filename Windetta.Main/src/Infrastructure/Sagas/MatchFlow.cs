@@ -22,7 +22,6 @@ public class MatchFlow : SagaStateMachineInstance
     public int BetCurrencyId { get; set; }
     public ulong BetAmount { get; set; }
     public int CurrentState { get; set; }
-    public string? CanceledReason { get; set; }
 }
 
 public enum MatchFlowState : int
@@ -222,7 +221,6 @@ public static class MatchFlowStateMachineExtensions
                 Funds = new FundsInfo(ctx.Saga.BetCurrencyId, ctx.Saga.BetAmount),
                 UsersIds = ctx.Saga.Players.Select(x => x.Id)
             }))
-            .Then(x => x.Saga.CanceledReason = selectReason(x.Message))
             .Finalize();
     }
 

@@ -35,22 +35,26 @@ public class MainHub : Hub
         await UnSubscribeOnCurrentLobbyEvents();
     }
 
-    private ValueTask SubscribeOnCurrentLobbyEvents()
+    private async Task SubscribeOnCurrentLobbyEvents()
     {
+        await Groups.AddToGroupAsync(Context.ConnectionId, GetUserId().ToString());
+
         var lobbyId = _lobbiesUsersSets.GetLobbyId(GetUserId());
         if (!lobbyId.HasValue)
-            return ValueTask.CompletedTask;
+            return;
 
-        return new ValueTask(Groups.AddToGroupAsync(Context.ConnectionId, lobbyId.Value.ToString()));
+        await Groups.AddToGroupAsync(Context.ConnectionId, lobbyId.Value.ToString());
     }
 
-    private ValueTask UnSubscribeOnCurrentLobbyEvents()
+    private async Task UnSubscribeOnCurrentLobbyEvents()
     {
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, GetUserId().ToString());
+
         var lobbyId = _lobbiesUsersSets.GetLobbyId(GetUserId());
         if (!lobbyId.HasValue)
-            return ValueTask.CompletedTask;
+            return;
 
-        return new ValueTask(Groups.RemoveFromGroupAsync(Context.ConnectionId, lobbyId.Value.ToString()));
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, lobbyId.Value.ToString());
     }
 
     private Guid GetUserId()
