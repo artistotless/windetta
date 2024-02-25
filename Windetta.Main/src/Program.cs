@@ -1,4 +1,5 @@
 ﻿using Autofac.Extensions.DependencyInjection;
+using Serilog;
 using Windetta.Common.Configuration;
 using Windetta.Common.Middlewares;
 using Windetta.Common.Types;
@@ -7,6 +8,12 @@ using Windetta.Main.Infrastructure.SignalR;
 using Windetta.Main.Web.Api;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 builder.ConfigureComponentLaunchSettings();
 builder.AddInfrastructureLayer();
 

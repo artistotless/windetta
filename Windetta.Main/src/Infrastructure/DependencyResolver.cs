@@ -26,7 +26,7 @@ public static class DependencyResolver
         var assembly = Assembly.GetExecutingAssembly();
 
         builder.ConfigureAddLogging();
-        services.AddHttpContextUserIdProvider();
+        services.AddUserIdProvider();
         services.AddDefaultInstanceIdProvider();
         services.AddConfigureAuthorization();
         services.AddConfigureAuthentication();
@@ -96,9 +96,9 @@ public static class DependencyResolver
             PollyPipelines.AddSearchGameServerConsumerRetryPolicy);
     }
 
-    private static void AddHttpContextUserIdProvider(this IServiceCollection services)
+    private static void AddUserIdProvider(this IServiceCollection services)
     {
-        services.AddScoped<Core.Services.IUserIdService, HttpContextUserIdProvider>();
+        services.AddScoped<Core.Services.IUserIdService, FromHeaderUserIdProvider>();
     }
 
     private static void ConfigureAddLogging(this WebApplicationBuilder builder)

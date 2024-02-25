@@ -14,7 +14,7 @@ public class JoinFiltersTests
     public async Task JoinShouldBeRejected_IfFilterDoesNotAllowToJoin()
     {
         // arrange
-        var request = new CreateLobbyRequest()
+        var request = new CreateLobbyDto()
         {
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId,

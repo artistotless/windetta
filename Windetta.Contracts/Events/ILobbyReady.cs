@@ -5,5 +5,5 @@ namespace Windetta.Contracts.Events;
 
 public interface ILobbyReady : CorrelatedBy<Guid>, IEvent
 {
-    public DateTimeOffset TimeStamp { get; set; }
+    public DateTime TimeStamp { get; set; }
 }

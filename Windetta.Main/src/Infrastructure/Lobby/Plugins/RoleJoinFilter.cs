@@ -30,6 +30,6 @@ public class RoleJoinFilter : JoinFilterConfigurable
             return ValueTask.FromResult<(bool, string?)>((true, null));
         }
 
-        return ValueTask.FromResult<(bool, string?)>((false, $"Use is not in Role - {roleValue}"));
+        return ValueTask.FromResult<(bool, string?)>((false, $"User is not in Role - {roleValue}"));
     }
 }

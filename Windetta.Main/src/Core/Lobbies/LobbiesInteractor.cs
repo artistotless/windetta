@@ -44,7 +44,7 @@ public sealed class LobbiesInteractor : IScopedService
         _lobbiesUsersSets.Unset(roomsCache.SelectMany(r => r.Members, (r, m) => m.Id));
     }
 
-    public async Task<ILobby> CreateAsync(CreateLobbyRequest request)
+    public async Task<ILobby> CreateAsync(CreateLobbyDto request)
     {
         if (_lobbiesUsersSets.GetLobbyId(request.InitiatorId).HasValue)
             throw LobbyException.AlreadyMemberOfLobby;
@@ -75,8 +75,7 @@ public sealed class LobbiesInteractor : IScopedService
         _lobbiesUsersSets.Unset(userId);
     }
 
-    // TODO: refactor it, too big size of method & duplicated code
-    private async Task<LobbyOptions> BuildLobbyOptions(CreateLobbyRequest request)
+    private async Task<LobbyOptions> BuildLobbyOptions(CreateLobbyDto request)
     {
         (GameConfiguration cfg, IEnumerable<SupportedCurrency> sc) configurations;
 

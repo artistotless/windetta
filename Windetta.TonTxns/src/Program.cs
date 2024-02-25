@@ -1,5 +1,6 @@
 using Autofac.Extensions.DependencyInjection;
 using MassTransit;
+using Serilog;
 using System.Reflection;
 using Windetta.Common.Configuration;
 using Windetta.Common.Constants;
@@ -14,6 +15,11 @@ using Windetta.TonTxns.Infrastructure.Sagas;
 
 var builder = WebApplication.CreateBuilder(args);
 
+Log.Logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 builder.ConfigureComponentLaunchSettings();
 
 var assembly = Assembly.GetExecutingAssembly();

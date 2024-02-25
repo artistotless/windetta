@@ -16,6 +16,9 @@ public class LobbyException : WindettaException
     public static LobbyException NotFound
         => new LobbyException(Errors.Main.LobbyNotFound);
 
+    public static LobbyException MemberAreNotInRoom
+    => new LobbyException(Errors.Main.MemberAreNotInRoom);
+
     public static LobbyException BetIsLessMinimumAllowed
         => new LobbyException(Errors.Main.BetIsLessMinimumAllowed);
 

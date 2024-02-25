@@ -20,7 +20,7 @@ public class LobbyDispatcherTests
     public async Task UpdateLobbyState_ShouldCausePrintingIntoOutputChannel()
     {
         // arrange
-        var request = new CreateLobbyRequest()
+        var request = new CreateLobbyDto()
         {
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId,
@@ -31,7 +31,7 @@ public class LobbyDispatcherTests
         var interactor = SharedServiceProvider.GetInstance()
             .GetRequiredService<LobbiesInteractor>();
         var outputChannel = new LobbyDebugOutput(_output, ref buffer);
-        var dispatcher = new LobbyObserver(outputChannel, new Mock<ILobbies>().Object);
+        var dispatcher = new LobbyObserver(new Mock<ILobbies>().Object, outputChannel, null);
         var lobby = await interactor.CreateAsync(request);
 
         // act
@@ -49,7 +49,7 @@ public class LobbyDispatcherTests
     {
         // arrange
         var provider = SharedServiceProvider.GetInstance();
-        var request = new CreateLobbyRequest()
+        var request = new CreateLobbyDto()
         {
             Bet = new Bet(1, 1000),
             GameId = ExampleGuids.GameId,
@@ -60,7 +60,7 @@ public class LobbyDispatcherTests
         var storage = provider.GetRequiredService<ILobbies>();
         var interactor = provider.GetRequiredService<LobbiesInteractor>();
         var outputChannel = new LobbyDebugOutput(_output, ref buffer);
-        var dispatcher = new LobbyObserver(outputChannel, storage);
+        var dispatcher = new LobbyObserver(storage, outputChannel, null);
         var lobby = await interactor.CreateAsync(request);
 
         // act
@@ -89,7 +89,7 @@ public class LobbyDispatcherTests
             services.AddSingleton((p) => new GamesRepositoryMock(gameCfg, sc).Mock.Object);
         });
 
-        var request = new CreateLobbyRequest()
+        var request = new CreateLobbyDto()
         {
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId,
@@ -101,12 +101,12 @@ public class LobbyDispatcherTests
         var storage = provider.GetRequiredService<ILobbies>();
         var interactor = provider.GetRequiredService<LobbiesInteractor>();
         var outputChannel = new LobbyDebugOutput(_output, ref buffer);
-        var dispatcher = new LobbyObserver(outputChannel, storage);
+        var dispatcher = new LobbyObserver(storage, outputChannel, null);
         var lobby = await interactor.CreateAsync(request);
 
         // act
         dispatcher.AddToTracking(lobby);
-        await interactor.JoinMemberAsync(Guid.NewGuid(), lobby.Id, roomIndex:0);
+        await interactor.JoinMemberAsync(Guid.NewGuid(), lobby.Id, roomIndex: 0);
         await interactor.JoinMemberAsync(Guid.NewGuid(), lobby.Id, roomIndex: 0);
 
         while (buffer.Count < 3 && new CancellationTokenSource

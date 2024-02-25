@@ -72,7 +72,7 @@ public class MatchCanceledNotifier : IConsumer<INotifyMatchCanceled>
 
         return _context.Clients
             .Group(context.Message.CorrelationId.ToString())
-            .SendAsync("onServerFound");
+            .SendAsync("onMatchCanceled");
     }
 }
 

@@ -1,8 +1,6 @@
-﻿using Windetta.Main.Core.Lobbies.Dtos;
+﻿namespace Windetta.Main.Core.Lobbies.Dtos;
 
-namespace Windetta.Main.Core.Lobbies;
-
-public class CreateLobbyRequest
+public class CreateLobbyDto
 {
     public Guid InitiatorId { get; set; }
     public Guid GameId { get; init; }

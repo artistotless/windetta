@@ -2,6 +2,7 @@
 using Windetta.Common.Testing;
 using Windetta.Main.Core.Games;
 using Windetta.Main.Core.Lobbies;
+using Windetta.Main.Core.Lobbies.Dtos;
 using Windetta.MainTests.Mocks;
 
 namespace Windetta.MainTests.LobbyTest;
@@ -26,7 +27,7 @@ public class LobbyTests
             services.AddSingleton((p) => new GamesRepositoryMock(gameCfg, sc).Mock.Object);
         });
 
-        var request = new CreateLobbyRequest()
+        var request = new CreateLobbyDto()
         {
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId,
@@ -47,7 +48,7 @@ public class LobbyTests
     public async void ShouldAddMemberToSelectedRoom()
     {
         // arrange
-        var request = new CreateLobbyRequest()
+        var request = new CreateLobbyDto()
         {
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId,
@@ -72,7 +73,7 @@ public class LobbyTests
     public async void JoinMemberShouldCauseUpdateEvent()
     {
         // arrange
-        var request = new CreateLobbyRequest()
+        var request = new CreateLobbyDto()
         {
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId,
@@ -106,7 +107,7 @@ public class LobbyTests
     public async void LeaveMemberShouldCauseUpdateEvent()
     {
         // arrange
-        var request = new CreateLobbyRequest()
+        var request = new CreateLobbyDto()
         {
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId,

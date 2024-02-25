@@ -11,6 +11,7 @@ public static class Errors
         public const string BetValidationFail = "bet_validation_fail";
         public const string AlreadyMemberOfLobby = "already_member_of_lobby";
         public const string LobbyNotFound = "lobby_notfound";
+        public const string MemberAreNotInRoom = "member_are_not_in_the_room";
         public const string BetIsLessMinimumAllowed = "bet_is_less_minimum_allowed";
         #endregion
 
