@@ -11,6 +11,9 @@ public class RoomException : WindettaException
     public static RoomException MaxMembersInRoomReached
         => new RoomException(Errors.Main.MaxMembersInRoomReached);
 
+    public static RoomException InvalidRoomId
+        => new RoomException(Errors.Main.InvalidRoomId);
+
     public static RoomException MemberAlreadyJoinedRoom
         => new RoomException(Errors.Main.MemberAlreadyJoinedRoom);
 

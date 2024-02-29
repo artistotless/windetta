@@ -143,6 +143,7 @@ public static class MatchFlowStateMachineExtensions
             if (lobby is null)
                 throw LobbyException.NotFound;
 
+            ctx.Saga.Properties = lobby.Properties;
             ctx.Saga.BetCurrencyId = lobby.Bet.CurrencyId;
             ctx.Saga.BetAmount = lobby.Bet.Amount;
             ctx.Saga.GameId = lobby.GameId;

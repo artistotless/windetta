@@ -77,6 +77,9 @@ public sealed class Lobby : ILobby
 
     public void Add(RoomMember member, ushort roomIndex)
     {
+        if (roomIndex >= _rooms.Length)
+            throw RoomException.InvalidRoomId;
+
         var room = _rooms[roomIndex];
 
         if (room is null)
@@ -99,7 +102,7 @@ public sealed class Lobby : ILobby
         var member = room.Members
             .FirstOrDefault(x => x.Id == memberId);
 
-        if(member is null)
+        if (member is null)
             throw LobbyException.MemberAreNotInRoom;
 
         member.LeaveRoom();

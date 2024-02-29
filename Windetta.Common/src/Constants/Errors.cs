@@ -8,6 +8,7 @@ public static class Errors
         public const string MemberAlreadyJoinedRoom = "member_already_joined_room";
         public const string MemberNotInRoom = "member_not_in_room";
         public const string MaxMembersInRoomReached = "maxmembers_in_room_reached";
+        public const string InvalidRoomId = "invalid_room_id";
         public const string BetValidationFail = "bet_validation_fail";
         public const string AlreadyMemberOfLobby = "already_member_of_lobby";
         public const string LobbyNotFound = "lobby_notfound";
