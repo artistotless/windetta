@@ -64,7 +64,8 @@ public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
              When(GameServerFound)
                 .SaveGameServerInfo()
                 .NotifyServerFound()
-                .TransitionTo(ServerFound));
+                .If(condiction => condiction.Saga.CurrentState != (int)MatchFlowState.Running,
+                then => then.TransitionTo(ServerFound)));
 
         During(ServerFound, GameServerSearching,
             When(ReadyAcceptConnections)
@@ -184,6 +185,7 @@ public static class MatchFlowStateMachineExtensions
         return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<INotifyReadyToConnect>(new
         {
             ctx.Message.CorrelationId,
+            Players = ctx.Saga.Players.Select(p => p.Id),
         }));
     }
 
