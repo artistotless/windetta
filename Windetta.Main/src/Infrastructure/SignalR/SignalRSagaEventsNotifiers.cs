@@ -7,7 +7,7 @@ namespace Windetta.Main.Infrastructure.Lobby;
 
 public class SignalRSagaEventsNotifiers { }
 
-public class MatchBegunNotifier : IConsumer<INotifyMatchBegun>
+public class MatchBegunNotifier : IConsumer<INotifyReadyToConnect>
 {
     private readonly ILogger<SignalRSagaEventsNotifiers> _logger;
     private readonly IHubContext<MainHub> _context;
@@ -20,23 +20,19 @@ public class MatchBegunNotifier : IConsumer<INotifyMatchBegun>
         _context = context;
     }
 
-    public async Task Consume(ConsumeContext<INotifyMatchBegun> context)
+    public async Task Consume(ConsumeContext<INotifyReadyToConnect> context)
     {
-        _logger.LogDebug("Saga Event: {event}", "match_begun");
+        _logger.LogDebug("Saga Event: {event}", "ready_connect");
 
-        Task GetPersonalNotifyTask(Guid userId, string ticket)
+        Task GetPersonalNotifyTask(Guid userId)
         {
             return _context.Clients
              .Group(userId.ToString())
-             .SendAsync("onMatchBegun", new
-             {
-                 Ticket = ticket,
-                 context.Message.Endpoint
-             });
+             .SendAsync("onReadyToConnect");
         }
 
-        var notifyTasks = context.Message.Tickets
-            .Select(x => GetPersonalNotifyTask(x.Key, x.Value));
+        var notifyTasks = context.Message.Players
+            .Select(GetPersonalNotifyTask);
 
         await Task.WhenAll(notifyTasks);
     }
@@ -55,13 +51,25 @@ public class ServerFoundNotifier : IConsumer<INotifyServerFound>
         _context = context;
     }
 
-    public Task Consume(ConsumeContext<INotifyServerFound> context)
+    public async Task Consume(ConsumeContext<INotifyServerFound> context)
     {
         _logger.LogDebug("Saga Event: {event}", "server_found");
 
-        return _context.Clients
-            .Group(context.Message.CorrelationId.ToString())
-            .SendAsync("onServerFound");
+        Task GetPersonalNotifyTask(Guid userId, string ticket)
+        {
+            return _context.Clients
+             .Group(userId.ToString())
+             .SendAsync("onServerFound", new
+             {
+                 Ticket = ticket,
+                 context.Message.Endpoint
+             });
+        }
+
+        var notifyTasks = context.Message.Tickets
+            .Select(x => GetPersonalNotifyTask(x.Key, x.Value));
+
+        await Task.WhenAll(notifyTasks);
     }
 }
 

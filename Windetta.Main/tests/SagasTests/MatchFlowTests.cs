@@ -249,7 +249,7 @@ public class MatchFlowTests : IUseHarness
         await sagaHarness.Consumed.Any<IGameServeReadyAcceptConnections>();
 
         // assert
-        (await harness.Sent.Any<INotifyMatchBegun>())
+        (await harness.Sent.Any<INotifyReadyToConnect>())
             .ShouldBeTrue();
         (await sagaHarness.Exists(correllationId, s => s.Running))
             .HasValue.ShouldBeTrue();

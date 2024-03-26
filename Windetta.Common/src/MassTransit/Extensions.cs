@@ -33,10 +33,11 @@ public static class Extensions
             x.AddConsumers(assembly);
             x.UsingRabbitMq((context, cfg) =>
             {
-                cfg.Host(rmqQtions.Hostnames.First() ?? "localhost", rmqQtions.VirtualHost ?? "/", h =>
+                var host = rmqQtions.Hostnames.First() ?? "localhost";
+                cfg.Host(new Uri($"rabbitmq://{host}:{rmqQtions.Port}/{rmqQtions.VirtualHost}"), cfg =>
                 {
-                    h.Username(rmqQtions.Username ?? "admin");
-                    h.Password(rmqQtions.Password ?? "admin");
+                    cfg.Username(rmqQtions.Username ?? "admin");
+                    cfg.Password(rmqQtions.Password ?? "admin");
                 });
 
                 var data = GetConsumersWithMessageTypes(assembly);

@@ -57,21 +57,21 @@ public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
             When(GameServerReservationFailed)
                 .NotifyMatchAwaitingExpired()
                 .CancelMatch(reason => "GameServers unavailable"),
-            When(GameServerFound)
-                .NotifyServerFound()
-                .SaveGameServerInfo()
-                .If(condition => condition.Saga.CurrentState != (int)MatchFlowState.Running,
-                 callback => callback.TransitionTo(ServerFound)),
             When(CancellationRequested)
                 .CancelMatch(reason => reason.Reason));
 
+        During(GameServerSearching, Running,
+             When(GameServerFound)
+                .SaveGameServerInfo()
+                .NotifyServerFound()
+                .TransitionTo(ServerFound));
+
         During(ServerFound, GameServerSearching,
             When(ReadyAcceptConnections)
-                .NotifyMatchBegun()
+                .NotifyReadyToConnect()
                 .TransitionTo(Running));
 
         During(Running,
-            Ignore(GameServerFound),
             When(CancellationRequested)
                 .CancelMatch(reason => reason.Reason),
             When(MatchCompleted)
@@ -177,14 +177,13 @@ public static class MatchFlowStateMachineExtensions
         }));
     }
 
-    public static EventActivityBinder<MatchFlow, IGameServeReadyAcceptConnections> NotifyMatchBegun(
-    this EventActivityBinder<MatchFlow, IGameServeReadyAcceptConnections> binder)
+    public static EventActivityBinder<MatchFlow, TData> NotifyReadyToConnect<TData>(
+    this EventActivityBinder<MatchFlow, TData> binder)
+    where TData : class, CorrelatedBy<Guid>
     {
-        return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<INotifyMatchBegun>(new
+        return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<INotifyReadyToConnect>(new
         {
             ctx.Message.CorrelationId,
-            ctx.Saga.Endpoint,
-            ctx.Saga.Tickets
         }));
     }
 
@@ -194,6 +193,8 @@ public static class MatchFlowStateMachineExtensions
         return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<INotifyServerFound>(new
         {
             ctx.Message.CorrelationId,
+            Endpoint = new Uri(ctx.Saga.Endpoint!),
+            Tickets = ctx.Saga.Tickets!
         }));
     }
 
