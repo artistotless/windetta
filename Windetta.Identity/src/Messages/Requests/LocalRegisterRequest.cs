@@ -72,6 +72,7 @@ public class LocalRegisterHandler : IRequestHandler<LocalRegisterRequest>
             Email = user.Email,
             Role = Roles.USER,
             UserName = user.UserName,
+            TimeStamp = DateTime.UtcNow,
         });
     }
 

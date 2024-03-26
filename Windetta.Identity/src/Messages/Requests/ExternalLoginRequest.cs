@@ -59,6 +59,7 @@ public class ExternalLoginHandler : IRequestHandler<ExternalLoginRequest, Author
             Email = user.Email,
             Role = Roles.USER,
             UserName = user.UserName,
+            TimeStamp = DateTime.UtcNow,
         });
 
         return context;
