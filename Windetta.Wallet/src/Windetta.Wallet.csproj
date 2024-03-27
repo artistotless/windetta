@@ -26,5 +26,9 @@
     <ProjectReference Include="..\..\Windetta.Common\src\Windetta.Common.csproj" />
     <ProjectReference Include="..\..\Windetta.Contracts\Windetta.Contracts.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Logs\" />
+  </ItemGroup>
   
 </Project>
