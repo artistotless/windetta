@@ -82,7 +82,7 @@ public class LobbyDispatcherTests
         // arrange
         var gameCfg = new GameConfiguration()
         {
-            MaxPlayers = 3,
+            MaxPlayersInTeam = 3,
         };
 
         var sc = new[] { new SupportedCurrency(1, 1, 100000) };

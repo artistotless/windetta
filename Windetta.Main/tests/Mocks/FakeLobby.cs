@@ -90,7 +90,7 @@ public class ProxyLobby : ILobby
         {
             for (ushort i = 0; i < maxTeams; i++)
             {
-                var room = new Room(i, Configuration.MaxPlayers);
+                var room = new Room(i, Configuration.MaxPlayersInTeam);
 
                 yield return new KeyValuePair<ushort, Room>(i, room);
             }

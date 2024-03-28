@@ -7,6 +7,7 @@ using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
 using Windetta.Main.Core.Exceptions;
 using Windetta.Main.Core.Lobbies;
+using Windetta.Main.Core.Matches;
 
 namespace Windetta.Main.Infrastructure.Sagas;
 
@@ -14,7 +15,6 @@ public class MatchFlow : SagaStateMachineInstance
 {
     public Guid CorrelationId { get; set; }
     public IEnumerable<Player> Players { get; set; }
-    public IReadOnlyDictionary<Guid, string>? Tickets { get; set; }
     public IReadOnlyDictionary<string, string>? Properties { get; set; }
     public Guid GameId { get; set; }
     public string? Endpoint { get; set; }
@@ -37,7 +37,7 @@ public enum MatchFlowState : int
 
 public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
 {
-    public MatchFlowStateMachine(ILobbies lobbies)
+    public MatchFlowStateMachine(ILobbies lobbies, IOngoingMatches matches)
     {
         InstanceState(instance => instance.CurrentState);
 
@@ -63,7 +63,7 @@ public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
 
         During(GameServerSearching,
              When(GameServerFound)
-                .SaveGameServerInfo()
+                .SaveGameServerInfo(matches)
                 .NotifyServerFound()
                 .TransitionTo(ServerFound));
 
@@ -198,17 +198,20 @@ public static class MatchFlowStateMachineExtensions
         {
             ctx.Message.CorrelationId,
             Endpoint = new Uri(ctx.Saga.Endpoint!),
-            Tickets = ctx.Saga.Tickets!
         }));
     }
 
     public static EventActivityBinder<MatchFlow, IGameServerFound> SaveGameServerInfo(
-    this EventActivityBinder<MatchFlow, IGameServerFound> binder)
+    this EventActivityBinder<MatchFlow, IGameServerFound> binder, IOngoingMatches matches)
     {
-        return binder.Then(x =>
+        return binder.Then(async x =>
         {
+            IEnumerable<(OngoingMatch, Guid)> ongoingMatches = x.Message
+            .Tickets.Select(t => (new OngoingMatch(x.Message.CorrelationId, t.Value), t.Key));
+
+            await matches.SetRangeAsync(ongoingMatches);
+
             x.Saga.Endpoint = x.Message.Endpoint.ToString();
-            x.Saga.Tickets = x.Message.Tickets;
         });
     }
 

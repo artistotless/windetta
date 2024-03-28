@@ -25,7 +25,7 @@ public class CreateTests
             Bet = new Bet(currencyId: 1, bet: 100_0),
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId,
-            GameConfiguration = new() { MaxPlayers = 2 },
+            GameConfiguration = new() { MaxPlayersInTeam = 2 },
         };
 
         var useCase = provider
@@ -55,7 +55,7 @@ public class CreateTests
             Bet = new Bet(currencyId: 1, bet: 100_0),
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId,
-            GameConfiguration = new() { MaxPlayers = 2 },
+            GameConfiguration = new() { MaxPlayersInTeam = 2 },
         };
 
         var useCase = provider
@@ -85,7 +85,7 @@ public class CreateTests
             Bet = new Bet(currencyId: 1, bet: 100_0),
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId,
-            GameConfiguration = new() { MaxPlayers = 2 },
+            GameConfiguration = new() { MaxPlayersInTeam = 2 },
         };
 
         var useCase = provider

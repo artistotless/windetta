@@ -55,21 +55,7 @@ public class ServerFoundNotifier : IConsumer<INotifyServerFound>
     {
         _logger.LogDebug("Saga Event: {event}", "server_found");
 
-        Task GetPersonalNotifyTask(Guid userId, string ticket)
-        {
-            return _context.Clients
-             .Group(userId.ToString())
-             .SendAsync("onServerFound", new
-             {
-                 Ticket = ticket,
-                 context.Message.Endpoint
-             });
-        }
-
-        var notifyTasks = context.Message.Tickets
-            .Select(x => GetPersonalNotifyTask(x.Key, x.Value));
-
-        await Task.WhenAll(notifyTasks);
+        // TODO: implement it
     }
 }
 

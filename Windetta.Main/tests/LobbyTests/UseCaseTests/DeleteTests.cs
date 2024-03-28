@@ -19,7 +19,7 @@ public class DeleteTests
             Bet = new Bet(),
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId,
-            GameConfiguration = new GameConfiguration() { MaxPlayers = 2 }
+            GameConfiguration = new GameConfiguration() { MaxPlayersInTeam = 2 }
         };
 
         var factory = SharedServiceProvider.GetInstance()
@@ -49,7 +49,7 @@ public class DeleteTests
             Bet = new Bet(),
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId,
-            GameConfiguration = new GameConfiguration() { MaxPlayers = 2 }
+            GameConfiguration = new GameConfiguration() { MaxPlayersInTeam = 2 }
         };
 
         var factory = provider.GetRequiredService<ILobbyUseCasesFactory>();

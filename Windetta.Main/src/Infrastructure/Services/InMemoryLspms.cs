@@ -1,5 +1,4 @@
 ﻿using Windetta.Main.Core.Services.LSPM;
-
 public class InMemoryLspms : ILspms
 {
     private readonly IList<Lspm> _items;

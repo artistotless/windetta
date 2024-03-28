@@ -14,8 +14,8 @@ public class LobbyTests
         // arrange
         var gameCfg = new GameConfiguration()
         {
-            MinPlayers = 1,
-            MaxPlayers = (uint)Random.Shared.Next(10, 1000),
+            MinPlayersInTeam = 1,
+            MaxPlayersInTeam = (uint)Random.Shared.Next(10, 1000),
             MinTeams = 1,
             MaxTeams = (uint)Random.Shared.Next(1, 1000)
         };
@@ -41,7 +41,7 @@ public class LobbyTests
 
         // assert
         lobby.Rooms.Count().ShouldBe((int)gameCfg.MaxTeams);
-        lobby.Rooms.First().MaxMembers.ShouldBe(gameCfg.MaxPlayers);
+        lobby.Rooms.First().MaxMembers.ShouldBe(gameCfg.MaxPlayersInTeam);
     }
 
     [Fact]

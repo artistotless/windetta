@@ -30,6 +30,7 @@ app.UseCors("allow_any_origins");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseLobbyEndpoints();
+app.UseOngoingMatchesEndpoints();
 app.MapGet("/", () => "Windetta");
 app.MapHub<MainHub>("/mainHub");
 

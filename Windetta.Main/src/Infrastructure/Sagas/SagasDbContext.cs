@@ -18,9 +18,6 @@ public class MatchesMap : SagaClassMap<MatchFlow>
             .HasConversion<PlayersDbModelConverter>();
         entity.Property(x => x.Properties)
             .HasConversion<PropertiesDbModelConverter>();
-        entity.Property(x => x.Tickets)
-            .UseCollation("latin1_general_ci")
-            .HasConversion<TicketsDbModelConverter>();
     }
 }
 

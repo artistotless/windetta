@@ -161,7 +161,7 @@ public sealed class Lobby : ILobby
 
         for (ushort i = 0; i < rooms.Length; i++)
         {
-            rooms[i] = new Room(i, Configuration.MaxPlayers);
+            rooms[i] = new Room(i, Configuration.MaxPlayersInTeam);
         }
 
         return rooms;

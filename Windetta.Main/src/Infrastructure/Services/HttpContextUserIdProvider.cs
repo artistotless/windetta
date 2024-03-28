@@ -5,7 +5,7 @@ using Windetta.Main.Core.Services;
 
 namespace Windetta.Main.Infrastructure.Services;
 
-public class HttpContextUserIdProvider : IUserIdService
+public class HttpContextUserIdProvider : IUserIdProvider
 {
     protected readonly IHttpContextAccessor ContextAccessor;
 

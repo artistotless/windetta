@@ -35,7 +35,7 @@ public class JoinMemberTests
         var options = new LobbyOptions()
         {
             InitiatorId = ExampleGuids.UserId,
-            GameConfiguration = new GameConfiguration() { MaxPlayers = 2 },
+            GameConfiguration = new GameConfiguration() { MaxPlayersInTeam = 2 },
         };
         var lobby = new ProxyLobby(options);
         var storageMock = new LobbiesMock() { ReturnThisLobby = lobby }.Mock;
@@ -67,7 +67,7 @@ public class JoinMemberTests
             Bet = new Bet(),
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId,
-            GameConfiguration = new GameConfiguration() { MaxPlayers = 2 },
+            GameConfiguration = new GameConfiguration() { MaxPlayersInTeam = 2 },
         };
 
         var lobbyMock = new Mock<ProxyLobby>(options, null);
