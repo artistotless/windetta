@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Windetta.Main.Infrastructure.Sagas;
 
@@ -10,9 +11,11 @@ using Windetta.Main.Infrastructure.Sagas;
 namespace Windetta.Main.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(SagasDbContext))]
-    partial class SagasDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240327142443_AddedReadyToConnectStateProperty")]
+    partial class AddedReadyToConnectStateProperty
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

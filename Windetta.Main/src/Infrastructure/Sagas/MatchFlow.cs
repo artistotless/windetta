@@ -22,6 +22,7 @@ public class MatchFlow : SagaStateMachineInstance
     public int BetCurrencyId { get; set; }
     public ulong BetAmount { get; set; }
     public int CurrentState { get; set; }
+    public int ReadyToConnectState { get; set; }
 }
 
 public enum MatchFlowState : int
@@ -60,15 +61,23 @@ public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
             When(CancellationRequested)
                 .CancelMatch(reason => reason.Reason));
 
-        During(GameServerSearching, Running,
+
+        DuringAny(When(ReadyAcceptConnections)
+            .Then(x =>
+            {
+                ;
+            }));
+
+        During(GameServerSearching,
              When(GameServerFound)
                 .SaveGameServerInfo()
                 .NotifyServerFound()
-                .If(condiction => condiction.Saga.CurrentState != (int)MatchFlowState.Running,
-                then => then.TransitionTo(ServerFound)));
+                .TransitionTo(ServerFound));
 
-        During(ServerFound, GameServerSearching,
-            When(ReadyAcceptConnections)
+        CompositeEvent(() => ReadyToConnect, s => s.ReadyToConnectState,
+            GameServerFound, ReadyAcceptConnections);
+
+        DuringAny(When(ReadyToConnect)
                 .NotifyReadyToConnect()
                 .TransitionTo(Running));
 
@@ -109,6 +118,7 @@ public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
     public Event<IGameServeReadyAcceptConnections> ReadyAcceptConnections { get; }
     public Event<ICancellationMatchRequested> CancellationRequested { get; }
     public Event<IMatchCompleted> MatchCompleted { get; }
+    public Event ReadyToConnect { get; }
 
     // Faults
     public Event<Fault<IHoldBalances>> HoldBalancesFailed { get; }
@@ -178,13 +188,12 @@ public static class MatchFlowStateMachineExtensions
         }));
     }
 
-    public static EventActivityBinder<MatchFlow, TData> NotifyReadyToConnect<TData>(
-    this EventActivityBinder<MatchFlow, TData> binder)
-    where TData : class, CorrelatedBy<Guid>
+    public static EventActivityBinder<MatchFlow> NotifyReadyToConnect(
+    this EventActivityBinder<MatchFlow> binder)
     {
         return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<INotifyReadyToConnect>(new
         {
-            ctx.Message.CorrelationId,
+            ctx.Saga.CorrelationId,
             Players = ctx.Saga.Players.Select(p => p.Id),
         }));
     }

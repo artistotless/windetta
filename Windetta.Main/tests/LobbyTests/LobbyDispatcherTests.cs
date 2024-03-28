@@ -70,7 +70,10 @@ public class LobbyDispatcherTests
         // assert
         var text = $"Lobby deleted: {lobby.Id}";
         (await storage.GetAllAsync()).Count().ShouldBe(0);
-        buffer.Dequeue().ShouldBe(text);
+
+        buffer.Dequeue(); // Lobby added
+        buffer.Dequeue()  // Lobby deleted
+            .ShouldBe(text);
     }
 
     [Fact]
@@ -112,13 +115,14 @@ public class LobbyDispatcherTests
         while (buffer.Count < 3 && new CancellationTokenSource
             (TimeSpan.FromSeconds(6)).IsCancellationRequested == false)
         {
-            await Task.Delay(100);
+            await Task.Delay(300);
         }
 
         // assert
         var text = $"Lobby ready: {lobby.Id}";
+        buffer.Dequeue(); // Lobby added
         buffer.Dequeue(); // Lobby update
-        buffer.Dequeue(); // Lobby update
-        buffer.Dequeue().ShouldBe(text); // Lobby ready
+        buffer.Dequeue()  // Lobby ready
+            .ShouldBe(text);
     }
 }

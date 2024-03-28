@@ -15,9 +15,8 @@ public static class IdentitySeeder
         using var roleManager = app.ApplicationServices
          .GetRequiredService<RoleManager<Role>>();
 
-        using var dbContext = app.ApplicationServices
+        using var dbContext =  app.ApplicationServices
            .GetRequiredService<IdentityDbContext>();
-        dbContext.Database.Migrate();
 
         if (!roleManager.Roles.Any())
         {

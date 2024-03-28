@@ -81,6 +81,17 @@ public static class Extensions
         return source.Add(new SendActivity<TSaga, TData, TMessage>(_ => endpoint, MessageFactory<TMessage>.Create(messageFactory, callback)));
     }
 
+    public static EventActivityBinder<TSaga> SendCommandAsync<TSaga, TMessage>(this EventActivityBinder<TSaga> source,
+        string serviceName, Func<BehaviorContext<TSaga>, Task<SendTuple<TMessage>>> messageFactory,
+        Action<SendContext<TMessage>> callback = null)
+        where TSaga : class, SagaStateMachineInstance
+        where TMessage : class
+    {
+        var endpoint = MyEndpointNameFormatter.CommandUri<TMessage>(serviceName);
+
+        return source.Add(new SendActivity<TSaga, TMessage>(_ => endpoint, MessageFactory<TMessage>.Create(messageFactory, callback)));
+    }
+
     public static async Task SendCommandAsync<TMessage>(this IBus bus,
          string serviceName, object values)
          where TMessage : class
