@@ -61,13 +61,6 @@ public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
             When(CancellationRequested)
                 .CancelMatch(reason => reason.Reason));
 
-
-        DuringAny(When(ReadyAcceptConnections)
-            .Then(x =>
-            {
-                ;
-            }));
-
         During(GameServerSearching,
              When(GameServerFound)
                 .SaveGameServerInfo()
