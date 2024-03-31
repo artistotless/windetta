@@ -7,7 +7,6 @@ using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
 using Windetta.Main.Core.Exceptions;
 using Windetta.Main.Core.Lobbies;
-using Windetta.Main.Core.Matches;
 
 namespace Windetta.Main.Infrastructure.Sagas;
 
@@ -33,7 +32,7 @@ public enum LobbyFlowState : int
 
 public class LobbyFlowStateMachine : MassTransitStateMachine<LobbyFlow>
 {
-    public LobbyFlowStateMachine(ILobbies lobbies, IOngoingMatches matches)
+    public LobbyFlowStateMachine(ILobbies lobbies)
     {
         InstanceState(instance => instance.CurrentState);
 

@@ -30,7 +30,7 @@ public static class AuthenticationConfiguration
                     var accessTokenFromHeader = context.Request.Headers.Authorization.ToString()
                     .Replace("Bearer ", string.Empty);
 
-                    if (string.IsNullOrEmpty(accessTokenFromQuery))
+                    if (!string.IsNullOrEmpty(accessTokenFromQuery))
                         context.Token = accessTokenFromHeader;
                     else
                         context.Token = accessTokenFromQuery;
