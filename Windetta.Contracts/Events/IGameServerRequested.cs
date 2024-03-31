@@ -1,15 +1,21 @@
-﻿using LSPM.Models;
-using MassTransit;
+﻿using MassTransit;
 using Windetta.Contracts.Base;
 
 namespace Windetta.Contracts.Events;
 
-public interface IGameServerRequested : CorrelatedBy<Guid>, IEvent
+/// <summary>
+/// Request to LSPM to start or retrieve info about already running server
+/// </summary>
+public interface IGameServerRequested : CorrelatedBy<Guid>, IEvent, ILspmMessage
 {
-    public Guid CorrelationId { get; set; }
+    /// <summary>
+    /// What kind of game do you need a game server for
+    /// </summary>
     public Guid GameId { get; set; }
-    public IEnumerable<Player> Players { get; set; }
-    public Dictionary<string, string>? Properties { get; set; }
-    public string LspmIp { get; set; }
+
+    /// <summary>
+    /// The moment in time when the request was generated. 
+    /// Needed to determine if the message has expired
+    /// </summary>
     public DateTimeOffset TimeStamp { get; set; }
 }

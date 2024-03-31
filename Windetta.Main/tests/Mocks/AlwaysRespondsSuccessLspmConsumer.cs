@@ -10,26 +10,8 @@ public class AlwaysRespondsSuccessLspmConsumer : IConsumer<IGameServerRequested>
     {
         return context.RespondAsync<RequestingGameServerResult>(new()
         {
-            Success = true,
-            Details = new ConnectionToServerDetails()
-            {
-                Endpoint = new UriBuilder("udp", "127.0.0.1", 9999).Uri,
-                Tickets = CreateTickets(context.Message.Players)
-            },
-            Error = null,
+            GameServerId = Guid.NewGuid(),
         });
-    }
-
-    private Dictionary<Guid, string> CreateTickets(IEnumerable<Player> players)
-    {
-        var dict = new Dictionary<Guid, string>();
-
-        foreach (var item in players)
-        {
-            dict.Add(item.Id, $"Ticket#{item.Id}");
-        }
-
-        return dict;
     }
 }
 
@@ -39,9 +21,7 @@ public class AlwaysOverloadLspmConsumer : IConsumer<IGameServerRequested>
     {
         return context.RespondAsync<RequestingGameServerResult>(new()
         {
-            Success = false,
-            Details = null,
-            Error = null,
+            Error = "Overload",
         });
     }
 }

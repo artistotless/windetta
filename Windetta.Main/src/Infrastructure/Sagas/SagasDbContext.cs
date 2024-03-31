@@ -4,22 +4,33 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Windetta.Main.Infrastructure.Sagas;
-public class MatchesMap : SagaClassMap<MatchFlow>
+public class MatchFlowMap : SagaClassMap<MatchFlow>
 {
     protected override void Configure(EntityTypeBuilder<MatchFlow> entity, ModelBuilder model)
     {
         entity.Property(x => x.CurrentState)
             .HasColumnType("TINYINT");
         entity.HasIndex(x => x.CorrelationId);
-        entity.Property(x => x.Endpoint)
-            .UseCollation("latin1_general_ci")
-            .HasColumnType("VARCHAR(42)");
+        entity.Property(x => x.Players)
+            .HasConversion<PlayersDbModelConverter>();
+    }
+}
+
+public class LobbyFlowMap : SagaClassMap<LobbyFlow>
+{
+    protected override void Configure(EntityTypeBuilder<LobbyFlow> entity, ModelBuilder model)
+    {
+        //TODO: доделать
+        entity.Property(x => x.CurrentState)
+            .HasColumnType("TINYINT");
+        entity.HasIndex(x => x.CorrelationId);
         entity.Property(x => x.Players)
             .HasConversion<PlayersDbModelConverter>();
         entity.Property(x => x.Properties)
             .HasConversion<PropertiesDbModelConverter>();
     }
 }
+
 
 public class SagasDbContext : SagaDbContext
 {
@@ -29,7 +40,7 @@ public class SagasDbContext : SagaDbContext
     {
         get
         {
-            yield return new MatchesMap();
+            yield return new MatchFlowMap();
         }
     }
 }

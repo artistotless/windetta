@@ -31,7 +31,7 @@ public class MatchBegunNotifier : IConsumer<INotifyReadyToConnect>
              .SendAsync("onReadyToConnect");
         }
 
-        var notifyTasks = context.Message.Players
+        var notifyTasks = context.Message.PlayersIds
             .Select(GetPersonalNotifyTask);
 
         await Task.WhenAll(notifyTasks);

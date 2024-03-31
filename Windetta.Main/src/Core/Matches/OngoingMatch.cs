@@ -15,9 +15,15 @@ public struct OngoingMatch
     /// </summary>
     public string Ticket { get; init; }
 
-    public OngoingMatch(Guid matchId, string ticket)
+    /// <summary>
+    /// GameServer endpoint
+    /// </summary>
+    public Uri Endpoint { get; set; }
+
+    public OngoingMatch(Guid matchId, string ticket, Uri endpoint)
     {
         Id = matchId;
         Ticket = ticket;
+        Endpoint = endpoint;
     }
 }

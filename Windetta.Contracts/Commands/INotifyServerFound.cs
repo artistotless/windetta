@@ -5,4 +5,5 @@ namespace Windetta.Contracts.Commands;
 
 public interface INotifyServerFound : CorrelatedBy<Guid>, ICommand
 {
+    public Guid LobbyId { get; set; }
 }

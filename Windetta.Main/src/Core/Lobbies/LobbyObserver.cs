@@ -48,7 +48,8 @@ public sealed class LobbyObserver : ISingletonService
 
         await _publisher.Publish<ILobbyReady>(new
         {
-            CorrelationId = lobby.Id,
+            CorrelationId = Guid.NewGuid(),
+            LobbyId = lobby.Id,
             TimeStamp = DateTime.UtcNow,
         });
     }

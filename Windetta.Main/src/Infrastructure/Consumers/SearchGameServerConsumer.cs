@@ -43,8 +43,7 @@ public class SearchGameServerConsumer : IConsumer<ISearchGameServer>
         await context.Publish<IGameServerFound>(new
         {
             context.Message.CorrelationId,
-            result.Details!.Endpoint,
-            result.Details.Tickets,
+            result.GameServerId,
         });
     }
 
@@ -60,9 +59,6 @@ public class SearchGameServerConsumer : IConsumer<ISearchGameServer>
         {
             CorrelationId = message.CorrelationId,
             GameId = message.GameId,
-            Players = message.Players,
-            Properties = message.Properties,
-            TimeStamp = DateTimeOffset.UtcNow,
         };
 
         foreach (var item in allLspms)
@@ -71,9 +67,9 @@ public class SearchGameServerConsumer : IConsumer<ISearchGameServer>
 
             var response = await SendDurableRequest(request);
 
-            if (response is not null && response.Message.Success)
+            if (response is not null && response.Success)
             {
-                result = response.Message;
+                result = response;
                 break;
             }
         }
@@ -81,33 +77,29 @@ public class SearchGameServerConsumer : IConsumer<ISearchGameServer>
         return result ?? throw LspmException.Overload;
     }
 
-    private async Task<Response<RequestingGameServerResult>?> SendDurableRequest
-        (IGameServerRequested request)
+    private async Task<RequestingGameServerResult?> SendDurableRequest(IGameServerRequested request)
     {
-        Action<SendContext<IGameServerRequested>> requestExpirationHeader = (context) =>
+        Action<SendContext<IGameServerRequested>> setExpirationHeader = (context) =>
         {
             context.Headers.Set("expires", REQUEST_TIMEOUT_SECONDS);
         };
 
-        Response<RequestingGameServerResult> response;
-
         try
         {
-            response = await client.GetResponse<RequestingGameServerResult>
-            (request, x => x.UseExecute(requestExpirationHeader),
+            request.TimeStamp = DateTime.UtcNow;
+            var response = await client.GetResponse<RequestingGameServerResult>
+            (request, x => x.UseExecute(setExpirationHeader),
             timeout: RequestTimeout.After(s: REQUEST_TIMEOUT_SECONDS));
+
+            return response.Message;
         }
         catch { return null; }
-
-        return response;
     }
 
     private class GameServerRequested : IGameServerRequested
     {
         public Guid CorrelationId { get; set; }
         public Guid GameId { get; set; }
-        public IEnumerable<Player> Players { get; set; }
-        public Dictionary<string, string>? Properties { get; set; }
         public string LspmIp { get; set; }
         public DateTimeOffset TimeStamp { get; set; }
     }
