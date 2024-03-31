@@ -8,7 +8,7 @@ public class AlwaysRespondsSuccessLspmConsumer : IConsumer<IGameServerRequested>
 {
     public Task Consume(ConsumeContext<IGameServerRequested> context)
     {
-        return context.RespondAsync<RequestingGameServerResult>(new()
+        return context.RespondAsync<GameServerResult>(new()
         {
             GameServerId = Guid.NewGuid(),
         });
@@ -19,7 +19,7 @@ public class AlwaysOverloadLspmConsumer : IConsumer<IGameServerRequested>
 {
     public Task Consume(ConsumeContext<IGameServerRequested> context)
     {
-        return context.RespondAsync<RequestingGameServerResult>(new()
+        return context.RespondAsync<GameServerResult>(new()
         {
             Error = "Overload",
         });

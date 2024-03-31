@@ -16,7 +16,7 @@ public class TestSearchGameServerConsumer : IConsumer<ISearchGameServer>
 
     public async Task Consume(ConsumeContext<ISearchGameServer> context)
     {
-        var result = await client.GetResponse<RequestingGameServerResult>(new
+        var result = await client.GetResponse<GameServerResult>(new
         {
             context.Message.GameId,
             context.Message.CorrelationId,

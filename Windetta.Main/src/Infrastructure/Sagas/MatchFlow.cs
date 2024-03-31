@@ -19,6 +19,7 @@ public class MatchFlow : SagaStateMachineInstance
     public Guid GameId { get; set; }
     public DateTimeOffset Created { get; set; }
     public int CurrentState { get; set; }
+    public Uri GameServerEndpoint { get; set; }
 }
 
 public enum MatchFlowState : int
@@ -81,7 +82,6 @@ public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
     public Event<ICancellationMatchRequested> CancellationRequested { get; }
     public Event<IMatchCompleted> MatchCompleted { get; }
 
-
     // Faults
     public Event<Fault<IProcessWinnings>> ProcessingWinningsFailed { get; }
 }
@@ -116,6 +116,7 @@ public static class MatchFlowStateMachineExtensions
             ctx.Saga.Players = ctx.Message.Players;
             ctx.Saga.CorrelationId = ctx.Message.CorrelationId;
             ctx.Saga.Created = DateTime.UtcNow;
+            ctx.Saga.GameServerEndpoint = ctx.Message.GameServerEndpoint;
         });
     }
 
@@ -174,10 +175,12 @@ public static class MatchFlowStateMachineExtensions
     public static EventActivityBinder<MatchFlow, IMatchCreated> SaveTickets(
     this EventActivityBinder<MatchFlow, IMatchCreated> binder, IOngoingMatches matches)
     {
-        return binder.Then(async x =>
+        return binder.Then(async ctx =>
         {
-            IEnumerable<(OngoingMatch, Guid)> ongoingMatches = x.Message
-            .Tickets.Select(t => (new OngoingMatch(x.Message.CorrelationId, t.Value, x.Message.Endpoint), t.Key));
+            var endpoint = ctx.Saga.GameServerEndpoint;
+
+            IEnumerable<(OngoingMatch, Guid)> ongoingMatches = ctx.Message
+            .Tickets.Select(t => (new OngoingMatch(ctx.Message.CorrelationId, t.Value, endpoint), t.Key));
 
             await matches.SetRangeAsync(ongoingMatches);
         });

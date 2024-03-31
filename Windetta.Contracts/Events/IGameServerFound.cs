@@ -9,6 +9,11 @@ namespace Windetta.Contracts.Events;
 public interface IGameServerFound : CorrelatedBy<Guid>, IEvent
 {
     /// <summary>
+    /// Game server endpoint for connection
+    /// </summary>
+    public Uri GameServerEndpoint { get; set; }
+
+    /// <summary>
     /// Game server instance identifier
     /// </summary>
     public Guid GameServerId { get; set; }

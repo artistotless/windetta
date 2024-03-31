@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Windetta.Common.Constants;
 using Windetta.Common.MassTransit;
 using Windetta.Common.Testing;
+using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
 using Windetta.Main.Core.Games;
 using Windetta.Main.Core.Lobbies;
@@ -100,6 +101,37 @@ public class MatchFlowTests : IUseHarness
     }
 
     [Fact]
+    public async Task When_MatchCreated()
+    {
+        // arrange
+        await using var provider = GetProvider();
+        var harness = await provider.StartTestHarness();
+
+        await provider.AddOrUpdateSaga(CreateSagaWithState
+            (MatchFlowState.CreatingMatch));
+
+        var sagaHarness = harness.GetSagaStateMachineHarness
+            <MatchFlowStateMachine, MatchFlow>();
+
+        // act
+        await harness.Bus.Publish<IMatchCreated>(new
+        {
+            CorrelationId = correllationId,
+            Tickets = TicketGenerator.Create(2)
+        });
+
+        await sagaHarness.Consumed.Any<IMatchCreated>();
+
+        // assert
+        (await harness.Sent.Any<INotifyReadyToConnect>())
+            .ShouldBeTrue();
+        (await sagaHarness.Exists(correllationId, s => s.Running))
+            .HasValue.ShouldBeTrue();
+
+        await harness.OutputTimeline(_output, x => x.Now());
+    }
+
+    [Fact]
     public async Task When_MatchCompleted()
     {
         // arrange
@@ -125,5 +157,17 @@ public class MatchFlowTests : IUseHarness
             .HasValue.ShouldBeTrue();
 
         await harness.OutputTimeline(_output, x => x.Now());
+    }
+
+    private static class TicketGenerator
+    {
+        public static Dictionary<Guid, string> Create(int count)
+        {
+            var tickets = new Dictionary<Guid, string>(count);
+            for (var i = 0; i < count; i++)
+                tickets.Add(Guid.NewGuid(), $"ticket#{i}");
+
+            return tickets;
+        }
     }
 }

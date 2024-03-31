@@ -15,6 +15,7 @@ public class SearchGameServerConsumer : IConsumer<ISearchGameServer>
     private readonly ResiliencePipelineProvider<Type>? retryPolicy;
 
     private const int REQUEST_TIMEOUT_SECONDS = 10;
+    private string _current_lspm;
 
     public SearchGameServerConsumer(
         ILspms lspms,
@@ -32,7 +33,7 @@ public class SearchGameServerConsumer : IConsumer<ISearchGameServer>
         var pipeline = retryPolicy?.GetPipeline
             (typeof(SearchGameServerConsumer));
 
-        RequestingGameServerResult result;
+        GameServerResult result;
 
         if (pipeline is null)
             result = await RequestGameServer(context.Message, allLspms);
@@ -44,16 +45,18 @@ public class SearchGameServerConsumer : IConsumer<ISearchGameServer>
         {
             context.Message.CorrelationId,
             result.GameServerId,
+            result.GameServerEndpoint,
+            LspmIp = _current_lspm,
         });
     }
 
-    private async Task<RequestingGameServerResult> RequestGameServer
+    private async Task<GameServerResult> RequestGameServer
        (ISearchGameServer message, IEnumerable<Lspm> allLspms)
     {
         if (allLspms is null || allLspms.Count() == 0)
             throw LspmException.NotFound;
 
-        RequestingGameServerResult? result = null;
+        GameServerResult? result = null;
 
         var request = new GameServerRequested()
         {
@@ -63,8 +66,8 @@ public class SearchGameServerConsumer : IConsumer<ISearchGameServer>
 
         foreach (var item in allLspms)
         {
-            request.LspmIp = item.Endpoint.DnsSafeHost;
-
+            _current_lspm = item.Endpoint.DnsSafeHost;
+            request.LspmIp = _current_lspm;
             var response = await SendDurableRequest(request);
 
             if (response is not null && response.Success)
@@ -77,7 +80,7 @@ public class SearchGameServerConsumer : IConsumer<ISearchGameServer>
         return result ?? throw LspmException.Overload;
     }
 
-    private async Task<RequestingGameServerResult?> SendDurableRequest(IGameServerRequested request)
+    private async Task<GameServerResult?> SendDurableRequest(IGameServerRequested request)
     {
         Action<SendContext<IGameServerRequested>> setExpirationHeader = (context) =>
         {
@@ -87,7 +90,7 @@ public class SearchGameServerConsumer : IConsumer<ISearchGameServer>
         try
         {
             request.TimeStamp = DateTime.UtcNow;
-            var response = await client.GetResponse<RequestingGameServerResult>
+            var response = await client.GetResponse<GameServerResult>
             (request, x => x.UseExecute(setExpirationHeader),
             timeout: RequestTimeout.After(s: REQUEST_TIMEOUT_SECONDS));
 

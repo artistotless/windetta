@@ -27,6 +27,11 @@ public interface ICreateMatchFlowRequested : CorrelatedBy<Guid>, IEvent
     /// <summary>
     /// 
     /// </summary>
+    public Uri GameServerEndpoint { get; set; }
+
+    /// <summary>
+    /// 
+    /// </summary>
     public IReadOnlyDictionary<string, string>? Properties { get; set; }
 
     /// <summary>

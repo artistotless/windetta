@@ -4,6 +4,7 @@ using Windetta.Main.Core.Games;
 using Windetta.Main.Core.Lobbies;
 using Windetta.Main.Core.Lobbies.Plugins;
 using Windetta.Main.Core.Lobbies.UseCases;
+using Windetta.Main.Core.Matches;
 using Windetta.MainTests.Mocks;
 
 namespace Windetta.MainTests.Shared;
@@ -20,6 +21,7 @@ public static class SharedServiceProvider
 
         // dependencies
         services.TryAddScoped(p => new WalletServiceMock().Mock.Object);
+        services.TryAddSingleton<IOngoingMatches, InMemoryOngoingMatches>();
         services.TryAddSingleton<IGames, InMemoryGamesRepository>();
         services.TryAddSingleton<ILobbies, InMemoryLobbiesStorage>();
         services.TryAddSingleton<ILobbyUsersAssociations, InMemoryLobbyUsersAssociations>();
@@ -62,4 +64,3 @@ public static class SharedServiceProvider
         }
     }
 }
-

@@ -10,9 +10,14 @@ public class MatchFlowMap : SagaClassMap<MatchFlow>
     {
         entity.Property(x => x.CurrentState)
             .HasColumnType("TINYINT");
+        entity.Property(x => x.GameServerEndpoint)
+            .UseCollation("latin1_general_ci")
+            .HasColumnType("VARCHAR(42)");
         entity.HasIndex(x => x.CorrelationId);
         entity.Property(x => x.Players)
             .HasConversion<PlayersDbModelConverter>();
+        entity.Property(x => x.Properties)
+            .HasConversion<PropertiesDbModelConverter>();
     }
 }
 
@@ -41,6 +46,7 @@ public class SagasDbContext : SagaDbContext
         get
         {
             yield return new MatchFlowMap();
+            yield return new LobbyFlowMap();
         }
     }
 }

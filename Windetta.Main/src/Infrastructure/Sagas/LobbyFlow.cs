@@ -70,8 +70,6 @@ public class LobbyFlowStateMachine : MassTransitStateMachine<LobbyFlow>
     public Event<ILobbyReady> LobbyReady { get; }
     public Event<IBalancesHeld> BalancesHeld { get; }
     public Event<IGameServerFound> GameServerFound { get; }
-    public Event<IGameServerPreparedToAcceptConnection> ReadyAcceptConnections { get; }
-    public Event ReadyToConnect { get; }
 
     // Faults
     public Event<Fault<IHoldBalances>> HoldBalancesFailed { get; }
@@ -91,9 +89,15 @@ public static class LobbyFlowStateMachineExtensions
             if (lobby is null)
                 throw LobbyException.NotFound;
 
-            ctx.Saga.GameId = lobby.GameId;
             ctx.Saga.CorrelationId = ctx.Message.CorrelationId;
+            ctx.Saga.LobbyId = ctx.Message.LobbyId;
             ctx.Saga.Created = ctx.Message.TimeStamp;
+            ctx.Saga.GameId = lobby.GameId;
+            ctx.Saga.Properties = lobby.Properties;
+            ctx.Saga.BetCurrencyId = lobby.Bet.CurrencyId;
+            ctx.Saga.BetAmount = lobby.Bet.Amount;
+            ctx.Saga.Players = lobby.Rooms.SelectMany(r => r.Members,
+                (r, m) => new Player(m.Id, m.Name, r.Index));
         });
     }
 
@@ -104,6 +108,7 @@ public static class LobbyFlowStateMachineExtensions
         {
             CorrelationId = Guid.NewGuid(),
             ctx.Message.GameServerId,
+            ctx.Message.GameServerEndpoint,
             ctx.Message.LspmIp,
             ctx.Saga.LobbyId,
             Bet = new FundsInfo(ctx.Saga.BetCurrencyId, ctx.Saga.BetAmount),

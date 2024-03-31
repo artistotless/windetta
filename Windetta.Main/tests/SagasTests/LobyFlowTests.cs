@@ -230,35 +230,6 @@ public class LobyFlowTests : IUseHarness
     }
 
     [Fact]
-    public async Task When_ReadyAcceptConnections()
-    {
-        // arrange
-        await using var provider = GetProvider();
-        var harness = await provider.StartTestHarness();
-
-        await provider.AddOrUpdateSaga(CreateSagaWithState
-            (LobbyFlowState.ServerFound));
-
-        var sagaHarness = harness.GetSagaStateMachineHarness
-            <MatchFlowStateMachine, MatchFlow>();
-
-        // act
-        await harness.Bus.Publish<IGameServerPreparedToAcceptConnection>(new
-        {
-            CorrelationId = correllationId,
-        });
-        await sagaHarness.Consumed.Any<IGameServerPreparedToAcceptConnection>();
-
-        // assert
-        (await harness.Sent.Any<INotifyReadyToConnect>())
-            .ShouldBeTrue();
-        (await sagaHarness.Exists(correllationId, s => s.Running))
-            .HasValue.ShouldBeTrue();
-
-        await harness.OutputTimeline(_output, x => x.Now());
-    }
-
-    [Fact]
     public async Task When_GameServerReservationPeriodExpired()
     {
         // arrange
