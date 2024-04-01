@@ -8,6 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Web\Client\**" />
+    <Content Remove="Web\Client\**" />
+    <EmbeddedResource Remove="Web\Client\**" />
+    <None Remove="Web\Client\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Autofac" Version="7.0.1" />
     <PackageReference Include="Polly" Version="8.1.0" />
     <PackageReference Include="Polly.Extensions" Version="8.1.0" />
@@ -34,12 +41,11 @@
 
   <ItemGroup>
     <Folder Include="Logs\" />
-    <Folder Include="Web\Client\" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="Windetta.Main.Core">
-      <HintPath>..\..\Windetta.Main.Lib\bin\Debug\net8.0\Windetta.Main.Core.dll</HintPath>
+      <HintPath>..\..\Windetta.Main.Core\bin\Debug\net8.0\Windetta.Main.Core.dll</HintPath>
     </Reference>
   </ItemGroup>
 
