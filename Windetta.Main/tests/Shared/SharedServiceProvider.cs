@@ -24,7 +24,7 @@ public static class SharedServiceProvider
         services.TryAddSingleton<IOngoingMatches, InMemoryOngoingMatches>();
         services.TryAddSingleton<IGames, InMemoryGamesRepository>();
         services.TryAddSingleton<ILobbies, InMemoryLobbiesStorage>();
-        services.TryAddSingleton<ILobbyUsersAssociations, InMemoryLobbyUsersAssociations>();
+        services.TryAddSingleton<IUserLobbyMaps, InMemoryLobbyUserMaps>();
 
         // plugins
         services.AddIfNotAddedScoped<ILobbyPlugin, MinUserBalanceJoinFilter>(provider);

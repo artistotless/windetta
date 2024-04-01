@@ -18,6 +18,10 @@ public class LeaveMember : ILeaveMemberLobbyUseCase
         if (lobby is null)
             throw LobbyException.NotFound;
 
-        lobby.Remove(userId, roomIndex);
+        if (lobby.State == LobbyState.Ready)
+            throw new LobbyException
+                ("cannot_leave_when_lobby_ready");
+
+        lobby.RemoveMember(userId, roomIndex);
     }
 }

@@ -10,11 +10,6 @@ namespace Windetta.Contracts.Events;
 public interface ICreateMatchFlowRequested : CorrelatedBy<Guid>, IEvent
 {
     /// <summary>
-    /// The lobby identifier from which all necessary information will be obtained
-    /// </summary>
-    public Guid LobbyId { get; set; }
-
-    /// <summary>
     /// 
     /// </summary>
     public string LspmIp { get; set; }

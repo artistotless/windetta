@@ -37,6 +37,6 @@ public class JoinMember : IJoinMemberLobbyUseCase
 
         var member = new RoomMember(userId);
 
-        lobby.Add(member, roomIndex);
+        lobby.AddMember(member, roomIndex);
     }
 }

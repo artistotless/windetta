@@ -20,7 +20,9 @@ public static class AuthenticationConfiguration
             options.RequireHttpsMetadata = false;
             options.TokenValidationParameters = new TokenValidationParameters
             {
-                ValidateAudience = false
+                ValidateAudience = false,
+                //TODO: set TRUE
+                ValidateLifetime = false,
             };
             options.Events = new JwtBearerEvents
             {

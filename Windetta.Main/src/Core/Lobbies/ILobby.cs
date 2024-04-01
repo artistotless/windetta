@@ -24,6 +24,6 @@ public interface ILobby : ILobbyDisposeListener, ILobbyReadyListener, IDisposabl
     public string? AutoDisposeStrategy { get; }
 
     IEnumerable<IJoinFilter>? GetJoinFilters();
-    void Add(RoomMember member, ushort roomIndex);
-    void Remove(Guid memberId, ushort roomIndex);
+    void AddMember(RoomMember member, ushort roomIndex);
+    void RemoveMember(Guid memberId, ushort roomIndex);
 }

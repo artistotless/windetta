@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Connections.Features;
 using Microsoft.AspNetCore.SignalR;
+using Serilog;
 using Windetta.Main.Core.Lobbies;
 using Windetta.Main.Infrastructure.Services;
 
@@ -9,50 +10,51 @@ namespace Windetta.Main.Infrastructure.SignalR;
 [Authorize(Policy = "NeedRealtimeScope")]
 public class MainHub : Hub
 {
-    private readonly ILobbyUsersAssociations _lobbiesUsersSets;
+    private readonly LobbiesInteractor _lobbiesInteractor;
     private readonly FromHeaderUserIdProvider _userIdProvider;
 
-    public MainHub(
-        ILobbyUsersAssociations lobbiesUsersSets,
-        FromHeaderUserIdProvider userIdProvider)
+    public MainHub(FromHeaderUserIdProvider userIdProvider, LobbiesInteractor lobbiesInteractor)
     {
-        _lobbiesUsersSets = lobbiesUsersSets;
         _userIdProvider = userIdProvider;
+        _lobbiesInteractor = lobbiesInteractor;
     }
 
-    public async Task Subscribe()
-    {
-        await SubscribeOnCurrentLobbyEvents();
-    }
+    public override Task OnConnectedAsync()
+        => SubscribeOnCurrentLobbyEvents();
 
-    public override async Task OnConnectedAsync()
-    {
-        await SubscribeOnCurrentLobbyEvents();
-    }
-
-    public override async Task OnDisconnectedAsync(Exception? exception)
-    {
-        await UnSubscribeOnCurrentLobbyEvents();
-    }
+    public override Task OnDisconnectedAsync(Exception? exception)
+        => UnSubscribeFromCurrentLobbyEvents();
 
     private async Task SubscribeOnCurrentLobbyEvents()
     {
-        await Groups.AddToGroupAsync(Context.ConnectionId, GetUserId().ToString());
+        var userId = GetUserId();
 
-        var lobbyId = _lobbiesUsersSets.GetLobbyId(GetUserId());
+        await Groups.AddToGroupAsync(Context.ConnectionId, userId.ToString());
+
+        var lobbyId = await _lobbiesInteractor.GetLobbyIdByUserIdAsync(userId);
+
+        Log.ForContext<MainHub>().Information("User connected: {0}", userId);
+
         if (!lobbyId.HasValue)
             return;
 
         await Groups.AddToGroupAsync(Context.ConnectionId, lobbyId.Value.ToString());
     }
 
-    private async Task UnSubscribeOnCurrentLobbyEvents()
+    private async Task UnSubscribeFromCurrentLobbyEvents()
     {
-        await Groups.RemoveFromGroupAsync(Context.ConnectionId, GetUserId().ToString());
+        var userId = GetUserId();
 
-        var lobbyId = _lobbiesUsersSets.GetLobbyId(GetUserId());
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, userId.ToString());
+
+        var lobbyId = await _lobbiesInteractor.GetLobbyIdByUserIdAsync(userId);
+
+        Log.ForContext<MainHub>().Information("User disconnected: {0}", userId);
+
         if (!lobbyId.HasValue)
             return;
+
+        await _lobbiesInteractor.LeaveMemberAsync(userId, lobbyId.Value);
 
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, lobbyId.Value.ToString());
     }

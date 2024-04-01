@@ -10,7 +10,7 @@ namespace Windetta.Main.Core.Lobbies;
 public sealed class LobbiesInteractor : IScopedService
 {
     private readonly IGames _gamesRepository;
-    private readonly ILobbyUsersAssociations _lobbiesUsersSets;
+    private readonly IUserLobbyMaps _lobbyUserMaps;
     private readonly ILobbyUseCasesFactory _useCasesFactory;
     private readonly ILobbyPluginsFactory _pluginsFactory;
 
@@ -18,10 +18,10 @@ public sealed class LobbiesInteractor : IScopedService
         IGames gamesRepository,
         ILobbyPluginsFactory pluginsFactory,
         ILobbyUseCasesFactory useCaseFactory,
-        ILobbyUsersAssociations? lobbiesUsersSets = null)
+        IUserLobbyMaps? lobbiesUsersSets = null)
     {
-        _lobbiesUsersSets = lobbiesUsersSets ??
-            new InMemoryLobbyUsersAssociations();
+        _lobbyUserMaps = lobbiesUsersSets ??
+            new InMemoryLobbyUserMaps();
 
         _useCasesFactory = useCaseFactory;
         _pluginsFactory = pluginsFactory;
@@ -36,17 +36,17 @@ public sealed class LobbiesInteractor : IScopedService
 
     public async Task DeleteAsync(Guid lobbyId)
     {
-        var roomsCache = (await _useCasesFactory.Get<IGetLobbyUseCase>()
+        var rooms = (await _useCasesFactory.Get<IGetLobbyUseCase>()
             .ExecuteAsync(lobbyId)).Rooms;
 
-        await _useCasesFactory.Get<IDeleteLobbyUseCase>().ExecuteAsync(lobbyId);
+        _lobbyUserMaps.Unset(rooms.SelectMany(r => r.Members, (r, m) => m.Id));
 
-        _lobbiesUsersSets.Unset(roomsCache.SelectMany(r => r.Members, (r, m) => m.Id));
+        await _useCasesFactory.Get<IDeleteLobbyUseCase>().ExecuteAsync(lobbyId);
     }
 
     public async Task<ILobby> CreateAsync(CreateLobbyDto request)
     {
-        if (_lobbiesUsersSets.GetLobbyId(request.InitiatorId).HasValue)
+        if (_lobbyUserMaps.Get(request.InitiatorId).HasValue)
             throw LobbyException.AlreadyMemberOfLobby;
 
         var options = await BuildLobbyOptions(request);
@@ -54,7 +54,7 @@ public sealed class LobbiesInteractor : IScopedService
         var lobby = await _useCasesFactory.Get<ICreateLobbyUseCase>()
              .ExecuteAsync(options);
 
-        _lobbiesUsersSets.Set(lobby.Id, request.InitiatorId);
+        _lobbyUserMaps.Set(new(request.InitiatorId, lobby.Id, roomIndex: 0));
 
         return lobby;
     }
@@ -64,15 +64,25 @@ public sealed class LobbiesInteractor : IScopedService
         await _useCasesFactory.Get<IJoinMemberLobbyUseCase>()
             .ExecuteAsync(userId, lobbyId, roomIndex);
 
-        _lobbiesUsersSets.Set(lobbyId, userId);
+        _lobbyUserMaps.Set(new(userId, lobbyId, roomIndex));
     }
 
-    public async Task LeaveMemberAsync(Guid userId, Guid lobbyId, ushort roomIndex)
+    public async Task LeaveMemberAsync(Guid userId, Guid lobbyId, ushort? roomIndex = null)
     {
-        await _useCasesFactory.Get<ILeaveMemberLobbyUseCase>()
-             .ExecuteAsync(userId, lobbyId, roomIndex);
+        if (roomIndex is null)
+        {
+            var userLocation = _lobbyUserMaps.Get(userId);
 
-        _lobbiesUsersSets.Unset(userId);
+            if (!userLocation.HasValue)
+                throw LobbyException.MemberAreNotInRoom;
+
+            roomIndex = userLocation.Value.RoomIndex;
+        }
+
+        await _useCasesFactory.Get<ILeaveMemberLobbyUseCase>()
+             .ExecuteAsync(userId, lobbyId, roomIndex.Value);
+
+        _lobbyUserMaps.Unset(userId);
     }
 
     private async Task<LobbyOptions> BuildLobbyOptions(CreateLobbyDto request)

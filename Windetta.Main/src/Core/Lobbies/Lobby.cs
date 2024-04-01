@@ -75,7 +75,7 @@ public sealed class Lobby : ILobby
         OnUpdated();
     }
 
-    public void Add(RoomMember member, ushort roomIndex)
+    public void AddMember(RoomMember member, ushort roomIndex)
     {
         if (roomIndex >= _rooms.Length)
             throw RoomException.InvalidRoomId;
@@ -92,7 +92,7 @@ public sealed class Lobby : ILobby
         OnUpdated();
     }
 
-    public void Remove(Guid memberId, ushort roomIndex)
+    public void RemoveMember(Guid memberId, ushort roomIndex)
     {
         var room = _rooms[roomIndex];
 

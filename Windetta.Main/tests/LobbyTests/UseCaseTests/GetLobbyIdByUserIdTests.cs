@@ -11,7 +11,7 @@ public class GetLobbyIdByUserIdTests
     {
         // arrange
         var userId = Guid.NewGuid();
-        var mock = new Mock<ILobbyUsersAssociations>();
+        var mock = new Mock<IUserLobbyMaps>();
         var provider = SharedServiceProvider.GetInstance(s =>
         {
             s.AddSingleton(p => mock.Object);
@@ -25,6 +25,6 @@ public class GetLobbyIdByUserIdTests
             .ExecuteAsync(userId);
 
         //assert
-        mock.Verify(x => x.GetLobbyId(userId), Times.Once);
+        mock.Verify(x => x.Get(userId), Times.Once);
     }
 }

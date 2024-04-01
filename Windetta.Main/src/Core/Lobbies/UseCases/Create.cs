@@ -30,7 +30,7 @@ public class Create : ICreateLobbyUseCase
         //TODO: delete guid parameter
         lobby = new Lobby(options, Guid.Parse("195da05a-d3ee-4d8b-917c-a77cf7afa906"));
 
-        lobby.Add(new RoomMember(options.InitiatorId), roomIndex: 0);
+        lobby.AddMember(new RoomMember(options.InitiatorId), roomIndex: 0);
 
         lobby.SetAutoReadyStrategy(options.AutoReadyStrategy ??
             new DefaultReadyStrategy());

@@ -22,5 +22,5 @@ public class LobbyException : WindettaException
     public static LobbyException BetIsLessMinimumAllowed
         => new LobbyException(Errors.Main.BetIsLessMinimumAllowed);
 
-    private LobbyException(string errorCode) : base(errorCode) { }
+    public LobbyException(string errorCode) : base(errorCode) { }
 }

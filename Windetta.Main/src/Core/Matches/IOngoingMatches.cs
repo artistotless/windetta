@@ -26,4 +26,10 @@ public interface IOngoingMatches : ISingletonService
     /// <param name="playerId">Player ID</param>
     /// <returns>Current match ID with ticket</returns>
     public Task<OngoingMatch> GetAsync(Guid playerId);
+
+    /// <summary>
+    /// gets the IDs of all matches in progress
+    /// </summary>
+    /// <returns>Collection of IDs</returns>
+    public Task<IEnumerable<Guid>> GetAllAsync();
 }

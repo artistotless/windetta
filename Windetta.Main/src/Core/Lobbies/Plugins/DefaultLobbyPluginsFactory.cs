@@ -11,8 +11,7 @@ public sealed class DefaultLobbyPluginsFactory : ILobbyPluginsFactory
         _plugins = plugins;
     }
 
-    public T Get<T>(string pluginName,
-        Dictionary<string, string>? requirementsValues)
+    public T Get<T>(string pluginName, Dictionary<string, string>? requirementsValues)
         where T : ILobbyPlugin
     {
         ILobbyPlugin? plugin;

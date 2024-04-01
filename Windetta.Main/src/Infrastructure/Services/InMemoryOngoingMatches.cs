@@ -2,6 +2,7 @@
 using Windetta.Common.Types;
 using Windetta.Main.Core.Matches;
 
+/// <inheritdoc cref="IOngoingMatches"/>
 public class InMemoryOngoingMatches : IOngoingMatches
 {
     private readonly ConcurrentDictionary<Guid, OngoingMatch> _matches;
@@ -9,6 +10,17 @@ public class InMemoryOngoingMatches : IOngoingMatches
     public InMemoryOngoingMatches()
     {
         _matches = new();
+    }
+
+    public Task<IEnumerable<Guid>> GetAllAsync()
+        => Task.FromResult(_matches.Values.Select(m => m.Id));
+
+    Task<OngoingMatch> IOngoingMatches.GetAsync(Guid playerId)
+    {
+        if (!_matches.TryGetValue(playerId, out OngoingMatch ongoingMatch))
+            throw new WindettaException("Ongoing match is not found");
+
+        return Task.FromResult(ongoingMatch);
     }
 
     public Task SetAsync(OngoingMatch ongoingMatch, Guid playerId)
@@ -23,13 +35,5 @@ public class InMemoryOngoingMatches : IOngoingMatches
         var tasks = values.Select(x => SetAsync(x.ongoingMatch, x.playerId));
 
         return Task.WhenAll(tasks);
-    }
-
-    Task<OngoingMatch> IOngoingMatches.GetAsync(Guid playerId)
-    {
-        if (!_matches.TryGetValue(playerId, out OngoingMatch ongoingMatch))
-            throw new WindettaException("Ongoing match is not found");
-
-        return Task.FromResult(ongoingMatch);
     }
 }

@@ -51,14 +51,14 @@ public class ProxyLobby : ILobby
         _original.SetDisposeStrategy(strategy);
     }
 
-    public virtual void Add(RoomMember member, ushort roomIndex)
+    public virtual void AddMember(RoomMember member, ushort roomIndex)
     {
-        _original.Add(member, roomIndex);
+        _original.AddMember(member, roomIndex);
     }
 
-    public virtual void Remove(Guid memberId, ushort roomIndex)
+    public virtual void RemoveMember(Guid memberId, ushort roomIndex)
     {
-        _original.Remove(memberId, roomIndex);
+        _original.RemoveMember(memberId, roomIndex);
     }
 
     public virtual void Dispose()

@@ -14,6 +14,7 @@ public class Delete : IDeleteLobbyUseCase
     public async Task ExecuteAsync(Guid lobbyId)
     {
         var lobby = await _lobbies.GetAsync(lobbyId);
+
         if (lobby is null)
             throw LobbyException.NotFound;
 

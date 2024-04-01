@@ -191,10 +191,9 @@ public static class MatchFlowStateMachineExtensions
     {
         return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<INotifyReadyToConnect>(new
         {
-            ctx.Saga.GameId,
+            ctx.Message.CorrelationId,
             PlayersIds = ctx.Saga.Players.Select(p => p.Id),
         }));
     }
-
     #endregion
 }

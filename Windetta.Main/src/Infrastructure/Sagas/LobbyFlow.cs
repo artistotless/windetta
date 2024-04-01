@@ -32,7 +32,7 @@ public enum LobbyFlowState : int
 
 public class LobbyFlowStateMachine : MassTransitStateMachine<LobbyFlow>
 {
-    public LobbyFlowStateMachine(ILobbies lobbies)
+    public LobbyFlowStateMachine(ILobbies lobbies, LobbiesInteractor interactor)
     {
         InstanceState(instance => instance.CurrentState);
 
@@ -57,7 +57,8 @@ public class LobbyFlowStateMachine : MassTransitStateMachine<LobbyFlow>
              When(GameServerFound)
                 .NotifyServerFound()
                 .CreateMatchFlow()
-                .TransitionTo(ServerFound));
+                .DeleteLobby(interactor)
+                .TransitionTo(ServerFound)); ;
 
         SetCompletedWhenFinalized();
     }
@@ -73,6 +74,21 @@ public class LobbyFlowStateMachine : MassTransitStateMachine<LobbyFlow>
     // Faults
     public Event<Fault<IHoldBalances>> HoldBalancesFailed { get; }
     public Event<Fault<ISearchGameServer>> GameServerReservationFailed { get; }
+}
+
+public class LobbyFlowDefinition : SagaDefinition<LobbyFlow>
+{
+    protected override void ConfigureSaga(
+        IReceiveEndpointConfigurator endpointConfigurator,
+        ISagaConfigurator<LobbyFlow> sagaConfigurator,
+        IRegistrationContext context)
+    {
+        sagaConfigurator.UseInMemoryOutbox(context);
+        sagaConfigurator.UseMessageRetry(c =>
+        {
+            c.Interval(6, TimeSpan.FromSeconds(10));
+        });
+    }
 }
 
 #region Extension methods
@@ -109,12 +125,17 @@ public static class LobbyFlowStateMachineExtensions
             ctx.Message.GameServerId,
             ctx.Message.GameServerEndpoint,
             ctx.Message.LspmIp,
-            ctx.Saga.LobbyId,
             Bet = new FundsInfo(ctx.Saga.BetCurrencyId, ctx.Saga.BetAmount),
             ctx.Saga.GameId,
             ctx.Saga.Players,
             ctx.Saga.Properties
         }));
+    }
+
+    public static EventActivityBinder<LobbyFlow, IGameServerFound> DeleteLobby(
+    this EventActivityBinder<LobbyFlow, IGameServerFound> binder, LobbiesInteractor interactor)
+    {
+        return binder.ThenAsync(ctx => interactor.DeleteAsync(ctx.Saga.LobbyId));
     }
 
     public static EventActivityBinder<LobbyFlow, ILobbyReady> HoldBalances(

@@ -131,7 +131,7 @@ public class LobbyTests
         // act
         await interactor.JoinMemberAsync(memberId, lobby.Id, roomIndex: 0);
         lobby.Updated += callback;
-        await interactor.LeaveMemberAsync(memberId, lobby.Id, roomIndex: 0);
+        await interactor.LeaveMemberAsync(memberId, lobby.Id);
 
         // assert
         updateEventRaised.ShouldBeTrue();
