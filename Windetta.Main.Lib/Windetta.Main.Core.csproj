@@ -8,13 +8,13 @@
 
   <ItemGroup>
     <Reference Include="LSPM.Models">
-      <HintPath>..\..\..\lspm-models\src\bin\Debug\net8.0\LSPM.Models.dll</HintPath>
+      <HintPath>..\..\lspm-models\src\bin\Debug\net8.0\LSPM.Models.dll</HintPath>
     </Reference>
     <Reference Include="Windetta.Common">
-      <HintPath>..\..\Windetta.Common\src\bin\Debug\net8.0\Windetta.Common.dll</HintPath>
+      <HintPath>..\Windetta.Common\src\bin\Debug\net8.0\Windetta.Common.dll</HintPath>
     </Reference>
-    <Reference Include="Windetta.Main.Core">
-      <HintPath>..\..\Windetta.Main.Lib\bin\Debug\net8.0\Windetta.Main.Core.dll</HintPath>
+    <Reference Include="Windetta.Contracts">
+      <HintPath>..\Windetta.Contracts\bin\Debug\net8.0\Windetta.Contracts.dll</HintPath>
     </Reference>
   </ItemGroup>
 

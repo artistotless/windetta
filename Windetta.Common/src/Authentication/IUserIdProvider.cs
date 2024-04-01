@@ -1,4 +1,4 @@
-﻿namespace Windetta.Main.Core.Services;
+﻿namespace Windetta.Common.Authentication;
 
 /// <summary>
 /// Service providing user ID

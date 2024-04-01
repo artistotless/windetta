@@ -15,6 +15,7 @@ using Windetta.Main.Infrastructure.Sagas;
 using Windetta.Main.Infrastructure.Security;
 using Windetta.Main.Infrastructure.Services;
 using Windetta.Main.Infrastructure.SignalR;
+using IUserIdProvider = Windetta.Common.Authentication.IUserIdProvider;
 
 namespace Windetta.Main.Infrastructure;
 
@@ -98,7 +99,7 @@ public static class DependencyResolver
 
     private static void AddUserIdProvider(this IServiceCollection services)
     {
-        services.AddScoped<Core.Services.IUserIdProvider, FromHeaderUserIdProvider>();
+        services.AddScoped<IUserIdProvider, FromHeaderUserIdProvider>();
     }
 
     private static void ConfigureAddLogging(this WebApplicationBuilder builder)

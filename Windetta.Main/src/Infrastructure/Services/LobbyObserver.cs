@@ -1,8 +1,9 @@
 ﻿using MassTransit;
 using Windetta.Common.Types;
 using Windetta.Contracts.Events;
+using Windetta.Main.Core.Lobbies;
 
-namespace Windetta.Main.Core.Lobbies;
+namespace Windetta.Main.Infrastructure.Services;
 
 public sealed class LobbyObserver : ISingletonService
 {

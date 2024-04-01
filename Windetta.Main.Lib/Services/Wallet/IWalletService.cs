@@ -5,7 +5,7 @@ using Windetta.Contracts.Responses;
 namespace Windetta.Main.Core.Services.Wallet;
 
 /// <summary>
-/// Service communicating with the wallet microservice a black box
+/// Service communicating with the wallet microservice as a black box
 /// </summary>
 public interface IWalletService : IScopedService
 {

@@ -14,7 +14,7 @@ public abstract class ConfigurableAutoReadyStrategy : ConfigurableLobbyPlugin, I
 
     public void Start(ILobbyReadyListener lobby)
     {
-        this.Lobby = lobby;
+        Lobby = lobby;
 
         if (_timer is null)
             _timer = new Timer(Update, null, TimeSpan.Zero, _checkInterval);
