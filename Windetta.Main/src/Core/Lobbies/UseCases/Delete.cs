@@ -18,8 +18,6 @@ public class Delete : IDeleteLobbyUseCase
         if (lobby is null)
             throw LobbyException.NotFound;
 
-        await _lobbies.RemoveAsync(lobby.Id);
-
         lobby.Dispose();
     }
 }

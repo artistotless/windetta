@@ -8,11 +8,8 @@ public static class OngoingMatchesEndpoints
 {
     public static void UseOngoingMatchesEndpoints(this WebApplication web)
     {
-        //TODO: uncomment RequireAuthorization()
-        var group = web.MapGroup("api/ongoingMatches")/*.RequireAuthorization()*/;
-
         // Get current match information
-        group.MapGet("/", async (
+        web.MapGet("api/ongoingMatches", async (
             [FromServices] IOngoingMatches matches,
             [FromServices] IUserIdProvider userIdProvider) =>
         {
