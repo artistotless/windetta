@@ -1,4 +1,4 @@
-﻿using Windetta.Main.Clients;
+﻿using Windetta.Main.Core.Clients;
 using Windetta.Main.Core.Matches;
 
 namespace Windetta.RestClients.MainClients;

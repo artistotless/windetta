@@ -1,7 +1,7 @@
 ﻿using Windetta.Main.Core.Lobbies;
 using Windetta.Main.Core.Lobbies.Dtos;
 
-namespace Windetta.Main.Clients.Dtos;
+namespace Windetta.Main.Core.Clients.Dtos;
 
 public class CreateLobbyRequestDto
 {

@@ -1,7 +1,8 @@
-﻿using Windetta.Main.Core.Lobbies;
+﻿using Windetta.Main.Core.Clients;
+using Windetta.Main.Core.Lobbies;
 using Windetta.Main.Core.Lobbies.Dtos;
 
-namespace Windetta.Main.Clients;
+namespace Windetta.Main.Web.Api.Clients;
 
 public sealed class LobbyEndpointsClient : ILobbyEndpointsClient
 {

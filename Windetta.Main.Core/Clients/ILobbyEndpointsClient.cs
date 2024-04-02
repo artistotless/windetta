@@ -2,7 +2,7 @@
 using Windetta.Main.Core.Lobbies;
 using Windetta.Main.Core.Lobbies.Dtos;
 
-namespace Windetta.Main.Clients;
+namespace Windetta.Main.Core.Clients;
 
 public interface ILobbyEndpointsClient : IScopedService
 {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Windetta.Common.Authentication;
-using Windetta.Main.Clients;
+using Windetta.Main.Core.Clients;
 
 namespace Windetta.Main.Web.Api;
 

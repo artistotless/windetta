@@ -1,6 +1,7 @@
-﻿using Windetta.Main.Core.Matches;
+﻿using Windetta.Main.Core.Clients;
+using Windetta.Main.Core.Matches;
 
-namespace Windetta.Main.Clients;
+namespace Windetta.Main.Web.Api.Clients;
 
 public sealed class OngoingMatchesEndpointsClient : IOngoingMatchesEndpointsClient
 {

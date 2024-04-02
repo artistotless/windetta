@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Windetta.Common.Authentication;
-using Windetta.Main.Clients;
-using Windetta.Main.Clients.Dtos;
+using Windetta.Main.Core.Clients;
+using Windetta.Main.Core.Clients.Dtos;
 using Windetta.Main.Core.Lobbies;
 using Windetta.Main.Core.Lobbies.Dtos;
 using Windetta.Main.Infrastructure.Services;

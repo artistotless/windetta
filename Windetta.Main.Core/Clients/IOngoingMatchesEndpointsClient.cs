@@ -1,7 +1,7 @@
 ﻿using Windetta.Common.Types;
 using Windetta.Main.Core.Matches;
 
-namespace Windetta.Main.Clients;
+namespace Windetta.Main.Core.Clients;
 
 public interface IOngoingMatchesEndpointsClient : IScopedService
 {
