@@ -23,7 +23,7 @@ public static class OngoingMatchesEndpoints
         {
             Guid userId = userIdProvider.UserId;
 
-            return Results.Ok(await matches.GetByPlayerIdAsync(userId));
+            return Results.Ok(await matches.GetAsync(userId));
         });
     }
 }

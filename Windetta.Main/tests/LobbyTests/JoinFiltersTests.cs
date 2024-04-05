@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Windetta.Common.Constants;
 using Windetta.Common.Testing;
+using Windetta.Contracts;
 using Windetta.Main.Core.Exceptions;
 using Windetta.Main.Core.Lobbies;
 using Windetta.Main.Core.Lobbies.Dtos;
@@ -18,7 +19,7 @@ public class JoinFiltersTests
         {
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId,
-            Bet = new Bet(1, 100),
+            Bet = new FundsInfo(1, 100),
             JoinFilters = new[] { new PluginSetDto(nameof(AlwaysFalseJoinFilter)) }
         };
 

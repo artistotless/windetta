@@ -42,6 +42,12 @@ public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
                 .CreateMatch()
                 .TransitionTo(CreatingMatch));
 
+        //DuringAny(When(MatchInfoRequested)
+        //    .RespondAsync(ctx =>
+        //    {
+
+        //    }));
+
         During(CreatingMatch,
              When(MatchCreated)
                 .SaveTickets(tickets)
@@ -82,6 +88,7 @@ public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
     public Event<IWinningsProcessed> WinningsProcessed { get; }
     public Event<ICancellationMatchRequested> CancellationRequested { get; }
     public Event<IMatchCompleted> MatchCompleted { get; }
+    public Event<IMatchInfoRequested> MatchInfoRequested { get; }
 
     // Faults
     public Event<Fault<IProcessWinnings>> ProcessingWinningsFailed { get; }

@@ -1,13 +1,15 @@
-﻿using LSPM.Models;
-using Windetta.Contracts;
-using Windetta.Main.Core.Lobbies;
+﻿using Windetta.Contracts;
+using Windetta.Contracts.Responses;
 
-namespace Windetta.Main.Core.Matches;
+namespace LSPM.Models;
 
-/// <summary>
-/// Presents information about the match that is going on right now
-/// </summary>
-public sealed class OngoingMatch
+public sealed class GameServerResponse : ServiceResponse
+{
+    public Uri GameServerEndpoint { get; set; }
+    public Guid GameServerId { get; set; }
+}
+
+public sealed class MatchInfoResponse : ServiceResponse
 {
     /// <summary>
     /// Match ID

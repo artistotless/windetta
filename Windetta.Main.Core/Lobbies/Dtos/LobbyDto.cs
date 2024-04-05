@@ -1,4 +1,5 @@
-﻿using Windetta.Main.Core.Rooms;
+﻿using Windetta.Contracts;
+using Windetta.Main.Core.Rooms;
 
 namespace Windetta.Main.Core.Lobbies.Dtos;
 
@@ -9,7 +10,7 @@ public class LobbyDto
     public LobbyState State { get; init; }
     public DateTimeOffset Created { get; init; }
     public DateTimeOffset Updated { get; init; }
-    public Bet Bet { get; init; }
+    public FundsInfo Bet { get; init; }
     public IEnumerable<string>? JoinFilters { get; init; }
     public IEnumerable<Room> Rooms { get; init; }
 

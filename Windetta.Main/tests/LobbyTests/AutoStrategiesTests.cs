@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Windetta.Common.Testing;
+using Windetta.Contracts;
 using Windetta.Main.Core.Lobbies;
 using Windetta.Main.Core.Lobbies.Dtos;
 using Windetta.MainTests.Mocks;
@@ -15,7 +16,7 @@ public class AutoStrategiesTests
         // arrange
         var request = new CreateLobbyDto()
         {
-            Bet = new Bet(1, 1000),
+            Bet = new FundsInfo(1, 1000),
             AutoReadyStrategy = new PluginSetDto(nameof(FullRoomsReadyStrategy)),
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId
@@ -54,7 +55,7 @@ public class AutoStrategiesTests
         // arrange
         var request = new CreateLobbyDto()
         {
-            Bet = new Bet(1, 800),
+            Bet = new FundsInfo(1, 800),
             AutoDisposeStrategy = new PluginSetDto(nameof(DateDisposeStrategy)),
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId

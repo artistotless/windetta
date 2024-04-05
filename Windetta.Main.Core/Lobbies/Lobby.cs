@@ -1,4 +1,5 @@
-﻿using Windetta.Main.Core.Exceptions;
+﻿using Windetta.Contracts;
+using Windetta.Main.Core.Exceptions;
 using Windetta.Main.Core.Games;
 using Windetta.Main.Core.Lobbies.Plugins;
 using Windetta.Main.Core.Rooms;
@@ -14,7 +15,7 @@ public sealed class Lobby : ILobby
     public DateTimeOffset UpdatedAt { get; set; }
     public IReadOnlyDictionary<string, string>? Properties { get; init; }
     public int MembersCount { get; private set; }
-    public Bet Bet { get; init; }
+    public FundsInfo Bet { get; init; }
     public Guid InitiatorId { get; init; }
     public GameConfiguration Configuration { get; init; }
     public IEnumerable<string>? JoinFilters => _joinFilters?

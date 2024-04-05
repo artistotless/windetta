@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Windetta.Common.Testing;
+using Windetta.Contracts;
 using Windetta.Main.Core.Games;
 using Windetta.Main.Core.Lobbies;
 using Windetta.Main.Core.Lobbies.Dtos;
@@ -31,7 +32,7 @@ public class LobbyTests
         {
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId,
-            Bet = new Bet(currencyId: 1, bet: 100)
+            Bet = new FundsInfo(currencyId: 1, amount: 100)
         };
 
         // act
@@ -52,7 +53,7 @@ public class LobbyTests
         {
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId,
-            Bet = new Bet(currencyId: 1, bet: 100)
+            Bet = new FundsInfo(currencyId: 1, amount: 100)
         };
 
         var interactor = SharedServiceProvider.GetInstance()
@@ -77,7 +78,7 @@ public class LobbyTests
         {
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId,
-            Bet = new Bet(currencyId: 1, bet: 100)
+            Bet = new FundsInfo(currencyId: 1, amount: 100)
         };
 
         var interactor = SharedServiceProvider.GetInstance()
@@ -111,7 +112,7 @@ public class LobbyTests
         {
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId,
-            Bet = new Bet(currencyId: 1, bet: 100)
+            Bet = new FundsInfo(currencyId: 1, amount: 100)
         };
 
         var interactor = SharedServiceProvider.GetInstance()

@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using Windetta.Contracts;
 using Windetta.Main.Core.Games;
 using Windetta.Main.Core.Lobbies;
 using Windetta.Main.Core.Lobbies.Plugins;
@@ -14,7 +15,7 @@ public class ProxyLobby : ILobby
     public DateTimeOffset CreatedAt { get { return _original.CreatedAt; } init { } }
     public DateTimeOffset UpdatedAt { get { return _original.UpdatedAt; } set { _original.UpdatedAt = value; } }
     public int MembersCount { get { return _original.MembersCount; } private set { } }
-    public Bet Bet { get { return _original.Bet; } init { } }
+    public FundsInfo Bet { get { return _original.Bet; } init { } }
     public Guid InitiatorId { get { return _original.InitiatorId; } init { } }
     public GameConfiguration Configuration { get { return _original.Configuration; } init { } }
 

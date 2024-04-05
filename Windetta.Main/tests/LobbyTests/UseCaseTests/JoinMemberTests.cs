@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Windetta.Common.Constants;
 using Windetta.Common.Testing;
+using Windetta.Contracts;
 using Windetta.Main.Core.Exceptions;
 using Windetta.Main.Core.Games;
 using Windetta.Main.Core.Lobbies;
@@ -64,7 +65,7 @@ public class JoinMemberTests
         // arrange
         var options = new LobbyOptions()
         {
-            Bet = new Bet(),
+            Bet = new FundsInfo(1, 100),
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId,
             GameConfiguration = new GameConfiguration() { MaxPlayersInTeam = 2 },

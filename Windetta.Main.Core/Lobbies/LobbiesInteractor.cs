@@ -1,4 +1,5 @@
 ﻿using Windetta.Common.Types;
+using Windetta.Contracts;
 using Windetta.Main.Core.Exceptions;
 using Windetta.Main.Core.Games;
 using Windetta.Main.Core.Lobbies.Dtos;
@@ -120,7 +121,7 @@ public sealed class LobbiesInteractor : IScopedService
         return options;
     }
 
-    private static void ValidateBet(IEnumerable<SupportedCurrency> sc, Bet bet)
+    private static void ValidateBet(IEnumerable<SupportedCurrency> sc, FundsInfo bet)
     {
         if (!sc.Any(s =>
             s.CurrencyId == bet.CurrencyId

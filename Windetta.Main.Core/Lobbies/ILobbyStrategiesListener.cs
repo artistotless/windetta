@@ -1,4 +1,5 @@
-﻿using Windetta.Main.Core.Games;
+﻿using Windetta.Contracts;
+using Windetta.Main.Core.Games;
 using Windetta.Main.Core.Lobbies.Plugins;
 using Windetta.Main.Core.Rooms;
 
@@ -9,7 +10,7 @@ public interface ILobbyStrategiesListener
     bool IsPublic { get; init; }
     DateTimeOffset CreatedAt { get; init; }
     DateTimeOffset UpdatedAt { get; set; }
-    Bet Bet { get; init; }
+    FundsInfo Bet { get; init; }
     GameConfiguration Configuration { get; }
     IEnumerable<Room> Rooms { get; }
     int MembersCount { get; }

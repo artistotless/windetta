@@ -1,5 +1,5 @@
 ﻿using LSPM.Models;
-using Windetta.Main.Core.Lobbies;
+using Windetta.Contracts;
 
 namespace Windetta.Main.Core.Matches;
 
@@ -21,7 +21,7 @@ public class Match
     /// <summary>
     /// Rate amount
     /// </summary>
-    public Bet Bet { get; set; }
+    public FundsInfo Bet { get; set; }
 
     /// <summary>
     /// State of the match (Canceled, Completed)
