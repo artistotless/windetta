@@ -5,7 +5,7 @@ using Windetta.Main.Core.Matches;
 /// <inheritdoc cref="IOngoingMatches"/>
 public class InMemoryOngoingMatches : IOngoingMatches
 {
-    private readonly ConcurrentDictionary<Guid, OngoingMatch> _matches;
+    private readonly ConcurrentDictionary<Guid, Guid> _matches;
 
     public InMemoryOngoingMatches()
     {
@@ -13,26 +13,26 @@ public class InMemoryOngoingMatches : IOngoingMatches
     }
 
     public Task<IEnumerable<Guid>> GetAllAsync()
-        => Task.FromResult(_matches.Values.Select(m => m.Id));
+        => Task.FromResult(_matches.Values.AsEnumerable());
 
-    Task<OngoingMatch> IOngoingMatches.GetAsync(Guid playerId)
+    Task<Guid> IOngoingMatches.GetAsync(Guid playerId)
     {
-        if (!_matches.TryGetValue(playerId, out OngoingMatch ongoingMatch))
+        if (!_matches.TryGetValue(playerId, out Guid ongoingMatchId))
             throw new WindettaException("Ongoing match is not found");
 
-        return Task.FromResult(ongoingMatch);
+        return Task.FromResult(ongoingMatchId);
     }
 
-    public Task SetAsync(OngoingMatch ongoingMatch, Guid playerId)
+    public Task SetAsync(Guid ongoingMatchId, Guid playerId)
     {
-        _matches[playerId] = ongoingMatch;
+        _matches[playerId] = ongoingMatchId;
 
         return Task.CompletedTask;
     }
 
-    public Task SetRangeAsync(IEnumerable<(OngoingMatch ongoingMatch, Guid playerId)> values)
+    public Task SetRangeAsync(IEnumerable<(Guid matchId, Guid playerId)> values)
     {
-        var tasks = values.Select(x => SetAsync(x.ongoingMatch, x.playerId));
+        var tasks = values.Select(x => SetAsync(x.matchId, x.playerId));
 
         return Task.WhenAll(tasks);
     }

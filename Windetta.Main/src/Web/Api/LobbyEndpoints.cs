@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Windetta.Common.Authentication;
-using Windetta.Main.Core.Clients;
 using Windetta.Main.Core.Clients.Dtos;
 using Windetta.Main.Core.Lobbies;
 using Windetta.Main.Core.Lobbies.Dtos;
@@ -12,20 +11,20 @@ public static class LobbyEndpoints
 {
     public static void UseLobbyEndpoints(this WebApplication web)
     {
+        var group = web.MapGroup("api/lobbies");
+
         // Get lobbies
-        web.MapGet("api/lobbies", async ([FromServices] ILobbies lobbies) =>
+        group.MapGet("/", async ([FromServices] ILobbies lobbies) =>
         {
             return Results.Ok(await lobbies.GetAllAsync());
         });
-
-        var group = web.MapGroup("api/lobbies");
 
         // Create lobby
         group.MapPost("/", async (
             [FromBody] CreateLobbyRequestDto body,
             [FromServices] IUserIdProvider userIdProvider,
             [FromServices] LobbyObserver observer,
-            [FromServices] ILobbyEndpointsClient client) =>
+            [FromServices] LobbiesInteractor interactor) =>
         {
             var createRequest = new CreateLobbyDto()
             {
@@ -39,7 +38,7 @@ public static class LobbyEndpoints
                 AutoReadyStrategy = body.AutoReadyStrategy,
             };
 
-            var lobby = await client.CreateAsync(createRequest);
+            var lobby = await interactor.CreateAsync(createRequest);
 
             observer.AddToTracking(lobby);
 
@@ -51,9 +50,9 @@ public static class LobbyEndpoints
             [FromRoute] Guid lobbyId,
             [FromRoute] ushort roomIndex,
             [FromServices] IUserIdProvider userIdProvider,
-            [FromServices] ILobbyEndpointsClient client) =>
+            [FromServices] LobbiesInteractor interactor) =>
         {
-            await client.JoinMemberAsync
+            await interactor.JoinMemberAsync
             (userIdProvider.UserId, lobbyId, roomIndex);
 
             return Results.NoContent();
@@ -64,9 +63,9 @@ public static class LobbyEndpoints
             [FromRoute] Guid lobbyId,
             [FromRoute] ushort roomIndex,
             [FromServices] IUserIdProvider userIdProvider,
-            [FromServices] ILobbyEndpointsClient client) =>
+            [FromServices] LobbiesInteractor interactor) =>
         {
-            await client.LeaveMemberAsync
+            await interactor.LeaveMemberAsync
             (userIdProvider.UserId, lobbyId, roomIndex);
 
             return Results.NoContent();

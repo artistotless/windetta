@@ -12,20 +12,20 @@ public interface IOngoingMatches : ISingletonService
     /// </summary>
     /// <param name="ongoingMatch">Current match</param>
     /// <param name="playerId">Player ID</param>
-    public Task SetAsync(OngoingMatch ongoingMatch, Guid playerId);
+    public Task SetAsync(Guid matchId, Guid playerId);
 
     /// <summary>
     /// Sets the current matches for the players
     /// </summary>
     /// <param name="values">Current matches</param>
-    public Task SetRangeAsync(IEnumerable<(OngoingMatch ongoingMatch, Guid playerId)> values);
+    public Task SetRangeAsync(IEnumerable<(Guid matchId, Guid playerId)> values);
 
     /// <summary>
     /// Gets the player's current match
     /// </summary>
     /// <param name="playerId">Player ID</param>
-    /// <returns>Current match ID with ticket</returns>
-    public Task<OngoingMatch> GetAsync(Guid playerId);
+    /// <returns>Current match ID</returns>
+    public Task<Guid> GetAsync(Guid playerId);
 
     /// <summary>
     /// gets the IDs of all matches in progress

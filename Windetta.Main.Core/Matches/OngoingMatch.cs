@@ -1,29 +1,35 @@
-﻿namespace Windetta.Main.Core.Matches;
+﻿using LSPM.Models;
+using Windetta.Main.Core.Lobbies;
+
+namespace Windetta.Main.Core.Matches;
 
 /// <summary>
-/// The structure of the match that is going on right now
+/// Presents information about the match that is going on right now
 /// </summary>
-public struct OngoingMatch
+public sealed class OngoingMatch
 {
     /// <summary>
     /// Match ID
     /// </summary>
-    public Guid Id { get; init; }
+    public Guid MatchId { get; init; }
 
     /// <summary>
-    /// Ticket for player identification when connecting to the game server
+    /// What game the match is on
     /// </summary>
-    public string Ticket { get; init; }
+    public Guid GameId { get; init; }
 
     /// <summary>
-    /// GameServer endpoint
+    /// List of players participating in the match
     /// </summary>
-    public Uri Endpoint { get; set; }
+    public IEnumerable<Player> Players { get; init; }
 
-    public OngoingMatch(Guid matchId, string ticket, Uri endpoint)
-    {
-        Id = matchId;
-        Ticket = ticket;
-        Endpoint = endpoint;
-    }
+    /// <summary>
+    /// How much each player bet
+    /// </summary>
+    public Bet Bet { get; init; }
+
+    /// <summary>
+    /// When the match was created
+    /// </summary>
+    public DateTime Created { get; init; }
 }

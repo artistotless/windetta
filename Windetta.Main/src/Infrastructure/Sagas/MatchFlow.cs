@@ -32,7 +32,7 @@ public enum MatchFlowState : int
 
 public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
 {
-    public MatchFlowStateMachine(IOngoingMatches matches)
+    public MatchFlowStateMachine(IOngoingMatches matches, ITickets tickets)
     {
         InstanceState(instance => instance.CurrentState);
 
@@ -44,7 +44,8 @@ public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
 
         During(CreatingMatch,
              When(MatchCreated)
-                .SaveTickets(matches)
+                .SaveTickets(tickets)
+                .SaveOngoingMatch(matches)
                 .NotifyReadyToConnect()
                 .TransitionTo(Running));
 
@@ -172,17 +173,36 @@ public static class MatchFlowStateMachineExtensions
         }));
     }
 
-    public static EventActivityBinder<MatchFlow, IMatchCreated> SaveTickets(
+    public static EventActivityBinder<MatchFlow, IMatchCreated> SaveOngoingMatch(
     this EventActivityBinder<MatchFlow, IMatchCreated> binder, IOngoingMatches matches)
     {
         return binder.Then(async ctx =>
         {
             var endpoint = ctx.Saga.GameServerEndpoint;
 
-            IEnumerable<(OngoingMatch, Guid)> ongoingMatches = ctx.Message
-            .Tickets.Select(t => (new OngoingMatch(ctx.Message.CorrelationId, t.Value, endpoint), t.Key));
+            IEnumerable<(Guid, Guid)> ongoingMatches = ctx.Message
+            .Tickets.Select(t => (ctx.Message.CorrelationId, t.Key));
 
             await matches.SetRangeAsync(ongoingMatches);
+        });
+    }
+
+    public static EventActivityBinder<MatchFlow, IMatchCreated> SaveTickets(
+    this EventActivityBinder<MatchFlow, IMatchCreated> binder, ITickets tickets)
+    {
+        return binder.Then(async ctx =>
+        {
+            var endpoint = ctx.Saga.GameServerEndpoint;
+
+            IEnumerable<Ticket> goingToSaveTickets = ctx.Message
+            .Tickets.Select(t => new Ticket()
+            {
+                MatchId = ctx.Message.CorrelationId,
+                PlayerId = t.Key,
+                Value = t.Value
+            });
+
+            await tickets.SetRangeAsync(goingToSaveTickets);
         });
     }
 
