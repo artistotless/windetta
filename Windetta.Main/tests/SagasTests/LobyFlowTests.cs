@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Windetta.Common.Constants;
 using Windetta.Common.MassTransit;
 using Windetta.Common.Testing;
+using Windetta.Contracts;
 using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
 using Windetta.Main.Core.Games;
@@ -37,6 +38,9 @@ public class LobyFlowTests : IUseHarness
         {
             ReturnThisLobby = new ProxyLobby(new LobbyOptions()
             {
+                Bet = new FundsInfo(1, 1000),
+                GameId = ExampleGuids.GameId,
+                Properties = new Dictionary<string, string>(),
                 InitiatorId = ExampleGuids.UserId,
                 GameConfiguration = new GameConfiguration(2, 2),
             })
@@ -44,6 +48,7 @@ public class LobyFlowTests : IUseHarness
 
         return SharedServiceProvider.GetInstance(services =>
         {
+            services.AddSingleton(p => new TicketsMock().Mock.Object);
             services.AddSingleton(p => storageMock.Mock.Object);
             services.AddScoped(p => new LspmsMock().Mock.Object);
             services.ConfigureTestMassTransit(Svc.Main, this);
@@ -70,7 +75,7 @@ public class LobyFlowTests : IUseHarness
         return cfg =>
         {
             cfg.AddRequestClient<IGameServerRequested>();
-            cfg.AddSagaStateMachine<MatchFlowStateMachine, MatchFlow>();
+            cfg.AddSagaStateMachine<LobbyFlowStateMachine, LobbyFlow>();
         };
     }
     #endregion
@@ -81,16 +86,19 @@ public class LobyFlowTests : IUseHarness
         // arrange
         await using var provider = GetProvider();
         var harness = await provider.StartTestHarness();
+
         var argument = new
         {
+            LobbyId = Guid.NewGuid(),
             CorrelationId = correllationId,
             TimeStamp = DateTimeOffset.UtcNow
         };
-        var sagaHarness = harness.GetSagaStateMachineHarness
-            <LobbyFlowStateMachine, LobbyFlow>();
 
         // act
         await harness.Bus.Publish<ILobbyReady>(argument);
+        await harness.Consumed.Any<ILobbyReady>();
+        var sagaHarness = harness.GetSagaStateMachineHarness
+        <LobbyFlowStateMachine, LobbyFlow>();
 
         // assert
         (await sagaHarness.Consumed.Any<ILobbyReady>())
@@ -117,6 +125,7 @@ public class LobyFlowTests : IUseHarness
 
         await using var provider = SharedServiceProvider.GetInstance(services =>
         {
+            services.AddSingleton(p => new TicketsMock().Mock.Object);
             services.RegisterConsumer<AlwaysRespondsSuccessLspmConsumer>();
             services.RegisterConsumer<TestSearchGameServerConsumer>();
             services.AddScoped(p => new LspmsMock(new List<Lspm> { lspm }).Mock.Object);
@@ -129,7 +138,7 @@ public class LobyFlowTests : IUseHarness
             (LobbyFlowState.AwaitingHoldBalances));
 
         var sagaHarness = harness.GetSagaStateMachineHarness
-            <MatchFlowStateMachine, MatchFlow>();
+            <LobbyFlowStateMachine, LobbyFlow>();
 
         // act
         await harness.Bus.Publish<IBalancesHeld>(new
@@ -162,6 +171,7 @@ public class LobyFlowTests : IUseHarness
 
         await using var provider = SharedServiceProvider.GetInstance(services =>
         {
+            services.AddSingleton(p => new TicketsMock().Mock.Object);
             services.RegisterConsumer<AlwaysOverloadLspmConsumer>();
             services.RegisterConsumer<TestSearchGameServerConsumer>();
             services.AddScoped(p => new LspmsMock(new List<Lspm> { lspm }).Mock.Object);
@@ -235,6 +245,7 @@ public class LobyFlowTests : IUseHarness
         // arrange
         await using var provider = SharedServiceProvider.GetInstance(services =>
         {
+            services.AddSingleton(p => new TicketsMock().Mock.Object);
             services.RegisterConsumer<AlwaysFaultSearchGameServerConsumer>();
             services.ConfigureTestMassTransit(Svc.Main, this);
         });
@@ -245,7 +256,7 @@ public class LobyFlowTests : IUseHarness
             (LobbyFlowState.GameServerSearching));
 
         var sagaHarness = harness.GetSagaStateMachineHarness
-            <MatchFlowStateMachine, MatchFlow>();
+            <LobbyFlowStateMachine, LobbyFlow>();
 
         // act
         await harness.Bus.SendCommandAsync<ISearchGameServer>(Svc.Main, new
@@ -260,33 +271,6 @@ public class LobyFlowTests : IUseHarness
         // assert
         (await harness.Sent.Any<INotifyMatchAwaitingExpired>())
             .ShouldBeTrue();
-
-        await harness.OutputTimeline(_output, x => x.Now());
-    }
-
-    [Fact]
-    public async Task During_GameServerSearch_When_CancellationRequested()
-    {
-        // arrange
-        await using var provider = GetProvider();
-        var harness = await provider.StartTestHarness();
-
-        await provider.AddOrUpdateSaga(CreateSagaWithState
-            (LobbyFlowState.GameServerSearching));
-
-        var sagaHarness = harness.GetSagaStateMachineHarness
-            <MatchFlowStateMachine, MatchFlow>();
-
-        // act
-        await harness.Bus.Publish<ICancellationMatchRequested>(new
-        {
-            CorrelationId = correllationId,
-        });
-        await sagaHarness.Consumed.Any<ICancellationMatchRequested>();
-
-        // assert
-        (await sagaHarness.NotExists(correllationId))
-            .HasValue.ShouldBeFalse();
 
         await harness.OutputTimeline(_output, x => x.Now());
     }

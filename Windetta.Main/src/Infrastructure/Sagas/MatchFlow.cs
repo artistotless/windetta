@@ -5,6 +5,7 @@ using Windetta.Common.MassTransit;
 using Windetta.Contracts;
 using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
+using Windetta.Contracts.Responses;
 using Windetta.Main.Core.Matches;
 
 namespace Windetta.Main.Infrastructure.Sagas;
@@ -42,11 +43,15 @@ public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
                 .CreateMatch()
                 .TransitionTo(CreatingMatch));
 
-        //DuringAny(When(MatchInfoRequested)
-        //    .RespondAsync(ctx =>
-        //    {
-
-        //    }));
+        DuringAny(When(MatchInfoRequested)
+            .RespondAsync(x => x.Init<MatchInfoResponse>(new MatchInfoResponse
+            {
+                Bet = new FundsInfo(x.Saga.BetCurrencyId, x.Saga.BetAmount),
+                Created = x.Saga.Created,
+                MatchId = x.Saga.CorrelationId,
+                GameId = x.Saga.GameId,
+                Players = x.Saga.Players,
+            })));
 
         During(CreatingMatch,
              When(MatchCreated)

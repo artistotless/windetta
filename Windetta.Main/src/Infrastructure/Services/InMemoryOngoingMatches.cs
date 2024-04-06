@@ -2,6 +2,8 @@
 using Windetta.Common.Types;
 using Windetta.Main.Core.Matches;
 
+namespace Windetta.Main.Infrastructure.Services;
+
 /// <inheritdoc cref="IOngoingMatches"/>
 public class InMemoryOngoingMatches : IOngoingMatches
 {

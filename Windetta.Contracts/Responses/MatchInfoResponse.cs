@@ -1,12 +1,8 @@
 ﻿using LSPM.Models;
-using Windetta.Contracts;
 
-namespace Windetta.Main.Core.Matches;
+namespace Windetta.Contracts.Responses;
 
-/// <summary>
-/// Presents information about the match that is going on right now
-/// </summary>
-public sealed class OngoingMatch
+public sealed class MatchInfoResponse : ServiceResponse
 {
     /// <summary>
     /// Match ID

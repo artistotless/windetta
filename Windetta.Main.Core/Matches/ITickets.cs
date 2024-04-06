@@ -6,6 +6,7 @@ namespace Windetta.Main.Core.Matches;
 /// <summary>
 /// Manages player tickets
 /// </summary>
+/// <remarks>Task: #TvSCrRzC</remarks>
 public interface ITickets : IScopedService
 {
     /// <summary>
@@ -18,7 +19,8 @@ public interface ITickets : IScopedService
     /// Sets the ticket for certain player
     /// </summary>
     /// <param name="key">Key</param>
-    public Task GetAsync(TicketKey key);
+    /// <returns>Ticket string</returns>
+    public Task<string> GetAsync(TicketKey key);
 
     /// <summary>
     /// Unsets the ticket for certain player
