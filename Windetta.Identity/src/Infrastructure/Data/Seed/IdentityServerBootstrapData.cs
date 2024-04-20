@@ -3,17 +3,6 @@ using IdentityServer4.Models;
 
 namespace Windetta.Identity.Infrastructure.Data.Seed;
 
-public class IdentityRole : IdentityResource
-{
-    public IdentityRole()
-    {
-        Name = "role";
-        DisplayName = "Your role";
-        Emphasize = true;
-        UserClaims = new[] { "role" };
-    }
-}
-
 public static class IdentityServerBootstrapData
 {
     public static IEnumerable<IdentityResource> IdentityResources =>
@@ -22,7 +11,6 @@ public static class IdentityServerBootstrapData
         new IdentityResources.OpenId(),
         new IdentityResources.Profile(),
         new IdentityResources.Email(),
-        new IdentityRole()
     };
 
     public static IEnumerable<ApiResource> ApiResources =>
@@ -66,7 +54,7 @@ public static class IdentityServerBootstrapData
                 IdentityServerConstants.StandardScopes.Profile,
                 IdentityServerConstants.StandardScopes.Email,
                 IdentityServerConstants.StandardScopes.Address,
-                "realtime","role"
+                "realtime",
             }
             };
 
@@ -88,7 +76,6 @@ public static class IdentityServerBootstrapData
                     IdentityServerConstants.StandardScopes.OpenId,
                     IdentityServerConstants.StandardScopes.Profile,
                     IdentityServerConstants.StandardScopes.Email,
-                    "role",
                     "realtime"
                 }
             };

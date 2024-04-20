@@ -45,7 +45,9 @@ public class AccountController : BaseController
     public async Task<IActionResult> Login([FromForm] LocalLoginRequest request)
     {
         if (!ModelState.IsValid)
-            return View(request);
+        {
+            return await BuildLoginViewAsync();
+        }
 
         try
         {
@@ -56,17 +58,23 @@ public class AccountController : BaseController
         catch (Exception ex)
         {
             ModelState.AddModelError(string.Empty, ex.Message);
+
         }
 
-        var loginViewModel = await _dispatcher.HandleAsync(new StartLoginFlowRequest()
+        async Task<ViewResult> BuildLoginViewAsync()
         {
-            ReturnUrl = request.ReturnUrl,
-        });
+            var loginViewModel = await _dispatcher.HandleAsync(new StartLoginFlowRequest()
+            {
+                ReturnUrl = request.ReturnUrl,
+            });
 
-        loginViewModel.Username = request.Username;
-        loginViewModel.RememberLogin = request.RememberLogin;
+            loginViewModel.Email = request.Email;
+            loginViewModel.RememberLogin = request.RememberLogin;
 
-        return View(loginViewModel);
+            return View(loginViewModel);
+        }
+
+        return await BuildLoginViewAsync();
     }
 
     /// <summary>

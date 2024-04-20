@@ -15,9 +15,9 @@ public class LocalLoginRequest : IRequest<LocalLoginResponse>
 
     public bool RememberLogin { get; set; }
 
-    [MaxLength(25)]
     [Required]
-    public string Username { get; set; }
+    [EmailAddress]
+    public string Email { get; set; }
 
     [MaxLength(100)]
     [Required]
@@ -39,21 +39,20 @@ public class LocalLoginHandler : IRequestHandler<LocalLoginRequest, LocalLoginRe
     {
         var authContext = await _interaction.GetAuthorizationContextAsync(request.ReturnUrl);
 
+        var user = await _signInManager.UserManager.FindByEmailAsync(request.Email);
+
+        if (user is null)
+            throw new WindettaException(Errors.Identity.UserNotFound, "Username or password invalid");
+
         var signInResult = await _signInManager.PasswordSignInAsync(
-            request.Username, request.Password, request.RememberLogin, false);
+            user, request.Password, request.RememberLogin, false);
 
         if (!signInResult.Succeeded)
             throw new WindettaException(Errors.Identity.UserNotFound, "Username or password invalid");
 
-        var user = await _signInManager.UserManager.FindByNameAsync(request.Username);
-
-        if (user == null)
-            throw new WindettaException(Errors.Identity.UserNotFound, "User with username not registered");
-
         return new LocalLoginResponse()
         {
             Context = authContext,
-            Username = user.UserName ?? string.Empty,
         };
     }
 }

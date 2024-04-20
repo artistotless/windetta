@@ -1,22 +1,16 @@
 ﻿using IdentityModel;
 using IdentityServer4.Services;
 using IdentityServer4.Validation;
-using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
-using Windetta.Identity.Domain.Entities;
 
 namespace Windetta.Identity.Services;
 
 internal sealed class CustomClaimsService : DefaultClaimsService
 {
-    private readonly RoleManager<Role> _roleManager;
-
     public CustomClaimsService(
-        RoleManager<Role> roleManager,
         IProfileService profile,
         ILogger<DefaultClaimsService> logger) : base(profile, logger)
     {
-        _roleManager = roleManager;
     }
 
     /// <summary>
@@ -34,21 +28,17 @@ internal sealed class CustomClaimsService : DefaultClaimsService
 
         var claims = new List<Claim>(baseClaims);
 
+        claims.RemoveAll(x =>
+        x.Type.Equals(JwtClaimTypes.AuthenticationMethod) ||
+        x.Type.Equals(JwtClaimTypes.IdentityProvider));
+
         if (subject is null)
             return claims;
 
-        var roleScope = baseClaims.FirstOrDefault(
-            x => x.Type.Equals("scope") && x.Value.Equals(JwtClaimTypes.Role));
-
         var roleClaim = subject.FindFirst(JwtClaimTypes.Role);
 
-        if (roleScope is not null && roleClaim is not null)
-        {
-            var exist = await _roleManager.RoleExistsAsync(roleClaim.Value);
-
-            if (exist is true)
-                claims.Add(roleClaim);
-        }
+        if (roleClaim is not null)
+            claims.Add(roleClaim);
 
         return claims;
     }

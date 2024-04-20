@@ -22,6 +22,8 @@
 
   <ItemGroup>
     <PackageReference Include="AspNet.Security.OAuth.Vkontakte" Version="8.0.0" />
+    <PackageReference Include="IdentityServer4" Version="4.1.2" />
+    <PackageReference Include="IdentityServer4.Storage" Version="4.1.2" />
     <PackageReference Include="Serilog" Version="3.1.1" />
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
     <PackageReference Include="Serilog.Sinks.Console" Version="5.0.1" />
@@ -51,8 +53,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Infrastructure\Data\Migrations\SagasDb\" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="IdentityServer4">
-      <HintPath>..\..\is4dlls\IdentityServer4.dll</HintPath>
+      <HintPath>..\dlls\IdentityServer4.dll</HintPath>
     </Reference>
     <Reference Include="IdentityServer4.EntityFramework">
       <HintPath>..\dlls\IdentityServer4.EntityFramework.dll</HintPath>
@@ -60,10 +66,6 @@
     <Reference Include="IdentityServer4.EntityFramework.Storage">
       <HintPath>..\dlls\IdentityServer4.EntityFramework.Storage.dll</HintPath>
     </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Infrastructure\Data\Migrations\SagasDb\" />
   </ItemGroup>
 
 </Project>

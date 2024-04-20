@@ -5,6 +5,7 @@ using Windetta.Main.Core.Lobbies;
 using Windetta.Main.Core.Lobbies.Plugins;
 using Windetta.Main.Core.Lobbies.UseCases;
 using Windetta.Main.Core.Matches;
+using Windetta.Main.Infrastructure.Services;
 using Windetta.MainTests.Mocks;
 
 namespace Windetta.MainTests.Shared;

@@ -1,43 +1,41 @@
 @model RegisterInputModel
 
-<div class="login-page">
 
-    <partial name="_ValidationSummary" />
 
-    <div class="row">
-
-        <div class="col-sm-6">
-            <div class="card">
-                <div class="card-header">
-                    <h2>Register</h2>
-                </div>
-
-                <div class="card-body">
-                    <form asp-route="Register">
-
-                        <div class="form-group">
-                            <label asp-for="Username"></label>
-                            <input class="form-control" asp-for="Username" autofocus>
+<div class="relative font-medium flex items-center content-center">
+    <div class="mr-auto ml-auto w-full">
+        <div class="w-full max-w-md mr-auto ml-auto mt-4 mb-1 text-center">
+            <h1 class="text-gray-800 block text-3xl font-extrabold font-title">Sign up</h1>
+        </div>
+        <div class="w-full max-w-md mr-auto ml-auto mt-4">
+            <div class="bg-white shadow-lg rounded-md px-8 py-8 mb-4 ml-auto mr-auto">
+                <form asp-route="Register">
+                        <div class="mb-4">
+                        <label asp-for="Email" class="block text-gray-700 text-sm font-medium mb-2" for="email">
+                                Email
+                                address
+                            </label>
+                            <input asp-for="Email" autofocus class="shadow-sm appearance-none border border-gray-400 rounded w-full py-3 px-3 text-gray-700 text-sm leading-tight focus:outline-none focus:border-indigo-300" id="email" type="text" placeholder="user@example.com">
+                        </div>
+                        <div class="mb-6">
+                            <label asp-for="Password" class="block text-gray-700 text-sm font-medium mb-2" for="password"> Password </label>
+                            <input asp-for="Password" class="shadow-sm appearance-none border border-gray-400 rounded w-full py-3 px-3 text-gray-700 text-sm leading-tight focus:outline-none focus:border-indigo-300" id="password" type="password" placeholder="***************">
+                        </div>
+                        <div class="mb-6">
+                            <label asp-for="ConfirmPassword" class="block text-gray-700 text-sm font-medium mb-2" for="confirmPassword"> Password </label>
+                            <input asp-for="ConfirmPassword" class="shadow-sm appearance-none border border-gray-400 rounded w-full py-3 px-3 text-gray-700 text-sm leading-tight focus:outline-none focus:border-indigo-300" id="confirmPassword" type="password" placeholder="***************">
+                        </div>
+                        <partial name="_ValidationSummary" />
+                        <div class="mb-6">
+                            <button type="submit" class="bg-indigo-500 hover:bg-indigo-600 shadow-lg text-white font-semibold text-sm py-3 px-0 rounded text-center w-full hover:bg-tertiary duration-200 transition-all">
+                                Create account
+                            </button>
                         </div>
 
-                        <div class="form-group">
-                            <label asp-for="Email"></label>
-                            <input class="form-control" placeholder="user@site.com" asp-for="Email">
+                    <div class="d-flex" style=" width: 100%; margin-bottom: 18px; margin-top: 18px; display: flex; justify-content: center !important; align-items: center !important; ">
+                            <a href="@Url.ActionLink("login","account")" class="text-indigo-600 font-medium text-sm duration-200 transition-colors hover:text-indigo-800">Already have account? Sign in</a>
                         </div>
-
-                        <div class="form-group">
-                            <label asp-for="Password"></label>
-                            <input type="password" class="form-control" placeholder="********" asp-for="Password" autocomplete="off">
-                        </div>
-
-                        <div class="form-group">
-                            <label asp-for="ConfirmPassword"></label>
-                            <input type="password" class="form-control" placeholder="********" asp-for="ConfirmPassword" autocomplete="off">
-                        </div>
-
-                        <button class="btn btn-primary" name="button">Register</button>
-                    </form>
-                </div>
+                </form>
             </div>
         </div>
     </div>

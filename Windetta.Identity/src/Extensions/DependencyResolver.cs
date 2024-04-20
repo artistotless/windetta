@@ -2,11 +2,9 @@
 using IdentityServer4.Services;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
 using Windetta.Common.Database;
 using Windetta.Common.Options;
@@ -56,18 +54,14 @@ public static class DependencyResolver
     {
         using var provider = services.BuildServiceProvider();
 
-        var authBuilder = services.AddAuthentication();
-
+        var authBuilder = services.AddAuthentication(IdentityConstants.ApplicationScheme);
         var configuration = provider.GetRequiredService<IConfiguration>();
 
-        authBuilder.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
-         {
-             options.Authority = "https://localhost:7159";
-             options.TokenValidationParameters = new TokenValidationParameters
-             {
-                 ValidateAudience = false
-             };
-         });
+        services.ConfigureApplicationCookie(options =>
+        {
+            options.Cookie.Name = "windetta.identity";
+            options.LoginPath = "/account/login";
+        });
 
         authBuilder.AddVk(configuration);
         authBuilder.AddGoogle(configuration);
