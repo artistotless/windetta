@@ -1,4 +1,3 @@
-using Autofac.Core;
 using Autofac.Extensions.DependencyInjection;
 using MassTransit;
 using Serilog;

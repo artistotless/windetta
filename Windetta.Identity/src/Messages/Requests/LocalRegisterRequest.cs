@@ -59,8 +59,7 @@ public class LocalRegisterHandler : IRequestHandler<LocalRegisterRequest>
 
         var claims = new List<Claim>()
         {
-            new(JwtClaimTypes.Email, user.Email),
-            new(JwtClaimTypes.GivenName, user.DisplayName),
+            new(JwtClaimTypes.NickName, user.DisplayName),
         };
 
         (await _userManager.AddClaimsAsync(user, claims))

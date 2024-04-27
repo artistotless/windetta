@@ -54,6 +54,7 @@ public static class IdentityServerBootstrapData
                 IdentityServerConstants.StandardScopes.Profile,
                 IdentityServerConstants.StandardScopes.Email,
                 IdentityServerConstants.StandardScopes.Address,
+                IdentityServerConstants.StandardScopes.OfflineAccess,
                 "realtime",
             }
             };
