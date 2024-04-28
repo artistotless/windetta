@@ -26,7 +26,8 @@ Lobbies are highly customizable through our plugin system, allowing users to tai
 
 Advertisers on Windetta are not overlooked, as they can create Tournaments that are distinct from regular ones. These hubs are a unique way to advertise, as they can display project websites, descriptions and banners.
 
-![image](https://github.com/artistotless/windetta/assets/34582815/2e612618-4e5b-4389-9a85-83203417c65b)
+![image](https://github.com/artistotless/windetta/assets/34582815/cf9e578b-98d4-4475-bed1-f5006a687de3)
+
 
 ---
 
