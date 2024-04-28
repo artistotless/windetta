@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Windetta.Common.Constants;
 using Windetta.Common.Testing;
+using Windetta.Contracts;
 using Windetta.Main.Core.Exceptions;
 using Windetta.Main.Core.Lobbies;
 using Windetta.Main.Core.Lobbies.Plugins;
@@ -22,10 +23,10 @@ public class CreateTests
 
         var options = new LobbyOptions()
         {
-            Bet = new Bet(currencyId: 1, bet: 100_0),
+            Bet = new FundsInfo(currencyId: 1, amount: 100_0),
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId,
-            GameConfiguration = new() { MaxPlayers = 2 },
+            GameConfiguration = new() { MaxPlayersInTeam = 2 },
         };
 
         var useCase = provider
@@ -52,10 +53,10 @@ public class CreateTests
 
         var options = new LobbyOptions()
         {
-            Bet = new Bet(currencyId: 1, bet: 100_0),
+            Bet = new FundsInfo(currencyId: 1, amount: 100_0),
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId,
-            GameConfiguration = new() { MaxPlayers = 2 },
+            GameConfiguration = new() { MaxPlayersInTeam = 2 },
         };
 
         var useCase = provider
@@ -82,10 +83,10 @@ public class CreateTests
 
         var options = new LobbyOptions()
         {
-            Bet = new Bet(currencyId: 1, bet: 100_0),
+            Bet = new FundsInfo(currencyId: 1, amount: 100_0),
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId,
-            GameConfiguration = new() { MaxPlayers = 2 },
+            GameConfiguration = new() { MaxPlayersInTeam = 2 },
         };
 
         var useCase = provider

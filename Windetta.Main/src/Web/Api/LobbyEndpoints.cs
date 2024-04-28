@@ -1,76 +1,74 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SignalR;
+using Windetta.Common.Authentication;
+using Windetta.Main.Core.Clients.Dtos;
 using Windetta.Main.Core.Lobbies;
 using Windetta.Main.Core.Lobbies.Dtos;
-using Windetta.Main.Core.Services;
-using Windetta.Main.Infrastructure.SignalR;
-using Windetta.Main.Web.Api.Dtos;
+using Windetta.Main.Infrastructure.Services;
 
-namespace Windetta.Main.Web.Api
+namespace Windetta.Main.Web.Api;
+
+public static class LobbyEndpoints
 {
-    public static class LobbyEnpoints
+    public static void UseLobbyEndpoints(this WebApplication web)
     {
-        public static void UseLobbyEndpoints(this WebApplication web)
+        var group = web.MapGroup("api/lobbies");
+
+        // Get lobbies
+        group.MapGet("/", async ([FromServices] ILobbies lobbies) =>
         {
-            var group = web.MapGroup("api/lobbies")/*.RequireAuthorization()*/;
+            return Results.Ok(await lobbies.GetAllAsync());
+        });
 
-            // Get lobbies
-            web.MapGet("api/lobbies", async ([FromServices] ILobbies lobbies) =>
+        // Create lobby
+        group.MapPost("/", async (
+            [FromBody] CreateLobbyRequestDto body,
+            [FromServices] IUserIdProvider userIdProvider,
+            [FromServices] LobbyObserver observer,
+            [FromServices] LobbiesInteractor interactor) =>
+        {
+            var createRequest = new CreateLobbyDto()
             {
-                return Results.Ok(await lobbies.GetAllAsync());
-            });
+                Bet = body.Bet,
+                InitiatorId = userIdProvider.UserId,
+                GameId = body.GameId,
+                Private = body.Private,
+                Properties = body.Properties,
+                JoinFilters = body.JoinFilters,
+                AutoDisposeStrategy = body.AutoDisposeStrategy,
+                AutoReadyStrategy = body.AutoReadyStrategy,
+            };
 
-            // Create lobby
-            group.MapPost("/", async (
-                [FromBody] CreateLobbyRequestDto body,
-                [FromServices] IUserIdService userIdProvider,
-                [FromServices] LobbyObserver observer,
-                [FromServices] LobbiesInteractor interactor) =>
-            {
-                var createRequest = new CreateLobbyDto()
-                {
-                    Bet = body.Bet,
-                    InitiatorId = userIdProvider.UserId,
-                    GameId = body.GameId,
-                    Private = body.Private,
-                    Properties = body.Properties,
-                    JoinFilters = body.JoinFilters,
-                    AutoDisposeStrategy = body.AutoDisposeStrategy,
-                    AutoReadyStrategy = body.AutoReadyStrategy,
-                };
+            var lobby = await interactor.CreateAsync(createRequest);
 
-                var lobby = await interactor.CreateAsync(createRequest);
+            observer.AddToTracking(lobby);
 
-                observer.AddToTracking(lobby);
+            return Results.Ok(lobby);
+        });
 
-                return Results.Ok(lobby);
-            });
+        // Join room
+        group.MapPost("/{lobbyId:guid}/rooms/{roomIndex:int}", async (
+            [FromRoute] Guid lobbyId,
+            [FromRoute] ushort roomIndex,
+            [FromServices] IUserIdProvider userIdProvider,
+            [FromServices] LobbiesInteractor interactor) =>
+        {
+            await interactor.JoinMemberAsync
+            (userIdProvider.UserId, lobbyId, roomIndex);
 
-            // Join room
-            group.MapPost("/{lobbyId:guid}/rooms/{roomIndex:int}", async (
-                [FromRoute] Guid lobbyId,
-                [FromRoute] ushort roomIndex,
-                [FromServices] IUserIdService userIdProvider,
-                [FromServices] LobbiesInteractor interactor) =>
-            {
-                await interactor.JoinMemberAsync
-                (userIdProvider.UserId, lobbyId, roomIndex);
+            return Results.NoContent();
+        });
 
-                return Results.NoContent();
-            });
+        // Leave room
+        group.MapDelete("/{lobbyId:guid}/rooms/{roomIndex:int}", async (
+            [FromRoute] Guid lobbyId,
+            [FromRoute] ushort roomIndex,
+            [FromServices] IUserIdProvider userIdProvider,
+            [FromServices] LobbiesInteractor interactor) =>
+        {
+            await interactor.LeaveMemberAsync
+            (userIdProvider.UserId, lobbyId, roomIndex);
 
-            // Leave room
-            group.MapDelete("/{lobbyId:guid}/rooms/{roomIndex:int}", async (
-                [FromRoute] Guid lobbyId,
-                [FromRoute] ushort roomIndex,
-                [FromServices] IUserIdService userIdProvider,
-                [FromServices] LobbiesInteractor interactor) =>
-            {
-                await interactor.LeaveMemberAsync
-                (userIdProvider.UserId, lobbyId, roomIndex);
-
-                return Results.NoContent();
-            });
-        }
+            return Results.NoContent();
+        });
     }
 }

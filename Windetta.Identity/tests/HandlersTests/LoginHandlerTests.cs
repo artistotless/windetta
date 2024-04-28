@@ -29,7 +29,7 @@ public class LoginHandlerTests
         var sut = new LocalLoginHandler(signInManagerMock.Object, is4InteractionMock);
         var request = new LocalLoginRequest()
         {
-            Username = _userStore.GetUsers().First().UserName!,
+            Email = _userStore.GetUsers().First().Email!,
             Password = _userStore.GetUsers().First().PasswordHash!,
             RememberLogin = false,
             ReturnUrl = "~/"
@@ -39,7 +39,7 @@ public class LoginHandlerTests
         var response = sut.HandleAsync(request).GetAwaiter().GetResult();
 
         // assert
-        response.ShouldNotBeNull();
+        response.Context.ShouldNotBeNull();
     }
 
     [Fact]
@@ -51,7 +51,7 @@ public class LoginHandlerTests
         var sut = new LocalLoginHandler(signInManagerMock.Object, is4InteractionMock);
         var request = new LocalLoginRequest()
         {
-            Username = "notfounduser@gmail.com",
+            Email = "notfounduser@gmail.com",
             Password = "somePassword"
         };
 
@@ -71,7 +71,7 @@ public class LoginHandlerTests
         var sut = new LocalLoginHandler(signInManagerMock.Object, is4InteractionMock);
         var request = new LocalLoginRequest()
         {
-            Username = _userStore.GetUsers().First().Email!,
+            Email = _userStore.GetUsers().First().Email!,
             Password = "fakepass"
         };
 

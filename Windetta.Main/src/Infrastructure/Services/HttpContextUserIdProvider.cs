@@ -1,11 +1,10 @@
 ﻿using System.Security.Authentication;
 using System.Security.Claims;
-using Windetta.Common.Types;
-using Windetta.Main.Core.Services;
+using Windetta.Common.Authentication;
 
 namespace Windetta.Main.Infrastructure.Services;
 
-public class HttpContextUserIdProvider : IUserIdService
+public class HttpContextUserIdProvider : IUserIdProvider
 {
     protected readonly IHttpContextAccessor ContextAccessor;
 

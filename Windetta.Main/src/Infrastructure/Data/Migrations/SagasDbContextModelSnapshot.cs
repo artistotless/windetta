@@ -19,6 +19,43 @@ namespace Windetta.Main.Infrastructure.Data.Migrations
                 .HasAnnotation("ProductVersion", "7.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
+            modelBuilder.Entity("Windetta.Main.Infrastructure.Sagas.LobbyFlow", b =>
+                {
+                    b.Property<Guid>("CorrelationId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<ulong>("BetAmount")
+                        .HasColumnType("bigint unsigned");
+
+                    b.Property<int>("BetCurrencyId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<sbyte>("CurrentState")
+                        .HasColumnType("TINYINT");
+
+                    b.Property<Guid>("GameId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("LobbyId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Players")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Properties")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("CorrelationId");
+
+                    b.HasIndex("CorrelationId");
+
+                    b.ToTable("LobbyFlow");
+                });
+
             modelBuilder.Entity("Windetta.Main.Infrastructure.Sagas.MatchFlow", b =>
                 {
                     b.Property<Guid>("CorrelationId")
@@ -30,21 +67,19 @@ namespace Windetta.Main.Infrastructure.Data.Migrations
                     b.Property<int>("BetCurrencyId")
                         .HasColumnType("int");
 
-                    b.Property<string>("CanceledReason")
-                        .HasColumnType("VARCHAR(32)");
-
                     b.Property<DateTimeOffset>("Created")
                         .HasColumnType("datetime(6)");
 
                     b.Property<sbyte>("CurrentState")
                         .HasColumnType("TINYINT");
 
-                    b.Property<string>("Endpoint")
-                        .HasColumnType("VARCHAR(42)")
-                        .UseCollation("latin1_general_ci");
-
                     b.Property<Guid>("GameId")
                         .HasColumnType("char(36)");
+
+                    b.Property<string>("GameServerEndpoint")
+                        .IsRequired()
+                        .HasColumnType("VARCHAR(42)")
+                        .UseCollation("latin1_general_ci");
 
                     b.Property<string>("Players")
                         .IsRequired()
@@ -52,10 +87,6 @@ namespace Windetta.Main.Infrastructure.Data.Migrations
 
                     b.Property<string>("Properties")
                         .HasColumnType("longtext");
-
-                    b.Property<string>("Tickets")
-                        .HasColumnType("longtext")
-                        .UseCollation("latin1_general_ci");
 
                     b.HasKey("CorrelationId");
 

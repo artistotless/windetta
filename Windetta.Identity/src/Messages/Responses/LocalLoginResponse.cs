@@ -2,8 +2,7 @@
 
 namespace Windetta.Identity.Messages.Responses;
 
-public class LocalLoginResponse
+public struct LocalLoginResponse
 {
-    public AuthorizationRequest Context { get; set; }
-    public string Username { get; set; }
+    public AuthorizationRequest Context { get; init; }
 }

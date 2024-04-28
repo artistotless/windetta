@@ -1,6 +1,5 @@
 ﻿using MassTransit;
 using Windetta.Contracts.Commands;
-using Windetta.Contracts.Events;
 
 namespace Windetta.Main.Infrastructure.Consumers;
 

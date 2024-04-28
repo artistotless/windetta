@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Windetta.Common.Testing;
+using Windetta.Contracts;
 using Windetta.Main.Core.Games;
 using Windetta.Main.Core.Lobbies;
 using Windetta.Main.Core.Lobbies.Dtos;
@@ -14,8 +15,8 @@ public class LobbyTests
         // arrange
         var gameCfg = new GameConfiguration()
         {
-            MinPlayers = 1,
-            MaxPlayers = (uint)Random.Shared.Next(10, 1000),
+            MinPlayersInTeam = 1,
+            MaxPlayersInTeam = (uint)Random.Shared.Next(10, 1000),
             MinTeams = 1,
             MaxTeams = (uint)Random.Shared.Next(1, 1000)
         };
@@ -31,7 +32,7 @@ public class LobbyTests
         {
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId,
-            Bet = new Bet(currencyId: 1, bet: 100)
+            Bet = new FundsInfo(currencyId: 1, amount: 100)
         };
 
         // act
@@ -41,7 +42,7 @@ public class LobbyTests
 
         // assert
         lobby.Rooms.Count().ShouldBe((int)gameCfg.MaxTeams);
-        lobby.Rooms.First().MaxMembers.ShouldBe(gameCfg.MaxPlayers);
+        lobby.Rooms.First().MaxMembers.ShouldBe(gameCfg.MaxPlayersInTeam);
     }
 
     [Fact]
@@ -52,7 +53,7 @@ public class LobbyTests
         {
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId,
-            Bet = new Bet(currencyId: 1, bet: 100)
+            Bet = new FundsInfo(currencyId: 1, amount: 100)
         };
 
         var interactor = SharedServiceProvider.GetInstance()
@@ -77,7 +78,7 @@ public class LobbyTests
         {
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId,
-            Bet = new Bet(currencyId: 1, bet: 100)
+            Bet = new FundsInfo(currencyId: 1, amount: 100)
         };
 
         var interactor = SharedServiceProvider.GetInstance()
@@ -111,7 +112,7 @@ public class LobbyTests
         {
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId,
-            Bet = new Bet(currencyId: 1, bet: 100)
+            Bet = new FundsInfo(currencyId: 1, amount: 100)
         };
 
         var interactor = SharedServiceProvider.GetInstance()
@@ -131,7 +132,7 @@ public class LobbyTests
         // act
         await interactor.JoinMemberAsync(memberId, lobby.Id, roomIndex: 0);
         lobby.Updated += callback;
-        await interactor.LeaveMemberAsync(memberId, lobby.Id, roomIndex: 0);
+        await interactor.LeaveMemberAsync(memberId, lobby.Id);
 
         // assert
         updateEventRaised.ShouldBeTrue();

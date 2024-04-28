@@ -1,8 +1,10 @@
 ﻿using Autofac.Extensions.DependencyInjection;
 using Serilog;
+using System.Reflection;
 using Windetta.Common.Configuration;
 using Windetta.Common.Middlewares;
 using Windetta.Common.Types;
+using Windetta.Main.Core.Lobbies;
 using Windetta.Main.Infrastructure;
 using Windetta.Main.Infrastructure.SignalR;
 using Windetta.Main.Web.Api;
@@ -20,6 +22,7 @@ builder.AddInfrastructureLayer();
 builder.Host.UseServiceProviderFactory(
     new AutofacServiceProviderFactory(builder =>
     {
+        builder.ResolveDependenciesFromAssembly(Assembly.GetAssembly(typeof(ILobby)));
         builder.ResolveDependenciesFromAssembly();
     }));
 
@@ -30,6 +33,7 @@ app.UseCors("allow_any_origins");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseLobbyEndpoints();
+app.UseOngoingMatchesEndpoints();
 app.MapGet("/", () => "Windetta");
 app.MapHub<MainHub>("/mainHub");
 

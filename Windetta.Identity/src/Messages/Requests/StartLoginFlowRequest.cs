@@ -40,7 +40,7 @@ public class StartLoginFlowHandler : IRequestHandler<StartLoginFlowRequest, Logi
             {
                 EnableLocalLogin = local,
                 ReturnUrl = request.ReturnUrl,
-                Username = authContext?.LoginHint,
+                Email = authContext?.LoginHint,
             };
 
             if (!local)
@@ -86,7 +86,7 @@ public class StartLoginFlowHandler : IRequestHandler<StartLoginFlowRequest, Logi
             AllowRememberLogin = AccountOptions.AllowRememberLogin,
             EnableLocalLogin = allowLocal && AccountOptions.AllowLocalLogin,
             ReturnUrl = request.ReturnUrl,
-            Username = authContext?.LoginHint,
+            Email = authContext?.LoginHint,
             ExternalProviders = providers.ToArray()
         };
     }

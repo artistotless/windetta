@@ -12,7 +12,7 @@ public class FullRoomsReadyStrategy : AutoReadyStrategy
     {
         var count = Lobby.Rooms.Select(x => x.MembersCount).Sum();
 
-        if (count >= Lobby.Configuration.MaxPlayers)
+        if (count >= Lobby.Configuration.MaxPlayersInTeam)
         {
             return true;
         }

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Windetta.Main.Infrastructure.Security;
@@ -21,7 +20,9 @@ public static class AuthenticationConfiguration
             options.RequireHttpsMetadata = false;
             options.TokenValidationParameters = new TokenValidationParameters
             {
-                ValidateAudience = false
+                ValidateAudience = false,
+                //TODO: set TRUE
+                ValidateLifetime = false,
             };
             options.Events = new JwtBearerEvents
             {
@@ -31,7 +32,7 @@ public static class AuthenticationConfiguration
                     var accessTokenFromHeader = context.Request.Headers.Authorization.ToString()
                     .Replace("Bearer ", string.Empty);
 
-                    if (string.IsNullOrEmpty(accessTokenFromQuery))
+                    if (!string.IsNullOrEmpty(accessTokenFromQuery))
                         context.Token = accessTokenFromHeader;
                     else
                         context.Token = accessTokenFromQuery;

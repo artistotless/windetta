@@ -1,4 +1,5 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
+using Windetta.Contracts;
 using Windetta.Main.Core.Lobbies;
 using Windetta.Main.Core.Lobbies.Dtos;
 
@@ -14,7 +15,7 @@ public class LobbyDbModel
     public LobbyState State { get; set; }
     public DateTimeOffset Created { get; set; }
     public DateTimeOffset Updated { get; set; }
-    public Bet Bet { get; set; }
+    public FundsInfo Bet { get; set; }
     public IEnumerable<string>? JoinFilters { get; set; }
     public IEnumerable<RoomDbModel> Rooms { get; set; }
 

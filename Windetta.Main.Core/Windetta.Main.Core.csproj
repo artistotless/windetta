@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Version>1.0.0</Version>
+    <Description>Core library for Main service</Description>
+    <PackageOutputPath>C:\Projects\windetta-misc\nugets</PackageOutputPath>
+    <IncludeSymbols>True</IncludeSymbols>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Clients\**" />
+    <EmbeddedResource Remove="Clients\**" />
+    <None Remove="Clients\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Windetta.Common" Version="1.0.0" />
+    <PackageReference Include="Windetta.Contracts" Version="1.0.0" />
+    <PackageReference Include="Windetta.LSPM.Models" Version="1.0.0" />
+  </ItemGroup>
+
+</Project>

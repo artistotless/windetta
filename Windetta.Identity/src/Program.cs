@@ -24,7 +24,7 @@ builder.Host.UseSerilog();
 builder.ConfigureComponentLaunchSettings();
 
 var assemby = Assembly.GetExecutingAssembly();
-
+builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.AddMysqlDbContext<IdentityDbContext>(assemby);
 builder.Services.AddMysqlDbContext<SagasDbContext>(assemby);
 builder.Services.AddIdentityStore();
@@ -57,12 +57,20 @@ var app = builder.Build();
 IdentitySeeder.Seed(app);
 IdentityServerConfigurationSeeder.Seed(app);
 
-app.MapGet("/", () => "Windetta Identity Service").RequireAuthorization();
-app.MapGet("/ping", () => Results.Ok());
-
+app.UseHsts();
 app.UseStaticFiles();
 app.UseIdentityServer();
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+app.MapGet("/", (ctx) =>
+{
+
+    return ctx.Response.WriteAsync("Windetta.Identity");
+
+}).RequireAuthorization();
+
+app.MapGet("/ping", () => Results.Ok());
 app.Run();

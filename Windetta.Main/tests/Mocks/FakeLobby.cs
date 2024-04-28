@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using Windetta.Contracts;
 using Windetta.Main.Core.Games;
 using Windetta.Main.Core.Lobbies;
 using Windetta.Main.Core.Lobbies.Plugins;
@@ -14,7 +15,7 @@ public class ProxyLobby : ILobby
     public DateTimeOffset CreatedAt { get { return _original.CreatedAt; } init { } }
     public DateTimeOffset UpdatedAt { get { return _original.UpdatedAt; } set { _original.UpdatedAt = value; } }
     public int MembersCount { get { return _original.MembersCount; } private set { } }
-    public Bet Bet { get { return _original.Bet; } init { } }
+    public FundsInfo Bet { get { return _original.Bet; } init { } }
     public Guid InitiatorId { get { return _original.InitiatorId; } init { } }
     public GameConfiguration Configuration { get { return _original.Configuration; } init { } }
 
@@ -51,14 +52,14 @@ public class ProxyLobby : ILobby
         _original.SetDisposeStrategy(strategy);
     }
 
-    public virtual void Add(RoomMember member, ushort roomIndex)
+    public virtual void AddMember(RoomMember member, ushort roomIndex)
     {
-        _original.Add(member, roomIndex);
+        _original.AddMember(member, roomIndex);
     }
 
-    public virtual void Remove(Guid memberId, ushort roomIndex)
+    public virtual void RemoveMember(Guid memberId, ushort roomIndex)
     {
-        _original.Remove(memberId, roomIndex);
+        _original.RemoveMember(memberId, roomIndex);
     }
 
     public virtual void Dispose()
@@ -90,7 +91,7 @@ public class ProxyLobby : ILobby
         {
             for (ushort i = 0; i < maxTeams; i++)
             {
-                var room = new Room(i, Configuration.MaxPlayers);
+                var room = new Room(i, Configuration.MaxPlayersInTeam);
 
                 yield return new KeyValuePair<ushort, Room>(i, room);
             }

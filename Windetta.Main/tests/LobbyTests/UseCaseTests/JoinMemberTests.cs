@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Windetta.Common.Constants;
 using Windetta.Common.Testing;
+using Windetta.Contracts;
 using Windetta.Main.Core.Exceptions;
 using Windetta.Main.Core.Games;
 using Windetta.Main.Core.Lobbies;
@@ -35,7 +36,7 @@ public class JoinMemberTests
         var options = new LobbyOptions()
         {
             InitiatorId = ExampleGuids.UserId,
-            GameConfiguration = new GameConfiguration() { MaxPlayers = 2 },
+            GameConfiguration = new GameConfiguration() { MaxPlayersInTeam = 2 },
         };
         var lobby = new ProxyLobby(options);
         var storageMock = new LobbiesMock() { ReturnThisLobby = lobby }.Mock;
@@ -64,10 +65,10 @@ public class JoinMemberTests
         // arrange
         var options = new LobbyOptions()
         {
-            Bet = new Bet(),
+            Bet = new FundsInfo(1, 100),
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId,
-            GameConfiguration = new GameConfiguration() { MaxPlayers = 2 },
+            GameConfiguration = new GameConfiguration() { MaxPlayersInTeam = 2 },
         };
 
         var lobbyMock = new Mock<ProxyLobby>(options, null);

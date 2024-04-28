@@ -12,9 +12,11 @@ public static class Extensions
     /// of registering services in the dependency injection container, 
     /// determining the lifetime of the service based on the interface implemented by it.
     /// </summary>
-    public static void ResolveDependenciesFromAssembly(this ContainerBuilder builder)
+    /// <param name="assembly">If assembly null resolver will process CallingAssembly</param>
+    public static void ResolveDependenciesFromAssembly(this ContainerBuilder builder, Assembly? assembly = null)
     {
-        var typesFromCallingAssembly = Assembly.GetCallingAssembly().GetTypes();
+        var targetAssembly = assembly ?? Assembly.GetCallingAssembly();
+        var typesFromCallingAssembly = targetAssembly.GetTypes();
         var typesFromCommonAssembly = Assembly.GetExecutingAssembly().GetTypes();
 
         var allTypes = new List<Type>();

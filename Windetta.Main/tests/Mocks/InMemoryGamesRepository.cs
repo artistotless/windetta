@@ -17,7 +17,7 @@ public class InMemoryGamesRepository : IGames
                 Id = ExampleGuids.GameId,
                 Description = "Sea battle",
                 IconPath = "/seabattle.png",
-                Configuration = new GameConfiguration() { MaxPlayers = 2, MinPlayers = 1 },
+                Configuration = new GameConfiguration() { MaxPlayersInTeam = 2, MinPlayersInTeam = 1 },
                 Title = "Sea battle",
                 SupportedCurrencies = new[] { new SupportedCurrency() { CurrencyId = 1, MaxBet = 1000, MinBet = 100 } }
             }

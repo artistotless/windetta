@@ -5,7 +5,7 @@ namespace Windetta.TonTxns.Infrastructure.Data;
 
 public sealed class TonDbContext : DbContext
 {
-    public TonDbContext(DbContextOptions options) : base(options)
+    public TonDbContext(DbContextOptions<TonDbContext> options) : base(options)
     {
     }
 

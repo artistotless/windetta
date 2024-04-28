@@ -29,4 +29,12 @@ public static class Extensions
         if (httpsUrl != null && httpUrl != null)
             builder.WebHost.UseUrls(httpsUrl, httpUrl);
     }
+
+    public static void ConfigureClusterMap(this WebApplicationBuilder builder)
+    {
+        var configSection = builder.Configuration
+            .GetSection(nameof(ClusterMap));
+
+        builder.Services.Configure<ClusterMap>(configSection);
+    }
 }

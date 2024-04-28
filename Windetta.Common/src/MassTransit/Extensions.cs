@@ -33,10 +33,11 @@ public static class Extensions
             x.AddConsumers(assembly);
             x.UsingRabbitMq((context, cfg) =>
             {
-                cfg.Host(rmqQtions.Hostnames.First() ?? "localhost", rmqQtions.VirtualHost ?? "/", h =>
+                var host = rmqQtions.Hostnames.First() ?? "localhost";
+                cfg.Host(new Uri($"rabbitmq://{host}:{rmqQtions.Port}/{rmqQtions.VirtualHost}"), cfg =>
                 {
-                    h.Username(rmqQtions.Username ?? "admin");
-                    h.Password(rmqQtions.Password ?? "admin");
+                    cfg.Username(rmqQtions.Username ?? "admin");
+                    cfg.Password(rmqQtions.Password ?? "admin");
                 });
 
                 var data = GetConsumersWithMessageTypes(assembly);
@@ -78,6 +79,17 @@ public static class Extensions
         var endpoint = MyEndpointNameFormatter.CommandUri<TMessage>(serviceName);
 
         return source.Add(new SendActivity<TSaga, TData, TMessage>(_ => endpoint, MessageFactory<TMessage>.Create(messageFactory, callback)));
+    }
+
+    public static EventActivityBinder<TSaga> SendCommandAsync<TSaga, TMessage>(this EventActivityBinder<TSaga> source,
+        string serviceName, Func<BehaviorContext<TSaga>, Task<SendTuple<TMessage>>> messageFactory,
+        Action<SendContext<TMessage>> callback = null)
+        where TSaga : class, SagaStateMachineInstance
+        where TMessage : class
+    {
+        var endpoint = MyEndpointNameFormatter.CommandUri<TMessage>(serviceName);
+
+        return source.Add(new SendActivity<TSaga, TMessage>(_ => endpoint, MessageFactory<TMessage>.Create(messageFactory, callback)));
     }
 
     public static async Task SendCommandAsync<TMessage>(this IBus bus,

@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Windetta.Common.Testing;
+using Windetta.Contracts;
 using Windetta.Main.Core.Games;
 using Windetta.Main.Core.Lobbies;
 using Windetta.Main.Core.Lobbies.Dtos;
+using Windetta.Main.Infrastructure.Services;
 using Windetta.MainTests.Mocks;
 using Xunit.Abstractions;
 
@@ -24,7 +26,7 @@ public class LobbyDispatcherTests
         {
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId,
-            Bet = new Bet(currencyId: 1, bet: 100),
+            Bet = new FundsInfo(currencyId: 1, amount: 100),
         };
 
         var buffer = new Queue<string>();
@@ -36,7 +38,7 @@ public class LobbyDispatcherTests
 
         // act
         dispatcher.AddToTracking(lobby);
-        await interactor.LeaveMemberAsync(request.InitiatorId, lobby.Id, roomIndex: 0);
+        await interactor.LeaveMemberAsync(request.InitiatorId, lobby.Id);
         await interactor.JoinMemberAsync(request.InitiatorId, lobby.Id, roomIndex: 0);
 
         // assert
@@ -51,7 +53,7 @@ public class LobbyDispatcherTests
         var provider = SharedServiceProvider.GetInstance();
         var request = new CreateLobbyDto()
         {
-            Bet = new Bet(1, 1000),
+            Bet = new FundsInfo(1, 1000),
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId
         };
@@ -70,7 +72,10 @@ public class LobbyDispatcherTests
         // assert
         var text = $"Lobby deleted: {lobby.Id}";
         (await storage.GetAllAsync()).Count().ShouldBe(0);
-        buffer.Dequeue().ShouldBe(text);
+
+        buffer.Dequeue(); // Lobby added
+        buffer.Dequeue()  // Lobby deleted
+            .ShouldBe(text);
     }
 
     [Fact]
@@ -79,7 +84,7 @@ public class LobbyDispatcherTests
         // arrange
         var gameCfg = new GameConfiguration()
         {
-            MaxPlayers = 3,
+            MaxPlayersInTeam = 3,
         };
 
         var sc = new[] { new SupportedCurrency(1, 1, 100000) };
@@ -93,7 +98,7 @@ public class LobbyDispatcherTests
         {
             GameId = ExampleGuids.GameId,
             InitiatorId = ExampleGuids.UserId,
-            Bet = new Bet(currencyId: 1, bet: 100),
+            Bet = new FundsInfo(currencyId: 1, amount: 100),
             AutoReadyStrategy = new PluginSetDto(nameof(FullRoomsReadyStrategy)),
         };
 
@@ -112,13 +117,14 @@ public class LobbyDispatcherTests
         while (buffer.Count < 3 && new CancellationTokenSource
             (TimeSpan.FromSeconds(6)).IsCancellationRequested == false)
         {
-            await Task.Delay(100);
+            await Task.Delay(300);
         }
 
         // assert
         var text = $"Lobby ready: {lobby.Id}";
+        buffer.Dequeue(); // Lobby added
         buffer.Dequeue(); // Lobby update
-        buffer.Dequeue(); // Lobby update
-        buffer.Dequeue().ShouldBe(text); // Lobby ready
+        buffer.Dequeue()  // Lobby ready
+            .ShouldBe(text);
     }
 }

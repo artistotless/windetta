@@ -1,42 +1,38 @@
 ﻿using MassTransit;
 using Microsoft.AspNetCore.SignalR;
+using Serilog;
 using Windetta.Contracts.Commands;
 using Windetta.Main.Infrastructure.SignalR;
+using ILogger = Serilog.ILogger;
 
 namespace Windetta.Main.Infrastructure.Lobby;
 
 public class SignalRSagaEventsNotifiers { }
 
-public class MatchBegunNotifier : IConsumer<INotifyMatchBegun>
+public class MatchBegunNotifier : IConsumer<INotifyReadyToConnect>
 {
-    private readonly ILogger<SignalRSagaEventsNotifiers> _logger;
+    private readonly ILogger _logger;
     private readonly IHubContext<MainHub> _context;
 
-    public MatchBegunNotifier(
-    ILogger<SignalRSagaEventsNotifiers> logger,
-    IHubContext<MainHub> context)
+    public MatchBegunNotifier(IHubContext<MainHub> context)
     {
-        _logger = logger;
+        _logger = Log.ForContext<SignalRSagaEventsNotifiers>();
         _context = context;
     }
 
-    public async Task Consume(ConsumeContext<INotifyMatchBegun> context)
+    public async Task Consume(ConsumeContext<INotifyReadyToConnect> context)
     {
-        _logger.LogDebug("Saga Event: {event}", "match_begun");
+        _logger.Debug("Saga Event: {event}", "ready_connect");
 
-        Task GetPersonalNotifyTask(Guid userId, string ticket)
+        Task GetPersonalNotifyTask(Guid userId)
         {
             return _context.Clients
              .Group(userId.ToString())
-             .SendAsync("onMatchBegun", new
-             {
-                 Ticket = ticket,
-                 context.Message.Endpoint
-             });
+             .SendAsync("onReadyToConnect", new { MatchId = context.Message.CorrelationId });
         }
 
-        var notifyTasks = context.Message.Tickets
-            .Select(x => GetPersonalNotifyTask(x.Key, x.Value));
+        var notifyTasks = context.Message.PlayersIds
+            .Select(GetPersonalNotifyTask);
 
         await Task.WhenAll(notifyTasks);
     }
@@ -44,43 +40,38 @@ public class MatchBegunNotifier : IConsumer<INotifyMatchBegun>
 
 public class ServerFoundNotifier : IConsumer<INotifyServerFound>
 {
-    private readonly ILogger<SignalRSagaEventsNotifiers> _logger;
+    private readonly ILogger _logger;
     private readonly IHubContext<MainHub> _context;
 
-    public ServerFoundNotifier(
-    ILogger<SignalRSagaEventsNotifiers> logger,
-    IHubContext<MainHub> context)
+    public ServerFoundNotifier(IHubContext<MainHub> context)
     {
-        _logger = logger;
+        _logger = Log.ForContext<SignalRSagaEventsNotifiers>();
         _context = context;
     }
 
-    public Task Consume(ConsumeContext<INotifyServerFound> context)
+    public async Task Consume(ConsumeContext<INotifyServerFound> context)
     {
-        _logger.LogDebug("Saga Event: {event}", "server_found");
+        _logger.Debug("Saga Event: {event}", "server_found");
 
-        return _context.Clients
-            .Group(context.Message.CorrelationId.ToString())
-            .SendAsync("onServerFound");
+        await _context.Clients.Group(context.Message.LobbyId.ToString())
+         .SendAsync("onServerFound");
     }
 }
 
 public class MatchCanceledNotifier : IConsumer<INotifyMatchCanceled>
 {
-    private readonly ILogger<SignalRSagaEventsNotifiers> _logger;
+    private readonly ILogger _logger;
     private readonly IHubContext<MainHub> _context;
 
-    public MatchCanceledNotifier(
-    ILogger<SignalRSagaEventsNotifiers> logger,
-    IHubContext<MainHub> context)
+    public MatchCanceledNotifier(IHubContext<MainHub> context)
     {
-        _logger = logger;
+        _logger = Log.ForContext<SignalRSagaEventsNotifiers>();
         _context = context;
     }
 
     public Task Consume(ConsumeContext<INotifyMatchCanceled> context)
     {
-        _logger.LogDebug("Saga Event: {event}", "match_canceled");
+        _logger.Debug("Saga Event: {event}", "match_canceled");
 
         return _context.Clients
             .Group(context.Message.CorrelationId.ToString())
@@ -90,20 +81,18 @@ public class MatchCanceledNotifier : IConsumer<INotifyMatchCanceled>
 
 public class MatchAwaitingExpiredNotifier : IConsumer<INotifyMatchAwaitingExpired>
 {
-    private readonly ILogger<SignalRSagaEventsNotifiers> _logger;
+    private readonly ILogger _logger;
     private readonly IHubContext<MainHub> _context;
 
-    public MatchAwaitingExpiredNotifier(
-        ILogger<SignalRSagaEventsNotifiers> logger,
-        IHubContext<MainHub> context)
+    public MatchAwaitingExpiredNotifier(IHubContext<MainHub> context)
     {
-        _logger = logger;
+        _logger = Log.ForContext<SignalRSagaEventsNotifiers>();
         _context = context;
     }
 
     public Task Consume(ConsumeContext<INotifyMatchAwaitingExpired> context)
     {
-        _logger.LogDebug("Saga Event: {event}", "awaiting_expired");
+        _logger.Debug("Saga Event: {event}", "awaiting_expired");
 
         return _context.Clients
             .Group(context.Message.CorrelationId.ToString())

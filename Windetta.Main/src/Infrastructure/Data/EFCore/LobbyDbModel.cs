@@ -1,4 +1,5 @@
-﻿using Windetta.Main.Core.Lobbies;
+﻿using Windetta.Contracts;
+using Windetta.Main.Core.Lobbies;
 using Windetta.Main.Core.Lobbies.Dtos;
 
 namespace Windetta.Main.Infrastructure.Data.EFCore;
@@ -14,7 +15,7 @@ public class LobbyDbModel
 
     public DateTimeOffset Created { get; set; }
     public DateTimeOffset Updated { get; set; }
-    public Bet Bet { get; set; }
+    public FundsInfo Bet { get; set; }
     public IEnumerable<string>? JoinFilters { get; set; }
     public IEnumerable<RoomDbModel> Rooms { get; set; }
 

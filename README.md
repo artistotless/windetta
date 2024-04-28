@@ -16,33 +16,27 @@ Building strong partnerships and employing smart marketing strategies are key el
 ### Details
 ---
 
-*MatchHubs - Flexible lobbies*
+*Lobbies - More than just lobbies*
 
-Introducing MatchHubs - dynamic lobbies for team-based play. Any user can create a MatchHub, specifying the game they want to play and the bets involved. Another user can join, and the game will begin.
-
-
-*Customizable MatchHubs with Plugin System*
-
-MatchHubs are highly customizable through our plugin system, allowing users to tailor filters for incoming players to ensure they meet specific criteria. The MatchHub plugin system offers unparalleled flexibility, allowing you to play with specific individuals or set particular conditions.
+Introducing dynamic lobbies for team-based play. Any user can create a Lobby, specifying the game they want to play and the bets involved. Another user can join, and the game will begin.
+Lobbies are highly customizable through our plugin system, allowing users to tailor filters for incoming players to ensure they meet specific criteria. The LobbyPluginSystem offers unparalleled flexibility, allowing you to play with specific individuals or set particular conditions.
 
 
-*Advertiser Integration: Tournament MatchHubs*
+*Advertiser Integration: Tournaments*
 
-Advertisers on Windetta are not overlooked, as they can create Tournament MatchHubs that are distinct from regular ones. These hubs are a unique way to advertise, as they can display project websites, descriptions and banners.
+Advertisers on Windetta are not overlooked, as they can create Tournaments that are distinct from regular ones. These hubs are a unique way to advertise, as they can display project websites, descriptions and banners.
 
-![image](https://github.com/artistotless/windetta/assets/34582815/ab74e56f-de0c-41ab-989c-1dc830d7e1ad)
-
-
+![image](https://github.com/artistotless/windetta/assets/34582815/cf9e578b-98d4-4475-bed1-f5006a687de3)
 
 
 ---
 
 *How It Works*
 
-1. Any user can create a MatchHub, specifying the game and wager. The game is played.
-2. The initiator can customize the MatchHub with plugins, including filters and conditions (optional).   
-3. Other users can join the existing MatchHub room.
-4. If AutoReadyStrategy is defined, it will determine when to set the MatchHub state to 'Ready' for the game to begin. 
+1. Any user can create a Lobby, specifying the game and wager.
+2. The initiator can customize the Lobby with plugins, including filters and conditions (optional).   
+3. Other users can join the existing Lobby room.
+4. If AutoReadyStrategy is defined, it will determine when to set the Lobby state to 'Ready' for the game to begin. 
 5. The match begins.
 ---
 
@@ -56,12 +50,13 @@ Windetta is more than just a platform; it is a community of individuals united b
 
 ---
 #### *Development Progress*
-- [x] MatchHub system
-- [x] MatchHub plugins 
+- [x] Lobby system
+- [x] Lobby plugins 
 - [x] TopUp, Withdraw TON
 - [x] SignalR integration
 - [x] Windetta.Wallet service
-- [x] Windetta.Operations service
+- [x] LSMP (Local server process manager)
+- [x] GameServer for SeaBattle game
+- [ ] SPA
+- [ ] GameServer for Durak (Fool) card game 
 - [ ] 100% test coverage
-- [ ] LSMP (Local server process manager)
-- [ ] GameServer for SeaBattle

@@ -59,6 +59,7 @@ public class ExternalLoginHandler : IRequestHandler<ExternalLoginRequest, Author
             Email = user.Email,
             Role = Roles.USER,
             UserName = user.UserName,
+            TimeStamp = DateTime.UtcNow,
         });
 
         return context;
@@ -93,6 +94,7 @@ public class ExternalLoginHandler : IRequestHandler<ExternalLoginRequest, Author
         var claims = new List<Claim>()
         {
             new(JwtClaimTypes.Picture, identity.ImageUrl??string.Empty),
+            new(JwtClaimTypes.NickName, identity.DisplayName??string.Empty),
         };
 
         (await _signinManager.UserManager.AddClaimsAsync(user, claims))

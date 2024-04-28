@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using Windetta.Contracts;
 using Windetta.Contracts.Events;
 using Windetta.Main.Core.Lobbies;
 
@@ -19,7 +20,7 @@ namespace Windetta.Main.Web.Api
 
                 var lobby = await interactor.CreateAsync(new()
                 {
-                    Bet = new Bet(1, 100),
+                    Bet = new FundsInfo(1, 100),
                     GameId = gameId,
                     InitiatorId = player1Id
                 });

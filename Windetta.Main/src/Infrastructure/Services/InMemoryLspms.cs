@@ -1,6 +1,8 @@
 ﻿using Windetta.Main.Core.Services.LSPM;
 
-public class InMemoryLspms : ILspms
+namespace Windetta.Main.Infrastructure.Services;
+
+public sealed class InMemoryLspms : ILspms
 {
     private readonly IList<Lspm> _items;
 
