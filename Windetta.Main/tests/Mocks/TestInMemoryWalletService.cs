@@ -2,16 +2,17 @@
 using Windetta.Contracts;
 using Windetta.Contracts.Responses;
 using Windetta.Main.Core.Services.Wallet;
+using Windetta.Wallet.Domain;
 
 namespace Windetta.MainTests.Mocks;
 
 public class TestInMemoryWalletService : IWalletService
 {
-    private readonly List<Wallet.Domain.UserWallet> _wallets;
+    private readonly List<UserWallet> _wallets;
 
     public TestInMemoryWalletService()
     {
-        var balance = new Wallet.Domain.UserBalance()
+        var balance = new UserBalance()
         {
             CurrencyId = 1,
             WalletId = ExampleGuids.UserId
@@ -19,7 +20,7 @@ public class TestInMemoryWalletService : IWalletService
 
         balance.Increase(1000);
 
-        var wallet = new Wallet.Domain.UserWallet()
+        var wallet = new UserWallet()
         {
             UserId = ExampleGuids.UserId,
             Balances = new() { balance },

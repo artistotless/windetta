@@ -11,6 +11,8 @@ public class TonWithdrawMap : SagaClassMap<TonWithdrawFlow>
     {
         entity.Property(x => x.CurrentState).HasMaxLength(64);
         entity.HasIndex(x => x.CorrelationId);
+        entity.Property(x => x.Destination)
+            .HasConversion(tStruct => tStruct.Value, tString => new Contracts.TonAddress(tString));
     }
 }
 

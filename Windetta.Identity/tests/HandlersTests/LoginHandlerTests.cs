@@ -39,7 +39,7 @@ public class LoginHandlerTests
         var response = sut.HandleAsync(request).GetAwaiter().GetResult();
 
         // assert
-        response.ShouldNotBeNull();
+        response.Context.ShouldNotBeNull();
     }
 
     [Fact]

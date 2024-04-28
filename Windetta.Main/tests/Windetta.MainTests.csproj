@@ -15,6 +15,8 @@
     <PackageReference Include="AutoFixture.AutoMoq" Version="4.18.0" />
     <PackageReference Include="Moq" Version="4.18.4" />
     <PackageReference Include="Shouldly" Version="4.2.1" />
+    <PackageReference Include="Windetta.Common" Version="1.0.0" />
+    <PackageReference Include="Windetta.Main.Core" Version="1.0.0" />
     <PackageReference Include="xunit" Version="2.4.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -27,18 +29,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Windetta.Common\src\Windetta.Common.csproj" />
     <ProjectReference Include="..\..\Windetta.Wallet\src\Windetta.Wallet.csproj" />
     <ProjectReference Include="..\src\Windetta.Main.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="LSPM.Models">
-      <HintPath>..\..\..\lspm-models\src\bin\Debug\net8.0\LSPM.Models.dll</HintPath>
-    </Reference>
-    <Reference Include="Windetta.Main.Core">
-      <HintPath>..\..\Windetta.Main.Core\bin\Debug\net8.0\Windetta.Main.Core.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>

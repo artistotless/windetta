@@ -19,10 +19,6 @@
     <PackageReference Include="TonSdk.Core" Version="0.2.8" />
     <PackageReference Include="Portable.BouncyCastle" Version="1.9.0" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Windetta.Common\src\Windetta.Common.csproj" />
-    <ProjectReference Include="..\..\Windetta.Contracts\Windetta.Contracts.csproj" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.8">
@@ -30,6 +26,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="7.0.0" />
+    <PackageReference Include="Windetta.Common" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>
