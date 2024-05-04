@@ -13,6 +13,15 @@ public static class LobbyEndpoints
     {
         var group = web.MapGroup("api/lobbies");
 
+        // Get user's lobby information
+        web.MapGet("api/users/{userId:guid}/lobby", (
+            [FromRoute] Guid userId,
+            [FromServices] IUserLobbyMaps maps) =>
+        {
+            var result = maps.Get(userId);
+            return result.HasValue ? Results.Ok(result) : Results.NotFound();
+        });
+
         // Get lobbies
         group.MapGet("/", async ([FromServices] ILobbies lobbies) =>
         {
