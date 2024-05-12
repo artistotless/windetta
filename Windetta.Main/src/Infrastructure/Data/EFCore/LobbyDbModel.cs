@@ -41,8 +41,8 @@ public class LobbyDbModel
             Bet = dbModel.Bet,
             State = dbModel.State,
             GameId = dbModel.GameId,
-            Created = dbModel.Created,
-            Updated = dbModel.Updated,
+            CreatedAt = dbModel.Created,
+            UpdatedAt = dbModel.Updated,
             Id = dbModel.Id,
             JoinFilters = dbModel.JoinFilters,
             Rooms = dbModel.Rooms.Select(RoomDbModel.MapTo)

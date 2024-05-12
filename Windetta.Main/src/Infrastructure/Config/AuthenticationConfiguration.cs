@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Windetta.Common.Types;
+using Windetta.Main.Infrastructure.Services;
 
-namespace Windetta.Main.Infrastructure.Security;
+namespace Windetta.Main.Infrastructure.Config;
 
 public static class AuthenticationConfiguration
 {
@@ -13,32 +15,31 @@ public static class AuthenticationConfiguration
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         });
 
+        var cfg = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
+
+        authBuilder.AddScheme<RealtimeTokenOptions, RealtimeTokenHandler>
+            (nameof(RealtimeToken), options =>
+            {
+                var section = cfg.GetSection(nameof(RealtimeTokenOptions));
+
+                options.PublicKey = section
+                .GetValue<string>(nameof(RealtimeTokenOptions.PublicKey))
+                ?? throw new Exception("Unable read RealtimeTokenOptions.PublicKey in configuration");
+
+                options.ValidateLifetime = section
+                .GetValue<bool>(nameof(RealtimeTokenOptions.ValidateLifetime));
+            });
+
         authBuilder.AddJwtBearer(options =>
         {
             options.Authority = "https://localhost:7159";
-            //options.Configuration = new OpenIdConnectConfiguration();
             options.RequireHttpsMetadata = false;
+            options.MapInboundClaims = false;
             options.TokenValidationParameters = new TokenValidationParameters
             {
                 ValidateAudience = false,
                 //TODO: set TRUE
                 ValidateLifetime = false,
-            };
-            options.Events = new JwtBearerEvents
-            {
-                OnMessageReceived = context =>
-                {
-                    var accessTokenFromQuery = context.Request.Query["access_token"].ToString();
-                    var accessTokenFromHeader = context.Request.Headers.Authorization.ToString()
-                    .Replace("Bearer ", string.Empty);
-
-                    if (!string.IsNullOrEmpty(accessTokenFromQuery))
-                        context.Token = accessTokenFromHeader;
-                    else
-                        context.Token = accessTokenFromQuery;
-
-                    return Task.CompletedTask;
-                }
             };
         });
     }

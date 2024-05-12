@@ -19,7 +19,7 @@ public static class LobbyEndpoints
             [FromServices] IUserLobbyMaps maps) =>
         {
             var result = maps.Get(userId);
-            return result.HasValue ? Results.Ok(result) : Results.NotFound();
+            return result.HasValue ? Results.Ok(result) : Results.Ok(default(UserLobbyMapEntry));
         });
 
         // Get lobbies

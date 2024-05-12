@@ -1,14 +1,14 @@
 ﻿using System.Security.Authentication;
-using System.Security.Claims;
 using Windetta.Common.Authentication;
+using Windetta.Main.Infrastructure.Security;
 
 namespace Windetta.Main.Infrastructure.Services;
 
-public class HttpContextUserIdProvider : IUserIdProvider
+public class FromHttpContextUserIdProvider : IUserIdProvider
 {
     protected readonly IHttpContextAccessor ContextAccessor;
 
-    public HttpContextUserIdProvider(IHttpContextAccessor contextAccessor)
+    public FromHttpContextUserIdProvider(IHttpContextAccessor contextAccessor)
     {
         ContextAccessor = contextAccessor;
     }
@@ -25,7 +25,7 @@ public class HttpContextUserIdProvider : IUserIdProvider
                 !ContextAccessor.HttpContext.User.Identity.IsAuthenticated)
                 throw new AuthenticationException();
 
-            var idClaim = ContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier);
+            var idClaim = ContextAccessor.HttpContext.User.FindFirst(JwtClaimTypes.Subject);
 
             if (idClaim == null)
                 throw new Exception("Cannot get id claim from HttpContext");

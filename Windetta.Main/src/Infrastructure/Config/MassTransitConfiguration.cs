@@ -5,7 +5,7 @@ using Windetta.Common.MassTransit;
 using Windetta.Contracts.Events;
 using Windetta.Main.Infrastructure.Sagas;
 
-namespace Windetta.Main.Infrastructure.MassTransit;
+namespace Windetta.Main.Infrastructure.Config;
 
 public static class MassTransitConfiguration
 {

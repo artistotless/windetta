@@ -1,4 +1,4 @@
-﻿namespace Windetta.Main.Infrastructure.Security;
+﻿namespace Windetta.Main.Infrastructure.Config;
 
 public static class CorsConfiguration
 {

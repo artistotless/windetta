@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using System.Security.Authentication;
 using Windetta.Common.Types;
 
 namespace Windetta.Common.Middlewares;
@@ -21,17 +22,25 @@ public class ErrorHandlerMiddleware
         {
             await _next.Invoke(context);
         }
-        catch (WindettaException e)
+        catch (WindettaException we)
         {
             context.Response.StatusCode = 400;
-            context.Response.Headers.Append("X-ErrorCode", e.ErrorCode);
-            await context.Response.WriteAsync(e.Message ?? e.ErrorCode.Replace("_", " "));
+            context.Response.Headers.Append("X-ErrorCode", we.ErrorCode);
+            context.Response.ContentType = "application/json";
+            await context.Response.WriteAsJsonAsync(new ErrorDto
+                (we.ErrorCode, we.Message ?? we.ErrorCode.Replace("_", " ")));
+        }
+        catch (AuthenticationException)
+        {
+            context.Response.StatusCode = 200;
+            context.Response.Headers.Append("X-ErrorCode", "401");
+            await context.Response.WriteAsJsonAsync(new ErrorDto("401", "Authentication failure"));
         }
         catch (Exception e)
         {
-            context.Response.StatusCode = 500;
-            await context.Response.WriteAsync("Uknown server error");
             _logger.LogError(e, "Server Error {0}", e.Message);
+            context.Response.StatusCode = 500;
+            await context.Response.WriteAsJsonAsync(new ErrorDto("500", e.Message));
         }
     }
 }

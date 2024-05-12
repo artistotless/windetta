@@ -2,7 +2,7 @@
 
 namespace Windetta.Main.Infrastructure.Services;
 
-public sealed class FromHeaderUserIdProvider : HttpContextUserIdProvider, ISingletonService
+public sealed class FromHeaderUserIdProvider : FromHttpContextUserIdProvider, ISingletonService
 {
     public FromHeaderUserIdProvider(IHttpContextAccessor contextAccessor) : base(contextAccessor)
     {

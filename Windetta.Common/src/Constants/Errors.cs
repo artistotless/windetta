@@ -33,7 +33,9 @@ public static class Errors
     {
         public const string UserNotFound = "user_not_found";
         public const string AuthCodeNotFound = "auth_code_not_found";
+        public const string IsAllowedOnlyForUser = "allowed_only_for_user";
     }
+
     public static class Wallet
     {
         public const string InvalidFreezeAmount = "invalid_freeze_amount";

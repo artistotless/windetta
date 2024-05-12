@@ -6,13 +6,12 @@ using Windetta.Common.Mongo;
 using Windetta.Main.Core.Lobbies.Plugins;
 using Windetta.Main.Core.Lobbies.UseCases;
 using Windetta.Main.Core.Services.LSPM;
+using Windetta.Main.Infrastructure.Config;
 using Windetta.Main.Infrastructure.Consumers;
 using Windetta.Main.Infrastructure.Lobby.Plugins;
 using Windetta.Main.Infrastructure.Logging;
-using Windetta.Main.Infrastructure.MassTransit;
 using Windetta.Main.Infrastructure.Retries;
 using Windetta.Main.Infrastructure.Sagas;
-using Windetta.Main.Infrastructure.Security;
 using Windetta.Main.Infrastructure.Services;
 using Windetta.Main.Infrastructure.SignalR;
 using IUserIdProvider = Windetta.Common.Authentication.IUserIdProvider;
@@ -99,7 +98,7 @@ public static class DependencyResolver
 
     private static void AddUserIdProvider(this IServiceCollection services)
     {
-        services.AddScoped<IUserIdProvider, FromHeaderUserIdProvider>();
+        services.AddScoped<IUserIdProvider, FromHttpContextUserIdProvider>();
     }
 
     private static void ConfigureAddLogging(this WebApplicationBuilder builder)

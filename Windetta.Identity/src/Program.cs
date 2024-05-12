@@ -1,4 +1,5 @@
 using Autofac.Extensions.DependencyInjection;
+using IdentityModel;
 using MassTransit;
 using Serilog;
 using System.Reflection;
@@ -8,6 +9,7 @@ using Windetta.Common.Database;
 using Windetta.Common.MassTransit;
 using Windetta.Common.Redis;
 using Windetta.Common.Types;
+using Windetta.Identity.Config;
 using Windetta.Identity.Extensions;
 using Windetta.Identity.Infrastructure.Data;
 using Windetta.Identity.Infrastructure.Data.Seed;
@@ -30,12 +32,23 @@ builder.Services.AddMysqlDbContext<SagasDbContext>(assemby);
 builder.Services.AddIdentityStore();
 builder.Services.AddControllersWithViews();
 builder.Services.AddIdentityServer4();
-builder.Services.AddAuthorization();
+
+builder.Services.AddAuthorization(cfg =>
+{
+    cfg.AddPolicy("RequireRealtimeScope", builder =>
+    {
+        builder.RequireAuthenticatedUser();
+        builder.RequireClaim(JwtClaimTypes.Scope, "realtime");
+    });
+});
+
 builder.Services.AddControllers();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddRedis();
 builder.Services.AddAuthenticationMethods(); // Adding vk, google .. external auth providers
 builder.Services.ConfigureCustomViewsRouting();
+builder.Services.Configure<RealtimeTokenOptions>
+    (builder.Configuration.GetSection(nameof(RealtimeTokenOptions)));
 
 builder.Services.AddReadyMassTransit(assemby, Svc.Identity, cfg =>
 {
@@ -67,7 +80,6 @@ app.MapControllers();
 
 app.MapGet("/", (ctx) =>
 {
-
     return ctx.Response.WriteAsync("Windetta.Identity");
 
 }).RequireAuthorization();

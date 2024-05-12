@@ -39,8 +39,8 @@ public class LobbyDbModel
         return new LobbyDto()
         {
             Bet = dbModel.Bet,
-            Created = dbModel.Created,
-            Updated = dbModel.Updated,
+            CreatedAt = dbModel.Created,
+            UpdatedAt = dbModel.Updated,
             Id = dbModel.Id,
             GameId = dbModel.GameId,
             State = dbModel.State,

@@ -62,9 +62,11 @@ public static class DependencyResolver
         authBuilder.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
         {
             options.Authority = "https://localhost:7159";
+            options.MapInboundClaims = false;
             options.TokenValidationParameters = new TokenValidationParameters
             {
-                ValidateAudience = false
+                ValidateAudience = false,
+                ValidateLifetime = false,
             };
         });
 

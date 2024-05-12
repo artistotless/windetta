@@ -25,10 +25,7 @@ public class Create : ICreateLobbyUseCase
             throw WalletException.FundsNotEnough;
         }
 
-        ILobby lobby;
-
-        //TODO: delete guid parameter
-        lobby = new Lobby(options, Guid.Parse("195da05a-d3ee-4d8b-917c-a77cf7afa906"));
+        ILobby lobby = new Lobby(options);
 
         lobby.AddMember(new RoomMember(options.InitiatorId), roomIndex: 0);
 

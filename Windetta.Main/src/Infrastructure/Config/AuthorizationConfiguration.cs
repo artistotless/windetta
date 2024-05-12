@@ -1,4 +1,6 @@
-﻿namespace Windetta.Main.Infrastructure.Security;
+﻿using Windetta.Main.Infrastructure.Security;
+
+namespace Windetta.Main.Infrastructure.Config;
 
 internal static class AuthorizationConfiguration
 {

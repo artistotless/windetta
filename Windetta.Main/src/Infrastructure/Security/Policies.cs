@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
 
 namespace Windetta.Main.Infrastructure.Security;
 
@@ -10,14 +9,14 @@ internal static class Policies
         options.AddPolicy("NeedBeUser", p =>
         {
             p.RequireAuthenticatedUser();
-            p.RequireClaim(ClaimTypes.NameIdentifier);
+            p.RequireClaim(JwtClaimTypes.Subject);
         });
 
         options.AddPolicy("NeedRealtimeScope", p =>
         {
             p.RequireAuthenticatedUser();
-            p.RequireClaim(ClaimTypes.NameIdentifier);
-            p.RequireClaim("Scope", "realtime");
+            p.RequireClaim(JwtClaimTypes.Subject);
+            p.RequireClaim(JwtClaimTypes.Scope, "realtime");
         });
     }
 }
