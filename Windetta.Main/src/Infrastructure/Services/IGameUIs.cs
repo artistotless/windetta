@@ -1,6 +1,7 @@
 ﻿using Windetta.Common.Types;
+using Windetta.Main.Infrastructure.GameUIs;
 
-namespace Windetta.Main.Core.Games;
+namespace Windetta.Main.Infrastructure.Services;
 
 /// <summary>
 /// Service storing game ui contents
@@ -10,7 +11,7 @@ public interface IGameUIs : IScopedService
     /// <summary>
     /// Adds the game UI
     /// </summary>
-    public Task AddAsync(Guid gameId, string uiContent);
+    public Task AddAsync(Guid gameId, GameUIResult uiContent);
 
     /// <summary>
     /// Removes the game UI
@@ -20,11 +21,11 @@ public interface IGameUIs : IScopedService
     /// <summary>
     /// Updates the game UI
     /// </summary>
-    public Task UpdateAsync(Guid gameId, string uiContent);
+    public Task UpdateAsync(Guid gameId, GameUIResult uiContent);
 
     /// <summary>
     /// Gets the game UI
     /// </summary>
     /// <returns>HTML+Scripts</returns>
-    public Task<string> GetAsync(Guid gameId);
+    public Task<GameUIResult> GetAsync(Guid gameId);
 }

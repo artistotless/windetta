@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Text;
-using Windetta.Main.Core.Games;
+using Windetta.Common.Types;
+using Windetta.Main.Infrastructure.GameUIs;
+using Windetta.Main.Infrastructure.Services;
 
 namespace Windetta.Main.Web.Api;
 
@@ -13,8 +14,10 @@ public static class GameUIsEndpoints
             [FromRoute] Guid id,
             [FromServices] IGameUIs uis) =>
         {
-            var uiContent = await uis.GetAsync(id);
-            return Results.Content(uiContent, "text/html", Encoding.UTF8);
+            var content = await uis.GetAsync(id);
+            var response = new BaseResponse<GameUIResult>(content);
+
+            return Results.Json(response);
         });
     }
 }

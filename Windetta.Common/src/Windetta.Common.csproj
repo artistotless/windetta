@@ -8,7 +8,7 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Description>Common classes for Windetta project</Description>
     <PackageOutputPath>C:\Projects\windetta-misc\nugets</PackageOutputPath>
-    <Version>1.14.0</Version>
+    <Version>1.17.0</Version>
     <IncludeSymbols>True</IncludeSymbols>
   </PropertyGroup>
 

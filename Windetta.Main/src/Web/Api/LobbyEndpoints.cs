@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Windetta.Common.Authentication;
+using Windetta.Common.Types;
 using Windetta.Main.Core.Clients.Dtos;
 using Windetta.Main.Core.Lobbies;
 using Windetta.Main.Core.Lobbies.Dtos;
@@ -19,13 +20,19 @@ public static class LobbyEndpoints
             [FromServices] IUserLobbyMaps maps) =>
         {
             var result = maps.Get(userId);
-            return result.HasValue ? Results.Ok(result) : Results.Ok(default(UserLobbyMapEntry));
+            var response = new BaseResponse<UserLobbyMapEntry>
+            (result.HasValue ? result.Value : default);
+
+            return Results.Ok(response);
         });
 
         // Get lobbies
         group.MapGet("/", async ([FromServices] ILobbies lobbies) =>
         {
-            return Results.Ok(await lobbies.GetAllAsync());
+            var result = await lobbies.GetAllAsync();
+            var response = new BaseResponse<IEnumerable<LobbyDto>>(result);
+
+            return Results.Ok(response);
         });
 
         // Create lobby
@@ -48,10 +55,11 @@ public static class LobbyEndpoints
             };
 
             var lobby = await interactor.CreateAsync(createRequest);
-
             observer.AddToTracking(lobby);
 
-            return Results.Ok(lobby);
+            var response = new BaseResponse<ILobby>(lobby);
+
+            return Results.Ok(response);
         });
 
         // Join room

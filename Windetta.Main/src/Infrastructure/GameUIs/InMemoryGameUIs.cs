@@ -1,15 +1,16 @@
 ﻿using Windetta.Main.Core.Games;
+using Windetta.Main.Infrastructure.Services;
 
 namespace Windetta.Main.Infrastructure.GameUIs;
 
 public class InMemoryGameUIs : IGameUIs
 {
-    public Task AddAsync(Guid gameId, string uiContent)
+    public Task AddAsync(Guid gameId, GameUIResult uiContent)
     {
         throw new NotImplementedException();
     }
 
-    public Task<string> GetAsync(Guid gameId)
+    public Task<GameUIResult> GetAsync(Guid gameId)
     {
         return GameUIContentLoader.GetUIContent(gameId).AsTask();
     }
@@ -19,7 +20,7 @@ public class InMemoryGameUIs : IGameUIs
         throw new NotImplementedException();
     }
 
-    public Task UpdateAsync(Guid gameId, string uiContent)
+    public Task UpdateAsync(Guid gameId, GameUIResult uiContent)
     {
         throw new NotImplementedException();
     }

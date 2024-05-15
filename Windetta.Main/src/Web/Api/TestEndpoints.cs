@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using Windetta.Common.Types;
 using Windetta.Contracts;
 using Windetta.Contracts.Events;
 using Windetta.Main.Core.Lobbies;
@@ -33,7 +34,9 @@ namespace Windetta.Main.Web.Api
                     CorrelationId = lobby.Id,
                 });
 
-                return Results.Ok(lobby);
+                var response = new BaseResponse<ILobby>(lobby);
+
+                return Results.Ok(response);
             });
         }
     }

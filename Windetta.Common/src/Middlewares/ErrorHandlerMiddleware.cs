@@ -27,20 +27,40 @@ public class ErrorHandlerMiddleware
             context.Response.StatusCode = 400;
             context.Response.Headers.Append("X-ErrorCode", we.ErrorCode);
             context.Response.ContentType = "application/json";
-            await context.Response.WriteAsJsonAsync(new ErrorDto
-                (we.ErrorCode, we.Message ?? we.ErrorCode.Replace("_", " ")));
+
+            var response = new BaseResponse()
+            {
+                Error = we.Message ?? we.ErrorCode.Replace("_", " "),
+                Success = false,
+            };
+
+            await context.Response.WriteAsJsonAsync(response);
         }
         catch (AuthenticationException)
         {
             context.Response.StatusCode = 200;
             context.Response.Headers.Append("X-ErrorCode", "401");
-            await context.Response.WriteAsJsonAsync(new ErrorDto("401", "Authentication failure"));
+
+            var response = new BaseResponse()
+            {
+                Error = "Authentication failure",
+                Success = false,
+            };
+
+            await context.Response.WriteAsJsonAsync(response);
         }
         catch (Exception e)
         {
             _logger.LogError(e, "Server Error {0}", e.Message);
             context.Response.StatusCode = 500;
-            await context.Response.WriteAsJsonAsync(new ErrorDto("500", e.Message));
+
+            var response = new BaseResponse()
+            {
+                Error = e.Message,
+                Success = false,
+            };
+
+            await context.Response.WriteAsJsonAsync(response);
         }
     }
 }
