@@ -17,6 +17,13 @@ public class Game
     public string Title { get; set; }
 
     /// <summary>
+    /// Unique game code
+    /// To display in ui page paths
+    /// </summary>
+    /// <remarks>For example: poker-holdem, battleship</remarks>
+    public string Code { get; set; }
+
+    /// <summary>
     /// Description of the game
     /// </summary>
     public string Description { get; set; }

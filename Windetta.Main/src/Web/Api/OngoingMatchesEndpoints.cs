@@ -46,7 +46,8 @@ public static class OngoingMatchesEndpoints
                 Created = response.Message.Created,
                 GameId = response.Message.GameId,
                 MatchId = response.Message.MatchId,
-                Players = response.Message.Players
+                Players = response.Message.Players,
+                GameServerEndpoint = response.Message.GameServerEndpoint,
             });
 
         });

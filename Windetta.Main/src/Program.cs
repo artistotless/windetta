@@ -34,6 +34,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseLobbyEndpoints();
 app.UseOngoingMatchesEndpoints();
+app.UseGameUIsEndpoints();
 app.MapGet("/", () => "Windetta");
 app.MapHub<MainHub>("/mainHub");
 

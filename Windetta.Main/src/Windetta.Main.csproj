@@ -15,6 +15,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Infrastructure\GameUIs\b15739de-8d5b-4759-a20c-75389b14ecb8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Infrastructure\GameUIs\b15739de-8d5b-4759-a20c-75389b14ecb8">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Polly.Extensions" Version="8.1.0" />
     <PackageReference Include="Serilog" Version="3.1.1" />
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
@@ -27,7 +37,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Windetta.Common" Version="1.14.0" />
-    <PackageReference Include="Windetta.Main.Core" Version="1.2.0" />
+    <PackageReference Include="Windetta.Main.Core" Version="1.4.0" />
   </ItemGroup>
 
   <ItemGroup>

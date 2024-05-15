@@ -39,7 +39,7 @@ public static class IdentityServerBootstrapData
                 ClientId = "windetta.web",
                 ClientSecrets = { new Secret("secret".Sha256()) },
                 AllowedGrantTypes = GrantTypes.CodeAndClientCredentials,
-                RequireConsent = true,
+                RequireConsent = false,
                 Properties = new Dictionary<string, string>(){
                {"verified", "true"}
             },

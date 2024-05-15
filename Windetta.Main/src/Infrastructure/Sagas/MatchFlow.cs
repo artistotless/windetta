@@ -51,6 +51,7 @@ public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
                 MatchId = x.Saga.CorrelationId,
                 GameId = x.Saga.GameId,
                 Players = x.Saga.Players,
+                GameServerEndpoint = x.Saga.GameServerEndpoint,
             })));
 
         During(CreatingMatch,
