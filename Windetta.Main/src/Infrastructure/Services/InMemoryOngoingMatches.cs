@@ -15,7 +15,7 @@ public class InMemoryOngoingMatches : IOngoingMatches
     }
 
     public Task<IEnumerable<Guid>> GetAllAsync()
-        => Task.FromResult(_matches.Values.AsEnumerable());
+        => Task.FromResult(_matches.Values.Distinct().AsEnumerable());
 
     Task<Guid> IOngoingMatches.GetAsync(Guid playerId)
     {
