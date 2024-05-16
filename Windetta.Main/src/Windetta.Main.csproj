@@ -27,7 +27,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Windetta.Common" Version="1.17.0" />
-    <PackageReference Include="Windetta.Main.Core" Version="1.5.0" />
+    <PackageReference Include="Windetta.Main.Core" Version="1.6.0" />
   </ItemGroup>
 
   <ItemGroup>

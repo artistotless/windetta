@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Version>1.5.0</Version>
+    <Version>1.6.0</Version>
     <Platforms>AnyCPU;x86;x64;ARM32</Platforms>
     <Description>Core library for Main service</Description>
     <PackageOutputPath>C:\Projects\windetta-misc\nugets</PackageOutputPath>

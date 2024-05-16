@@ -28,7 +28,7 @@ public class MatchBegunNotifier : IConsumer<INotifyReadyToConnect>
         {
             return _context.Clients
              .Group(userId.ToString())
-             .SendAsync("onReadyToConnect", new { MatchId = context.Message.CorrelationId });
+             .SendAsync("onReadyToConnect", context.Message.CorrelationId);
         }
 
         var notifyTasks = context.Message.PlayersIds

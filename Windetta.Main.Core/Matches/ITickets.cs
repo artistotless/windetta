@@ -7,7 +7,7 @@ namespace Windetta.Main.Core.Matches;
 /// Manages player tickets
 /// </summary>
 /// <remarks>Task: #TvSCrRzC</remarks>
-public interface ITickets : IScopedService
+public interface ITickets : ISingletonService
 {
     /// <summary>
     /// Sets the tickets

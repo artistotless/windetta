@@ -36,7 +36,7 @@ public static class OngoingMatchesEndpoints
             {
                 ticket = await tickets.GetAsync(key);
             }
-            catch
+            catch (KeyNotFoundException)
             {
                 return Results.NotFound();
             }

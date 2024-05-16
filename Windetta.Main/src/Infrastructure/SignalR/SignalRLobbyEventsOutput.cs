@@ -46,6 +46,6 @@ public class SignalRLobbyEventsOutput : ILobbyObserverOutput
 
         var dto = new LobbyDto(lobby);
 
-        await _context.Clients.All.SendAsync("onUpdateddLobby", dto);
+        await _context.Clients.All.SendAsync("onUpdatedLobby", dto);
     }
 }
