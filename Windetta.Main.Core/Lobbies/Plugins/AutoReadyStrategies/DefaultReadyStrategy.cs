@@ -8,6 +8,6 @@ public class DefaultReadyStrategy : AutoReadyStrategy
 
     protected override bool CheckReady()
     {
-        return Lobby.MembersCount >= Lobby.Configuration.MaxPlayersInTeam;
+        return Lobby.MembersCount >= Lobby.Configuration.MaxPlayersInTeam * Lobby.Configuration.MinTeams;
     }
 }

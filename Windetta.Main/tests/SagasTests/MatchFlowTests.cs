@@ -41,11 +41,8 @@ public class MatchFlowTests : IUseHarness
             })
         };
 
-        var ticketsMock = new TicketsMock().Mock;
-
         return SharedServiceProvider.GetInstance(services =>
         {
-            services.AddSingleton(x => ticketsMock.Object);
             services.AddSingleton(p => storageMock.Mock.Object);
             services.AddScoped(p => new LspmsMock().Mock.Object);
             services.ConfigureTestMassTransit(Svc.Main, this);
@@ -121,7 +118,6 @@ public class MatchFlowTests : IUseHarness
         await harness.Bus.Publish<IMatchCreated>(new
         {
             CorrelationId = _correllationId,
-            Tickets = TicketGenerator.Create(2)
         });
 
         await sagaHarness.Consumed.Any<IMatchCreated>();
@@ -193,17 +189,5 @@ public class MatchFlowTests : IUseHarness
         response.Message.Players.ToArray().ShouldBeEquivalentTo(flow.Players.ToArray());
 
         await harness.OutputTimeline(_output, x => x.Now());
-    }
-
-    private static class TicketGenerator
-    {
-        public static Dictionary<Guid, string> Create(int count)
-        {
-            var tickets = new Dictionary<Guid, string>(count);
-            for (var i = 0; i < count; i++)
-                tickets.Add(Guid.NewGuid(), $"ticket#{i}");
-
-            return tickets;
-        }
     }
 }

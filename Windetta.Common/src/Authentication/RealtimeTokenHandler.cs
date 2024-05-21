@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System.Security.Claims;
@@ -6,10 +7,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Encodings.Web;
 using Windetta.Common.Types;
-using Windetta.Main.Infrastructure.Config;
-using Windetta.Main.Infrastructure.Security;
 
-namespace Windetta.Main.Infrastructure.Services;
+namespace Windetta.Common.Authentication;
 
 public class RealtimeTokenHandler : AuthenticationHandler<RealtimeTokenOptions>
 {
@@ -20,27 +19,30 @@ public class RealtimeTokenHandler : AuthenticationHandler<RealtimeTokenOptions>
     {
     }
 
+    private const string VALIDATION_FAIL = "Validation of realtime token failed";
+
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         Logger.LogDebug("RealtimeTokenHandler: begins");
 
-        var tokenFromQuery = Context.Request.Query[JwtClaimTypes.AccessToken].ToString();
-        var tokenFromHeader = Context.Request.Headers.Authorization.ToString()
+        Context.Request.Cookies.TryGetValue("rt", out string? rtFromCookie);
+        var rtIdFromQuery = Context.Request.Query[JwtClaimTypes.AccessToken].ToString();
+        var rtIdFromHeader = Context.Request.Headers.Authorization.ToString()
         .Replace("Bearer ", string.Empty);
 
-        var token = string.IsNullOrEmpty(tokenFromQuery) ? tokenFromHeader : tokenFromQuery;
+        var rtId = string.IsNullOrEmpty(rtIdFromQuery) ? rtIdFromHeader : rtIdFromQuery;
 
-        if (string.IsNullOrEmpty(token))
+        if (string.IsNullOrEmpty(rtId) || string.IsNullOrEmpty(rtFromCookie))
             return AuthenticateResult.Fail("No realtime token");
 
-        var decodedJsonPermitToken = Convert.FromBase64String(token);
+        var decodedJsonToken = Convert.FromBase64String(rtFromCookie);
 
         RealtimeToken? tokenData;
 
         try
         {
             tokenData = JsonConvert.DeserializeObject<RealtimeToken>
-                (Encoding.UTF8.GetString(decodedJsonPermitToken));
+                (Encoding.UTF8.GetString(decodedJsonToken));
         }
         catch
         {
@@ -70,7 +72,7 @@ public class RealtimeTokenHandler : AuthenticationHandler<RealtimeTokenOptions>
 
         var sha256 = SHA256.Create();
         var payloadStream = new MemoryStream(
-            Encoding.UTF8.GetBytes($"{tokenData.UserId}{tokenData.Nickname}{tokenData.Expires}"));
+            Encoding.UTF8.GetBytes($"{rtId}{tokenData.UserId}{tokenData.Nickname}{tokenData.Expires}"));
 
         var payloadHashBytes = await sha256.ComputeHashAsync(payloadStream);
         var signatureBytes = Convert.FromBase64String(tokenData.Signature);
@@ -82,8 +84,8 @@ public class RealtimeTokenHandler : AuthenticationHandler<RealtimeTokenOptions>
         }
         else
         {
-            Logger.LogDebug("RealtimeTokenHandler: verify failed");
-            return AuthenticateResult.Fail("Validation of realtime token's signature is failed");
+            Logger.LogDebug("RealtimeTokenHandler: Validation of realtime token's signature is failed");
+            return AuthenticateResult.Fail(VALIDATION_FAIL);
         }
     }
 

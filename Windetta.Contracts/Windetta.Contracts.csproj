@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
     <Platforms>AnyCPU;x86;x64;ARM32</Platforms>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>1.1.0</Version>
+    <Version>1.3.0</Version>
     <Company>Windetta</Company>
     <Description>Contract classes for Windetta project</Description>
     <PackageOutputPath>C:\Projects\windetta-misc\nugets</PackageOutputPath>
@@ -19,7 +19,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Windetta.LSPM.Models" Version="1.0.0" />
+    <PackageReference Include="Windetta.LSPM.Models" Version="1.2.0" />
   </ItemGroup>
 
 </Project>

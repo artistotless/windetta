@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using System.Security.Cryptography;
 using System.Text;
 using Windetta.Common.Constants;
+using Windetta.Common.Helpers;
 using Windetta.Common.Types;
 using Windetta.Identity.Config;
 using Windetta.Identity.Domain.Entities;
@@ -38,13 +39,14 @@ public class RealtimeTokensController : BaseController
         if (user is null)
             throw new WindettaException(Errors.Identity.UserNotFound);
 
+        var tokenId = Guid.NewGuid().Cut(10);
         var nickname = user.DisplayName;
         var expires = DateTimeOffset
             .UtcNow.AddSeconds(_options.LifetimeSeconds)
             .ToUnixTimeSeconds();
 
         var sha256 = SHA256.Create();
-        var payloadStream = new MemoryStream(Encoding.UTF8.GetBytes($"{UserId}{nickname}{expires}"));
+        var payloadStream = new MemoryStream(Encoding.UTF8.GetBytes($"{tokenId}{UserId}{nickname}{expires}"));
         var hash = await sha256.ComputeHashAsync(payloadStream);
 
         var cryptor = ECDsa.Create();
@@ -64,6 +66,14 @@ public class RealtimeTokensController : BaseController
         var jsonBytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(tokenData));
         var result = Convert.ToBase64String(jsonBytes);
 
-        return Ok(result);
+        Response.Cookies.Append("rt", result, new()
+        {
+            HttpOnly = true,
+            SameSite = SameSiteMode.Strict,
+            Secure = true,
+            MaxAge = TimeSpan.FromSeconds(15)
+        });
+
+        return Ok(tokenId);
     }
 }

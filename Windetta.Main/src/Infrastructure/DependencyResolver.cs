@@ -14,7 +14,9 @@ using Windetta.Main.Infrastructure.Retries;
 using Windetta.Main.Infrastructure.Sagas;
 using Windetta.Main.Infrastructure.Services;
 using Windetta.Main.Infrastructure.SignalR;
+
 using IUserIdProvider = Windetta.Common.Authentication.IUserIdProvider;
+using IUserIdProviderSignalR = Microsoft.AspNetCore.SignalR.IUserIdProvider;
 
 namespace Windetta.Main.Infrastructure;
 
@@ -98,6 +100,7 @@ public static class DependencyResolver
 
     private static void AddUserIdProvider(this IServiceCollection services)
     {
+        services.AddScoped<IUserIdProviderSignalR, SubjectClaimUserIdProvider>();
         services.AddScoped<IUserIdProvider, FromHttpContextUserIdProvider>();
     }
 

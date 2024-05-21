@@ -32,9 +32,9 @@ public class InMemoryOngoingMatches : IOngoingMatches
         return Task.CompletedTask;
     }
 
-    public Task SetRangeAsync(IEnumerable<(Guid matchId, Guid playerId)> values)
+    public Task SetRangeAsync(Guid matchId, IEnumerable<Guid> playersIds)
     {
-        var tasks = values.Select(x => SetAsync(x.matchId, x.playerId));
+        var tasks = playersIds.Select(x => SetAsync(matchId, x));
 
         return Task.WhenAll(tasks);
     }

@@ -17,7 +17,10 @@ public class FakeGamesRepository : IGames
                 Id = ExampleGuids.GameId,
                 Description = "Sea battle",
                 IconPath = "/seabattle.png",
-                Configuration = new GameConfiguration(2,1),
+                Configuration = new GameConfiguration(1, 1)
+                {
+                    MinTeams=2, MaxTeams=2
+                },
                 Title = "Sea battle",
                 SupportedCurrencies = new[] {
                     new SupportedCurrency() {

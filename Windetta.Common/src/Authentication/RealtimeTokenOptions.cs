@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 
-namespace Windetta.Main.Infrastructure.Config;
+namespace Windetta.Common.Authentication;
 
 public sealed class RealtimeTokenOptions : AuthenticationSchemeOptions
 {

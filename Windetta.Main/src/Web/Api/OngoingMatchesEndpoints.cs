@@ -22,30 +22,6 @@ public static class OngoingMatchesEndpoints
             return Results.Ok(response);
         });
 
-        // Get player's ticket
-        web.MapGet("api/matches/{matchId:Guid}/ticket", async (
-            [FromRoute] Guid matchId,
-            [FromServices] IUserIdProvider userIdProvider,
-            [FromServices] ITickets tickets) =>
-        {
-            var key = new TicketKey(matchId, userIdProvider.UserId);
-
-            string ticket;
-
-            try
-            {
-                ticket = await tickets.GetAsync(key);
-            }
-            catch (KeyNotFoundException)
-            {
-                return Results.NotFound();
-            }
-
-            var response = new BaseResponse<string>(ticket);
-
-            return Results.Ok(response);
-        });
-
         // Get ongoing match ID by playerID
         web.MapGet("api/players/{playerId:Guid}/matches/ongoing", async (
             [FromRoute] Guid playerId,

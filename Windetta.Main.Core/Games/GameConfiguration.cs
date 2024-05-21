@@ -30,9 +30,9 @@ public class GameConfiguration
 
     }
 
-    public GameConfiguration(uint maxPlayers, uint minPlayers)
+    public GameConfiguration(uint maxPlayersInTeam, uint minPlayersInTeam)
     {
-        MaxPlayersInTeam = maxPlayers;
-        MinPlayersInTeam = minPlayers;
+        this.MaxPlayersInTeam = maxPlayersInTeam;
+        this.MinPlayersInTeam = minPlayersInTeam;
     }
 }

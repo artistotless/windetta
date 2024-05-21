@@ -38,7 +38,7 @@ builder.Services.AddAuthorization(cfg =>
     cfg.AddPolicy("RequireRealtimeScope", builder =>
     {
         builder.RequireAuthenticatedUser();
-        builder.RequireClaim(JwtClaimTypes.Scope, "realtime");
+        builder.RequireClaim(IdentityModel.JwtClaimTypes.Scope, "realtime");
     });
 });
 

@@ -18,7 +18,7 @@ public interface IOngoingMatches : ISingletonService
     /// Sets the current matches for the players
     /// </summary>
     /// <param name="values">Current matches</param>
-    public Task SetRangeAsync(IEnumerable<(Guid matchId, Guid playerId)> values);
+    public Task SetRangeAsync(Guid matchId, IEnumerable<Guid> playersIds);
 
     /// <summary>
     /// Gets the player's current match

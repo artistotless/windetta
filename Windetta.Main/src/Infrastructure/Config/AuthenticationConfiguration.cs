@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Windetta.Common.Types;
-using Windetta.Main.Infrastructure.Services;
+using Windetta.Common.Authentication;
 
 namespace Windetta.Main.Infrastructure.Config;
 
@@ -18,7 +17,7 @@ public static class AuthenticationConfiguration
         var cfg = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
 
         authBuilder.AddScheme<RealtimeTokenOptions, RealtimeTokenHandler>
-            (nameof(RealtimeToken), options =>
+            ("FirstConnectionAuth", options =>
             {
                 var section = cfg.GetSection(nameof(RealtimeTokenOptions));
 

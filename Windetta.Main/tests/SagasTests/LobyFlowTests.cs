@@ -48,7 +48,6 @@ public class LobyFlowTests : IUseHarness
 
         return SharedServiceProvider.GetInstance(services =>
         {
-            services.AddSingleton(p => new TicketsMock().Mock.Object);
             services.AddSingleton(p => storageMock.Mock.Object);
             services.AddScoped(p => new LspmsMock().Mock.Object);
             services.ConfigureTestMassTransit(Svc.Main, this);
@@ -125,7 +124,6 @@ public class LobyFlowTests : IUseHarness
 
         await using var provider = SharedServiceProvider.GetInstance(services =>
         {
-            services.AddSingleton(p => new TicketsMock().Mock.Object);
             services.RegisterConsumer<AlwaysRespondsSuccessLspmConsumer>();
             services.RegisterConsumer<TestSearchGameServerConsumer>();
             services.AddScoped(p => new LspmsMock(new List<Lspm> { lspm }).Mock.Object);
@@ -171,7 +169,6 @@ public class LobyFlowTests : IUseHarness
 
         await using var provider = SharedServiceProvider.GetInstance(services =>
         {
-            services.AddSingleton(p => new TicketsMock().Mock.Object);
             services.RegisterConsumer<AlwaysOverloadLspmConsumer>();
             services.RegisterConsumer<TestSearchGameServerConsumer>();
             services.AddScoped(p => new LspmsMock(new List<Lspm> { lspm }).Mock.Object);
@@ -223,10 +220,6 @@ public class LobyFlowTests : IUseHarness
         {
             CorrelationId = correllationId,
             Endpoint = new Uri("https://127.0.0.0:9090"),
-            Tickets = new[] {
-                new Ticket(){PlayerId = Guid.NewGuid(), Value="ffff" },
-                new Ticket(){PlayerId = Guid.NewGuid(), Value="ffff" },
-            }
         });
         await sagaHarness.Consumed.Any<IGameServerFound>();
 
@@ -245,7 +238,6 @@ public class LobyFlowTests : IUseHarness
         // arrange
         await using var provider = SharedServiceProvider.GetInstance(services =>
         {
-            services.AddSingleton(p => new TicketsMock().Mock.Object);
             services.RegisterConsumer<AlwaysFaultSearchGameServerConsumer>();
             services.ConfigureTestMassTransit(Svc.Main, this);
         });

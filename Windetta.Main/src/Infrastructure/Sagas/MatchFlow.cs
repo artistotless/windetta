@@ -33,7 +33,7 @@ public enum MatchFlowState : int
 
 public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
 {
-    public MatchFlowStateMachine(IOngoingMatches matches, ITickets tickets)
+    public MatchFlowStateMachine(IOngoingMatches matches)
     {
         InstanceState(instance => instance.CurrentState);
 
@@ -56,7 +56,6 @@ public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
 
         During(CreatingMatch,
              When(MatchCreated)
-                .SaveTickets(tickets)
                 .SaveOngoingMatch(matches)
                 .NotifyReadyToConnect()
                 .TransitionTo(Running));
@@ -192,30 +191,9 @@ public static class MatchFlowStateMachineExtensions
         return binder.Then(async ctx =>
         {
             var endpoint = ctx.Saga.GameServerEndpoint;
+            var players = ctx.Saga.Players.Select(x => x.Id);
 
-            IEnumerable<(Guid, Guid)> ongoingMatches = ctx.Message
-            .Tickets.Select(t => (ctx.Message.CorrelationId, t.Key));
-
-            await matches.SetRangeAsync(ongoingMatches);
-        });
-    }
-
-    public static EventActivityBinder<MatchFlow, IMatchCreated> SaveTickets(
-    this EventActivityBinder<MatchFlow, IMatchCreated> binder, ITickets tickets)
-    {
-        return binder.Then(async ctx =>
-        {
-            var endpoint = ctx.Saga.GameServerEndpoint;
-
-            IEnumerable<Ticket> goingToSaveTickets = ctx.Message
-            .Tickets.Select(t => new Ticket()
-            {
-                MatchId = ctx.Message.CorrelationId,
-                PlayerId = t.Key,
-                Value = t.Value
-            });
-
-            await tickets.SetRangeAsync(goingToSaveTickets);
+            await matches.SetRangeAsync(ctx.Message.CorrelationId, players);
         });
     }
 

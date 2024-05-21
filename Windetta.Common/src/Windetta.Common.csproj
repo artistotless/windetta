@@ -8,7 +8,7 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Description>Common classes for Windetta project</Description>
     <PackageOutputPath>C:\Projects\windetta-misc\nugets</PackageOutputPath>
-    <Version>1.17.0</Version>
+    <Version>1.19.0</Version>
     <IncludeSymbols>True</IncludeSymbols>
   </PropertyGroup>
 
@@ -75,7 +75,7 @@
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.35.0" />
     <PackageReference Include="TonSdk.Contracts" Version="0.2.4" />
     <PackageReference Include="TonSdk.Core" Version="0.2.8" />
-    <PackageReference Include="Windetta.Contracts" Version="1.1.0" />
+    <PackageReference Include="Windetta.Contracts" Version="1.3.0" />
     <PackageReference Include="xunit.abstractions" Version="2.0.3" />
   </ItemGroup>
 

@@ -1,4 +1,4 @@
-﻿namespace Windetta.Main.Infrastructure.Security;
+﻿namespace Windetta.Common.Types;
 
 public static class JwtClaimTypes
 {
