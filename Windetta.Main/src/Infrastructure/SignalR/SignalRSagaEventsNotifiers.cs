@@ -74,7 +74,7 @@ public class MatchCanceledNotifier : IConsumer<INotifyMatchCanceled>
         _logger.Debug("Saga Event: {event}", "match_canceled");
 
         return _context.Clients
-            .Group(context.Message.CorrelationId.ToString())
+            .Group(context.Message.LobbyId.ToString())
             .SendAsync("onMatchCanceled");
     }
 }
@@ -95,7 +95,7 @@ public class MatchAwaitingExpiredNotifier : IConsumer<INotifyMatchAwaitingExpire
         _logger.Debug("Saga Event: {event}", "awaiting_expired");
 
         return _context.Clients
-            .Group(context.Message.CorrelationId.ToString())
+            .Group(context.Message.LobbyId.ToString())
             .SendAsync("onAwaitingExpired");
     }
 }

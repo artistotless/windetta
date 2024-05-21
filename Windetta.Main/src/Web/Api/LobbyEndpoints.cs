@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Windetta.Common.Authentication;
+using Microsoft.AspNetCore.SignalR;
 using Windetta.Common.Types;
 using Windetta.Main.Core.Clients.Dtos;
 using Windetta.Main.Core.Lobbies;
 using Windetta.Main.Core.Lobbies.Dtos;
 using Windetta.Main.Infrastructure.Services;
+using Windetta.Main.Infrastructure.SignalR;
+
+using IUserIdProvider = Windetta.Common.Authentication.IUserIdProvider;
 
 namespace Windetta.Main.Web.Api;
 
@@ -38,14 +41,16 @@ public static class LobbyEndpoints
         // Create lobby
         group.MapPost("/", async (
             [FromBody] CreateLobbyRequestDto body,
+            [FromServices] IHubContext<MainHub> hub,
             [FromServices] IUserIdProvider userIdProvider,
             [FromServices] LobbyObserver observer,
             [FromServices] LobbiesInteractor interactor) =>
         {
+            var userId = userIdProvider.UserId;
             var createRequest = new CreateLobbyDto()
             {
                 Bet = body.Bet,
-                InitiatorId = userIdProvider.UserId,
+                InitiatorId = userId,
                 GameId = body.GameId,
                 Private = body.Private,
                 Properties = body.Properties,
@@ -57,6 +62,12 @@ public static class LobbyEndpoints
             var lobby = await interactor.CreateAsync(createRequest);
             observer.AddToTracking(lobby);
 
+            await hub.Clients.User(userId.ToString()).SendToMirrorAsync(new
+            {
+                method = MainHub.Methods.SubscribeOnLobbyFlow,
+                data = lobby.Id
+            });
+
             var response = new BaseResponse<ILobby>(lobby);
 
             return Results.Ok(response);
@@ -66,11 +77,20 @@ public static class LobbyEndpoints
         group.MapPost("/{lobbyId:guid}/rooms/{roomIndex:int}", async (
             [FromRoute] Guid lobbyId,
             [FromRoute] ushort roomIndex,
+            [FromServices] IHubContext<MainHub> hub,
             [FromServices] IUserIdProvider userIdProvider,
             [FromServices] LobbiesInteractor interactor) =>
         {
+            var userId = userIdProvider.UserId;
+
             await interactor.JoinMemberAsync
-            (userIdProvider.UserId, lobbyId, roomIndex);
+            (userId, lobbyId, roomIndex);
+
+            await hub.Clients.User(userId.ToString()).SendToMirrorAsync(new
+            {
+                method = MainHub.Methods.SubscribeOnLobbyFlow,
+                data = lobbyId
+            });
 
             return Results.NoContent();
         });
@@ -79,11 +99,20 @@ public static class LobbyEndpoints
         group.MapDelete("/{lobbyId:guid}/rooms/{roomIndex:int}", async (
             [FromRoute] Guid lobbyId,
             [FromRoute] ushort roomIndex,
+            [FromServices] IHubContext<MainHub> hub,
             [FromServices] IUserIdProvider userIdProvider,
             [FromServices] LobbiesInteractor interactor) =>
         {
+            var userId = userIdProvider.UserId;
+
             await interactor.LeaveMemberAsync
-            (userIdProvider.UserId, lobbyId, roomIndex);
+            (userId, lobbyId, roomIndex);
+
+            await hub.Clients.User(userId.ToString()).SendToMirrorAsync(new
+            {
+                method = MainHub.Methods.UnsubscribeFromLobbyFlow,
+                data = lobbyId
+            });
 
             return Results.NoContent();
         });
