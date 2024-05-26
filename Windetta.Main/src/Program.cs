@@ -1,4 +1,5 @@
 ﻿using Autofac.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.HttpOverrides;
 using Serilog;
 using System.Reflection;
 using Windetta.Common.Configuration;
@@ -28,6 +29,10 @@ builder.Host.UseServiceProviderFactory(
 
 var app = builder.Build();
 
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 app.UseMiddleware<ErrorHandlerMiddleware>();
 app.UseCors("allow_any_origins");
 app.UseAuthentication();

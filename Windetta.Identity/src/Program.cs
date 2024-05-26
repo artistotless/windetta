@@ -1,6 +1,7 @@
 using Autofac.Extensions.DependencyInjection;
 using IdentityModel;
 using MassTransit;
+using Microsoft.AspNetCore.HttpOverrides;
 using Serilog;
 using System.Reflection;
 using Windetta.Common.Configuration;
@@ -70,6 +71,10 @@ var app = builder.Build();
 IdentitySeeder.Seed(app);
 IdentityServerConfigurationSeeder.Seed(app);
 
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 app.UseHsts();
 app.UseStaticFiles();
 app.UseIdentityServer();
