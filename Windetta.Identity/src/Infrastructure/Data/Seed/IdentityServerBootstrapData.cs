@@ -44,9 +44,9 @@ public static class IdentityServerBootstrapData
                {"verified", "true"}
             },
                 // where to redirect to after login
-                RedirectUris = { "https://localhost:7084/signin-oidc" },
+                RedirectUris = { "https://localhost:55004/signin-oidc" },
                 // where to redirect to after logout
-                PostLogoutRedirectUris = { "https://localhost:7084/signout-callback-oidc" },
+                PostLogoutRedirectUris = { "https://localhost:55004/signout-callback-oidc" },
                 AllowOfflineAccess = true,
                 AllowedScopes = new List<string>
             {
@@ -59,31 +59,9 @@ public static class IdentityServerBootstrapData
             }
             };
 
-            //JavaScript Client
-            var client2 = new Client
-            {
-                Description = "JavaScript Client",
-                ClientId = "js",
-                ClientName = "JavaScript Client",
-                AllowedGrantTypes = GrantTypes.Code,
-                RequireClientSecret = false,
-                RedirectUris = { "https://localhost:5003/callback.html" },
-                PostLogoutRedirectUris = { "https://localhost:5003/index.html" },
-                AllowedCorsOrigins = { "https://localhost:5003" },
-                RequireConsent = true,
-
-                AllowedScopes =
-                {
-                    IdentityServerConstants.StandardScopes.OpenId,
-                    IdentityServerConstants.StandardScopes.Profile,
-                    IdentityServerConstants.StandardScopes.Email,
-                    "realtime"
-                }
-            };
-
             client1.AllowedCorsOrigins.Add("https://hoppscotch.io");
 
-            return new Client[] { client1, client2 };
+            return new Client[] { client1};
         }
     }
 

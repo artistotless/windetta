@@ -7,7 +7,7 @@ using ILogger = Serilog.ILogger;
 
 namespace Windetta.Main.Infrastructure.Lobby;
 
-public class SignalRSagaEventsNotifiers { }
+public class SignalRSagaLobbyFlowEventsOutput { }
 
 public class MatchBegunNotifier : IConsumer<INotifyReadyToConnect>
 {
@@ -16,7 +16,7 @@ public class MatchBegunNotifier : IConsumer<INotifyReadyToConnect>
 
     public MatchBegunNotifier(IHubContext<MainHub> context)
     {
-        _logger = Log.ForContext<SignalRSagaEventsNotifiers>();
+        _logger = Log.ForContext<SignalRSagaLobbyFlowEventsOutput>();
         _context = context;
     }
 
@@ -45,7 +45,7 @@ public class ServerFoundNotifier : IConsumer<INotifyServerFound>
 
     public ServerFoundNotifier(IHubContext<MainHub> context)
     {
-        _logger = Log.ForContext<SignalRSagaEventsNotifiers>();
+        _logger = Log.ForContext<SignalRSagaLobbyFlowEventsOutput>();
         _context = context;
     }
 
@@ -65,7 +65,7 @@ public class MatchCanceledNotifier : IConsumer<INotifyMatchCanceled>
 
     public MatchCanceledNotifier(IHubContext<MainHub> context)
     {
-        _logger = Log.ForContext<SignalRSagaEventsNotifiers>();
+        _logger = Log.ForContext<SignalRSagaLobbyFlowEventsOutput>();
         _context = context;
     }
 
@@ -86,7 +86,7 @@ public class MatchAwaitingExpiredNotifier : IConsumer<INotifyMatchAwaitingExpire
 
     public MatchAwaitingExpiredNotifier(IHubContext<MainHub> context)
     {
-        _logger = Log.ForContext<SignalRSagaEventsNotifiers>();
+        _logger = Log.ForContext<SignalRSagaLobbyFlowEventsOutput>();
         _context = context;
     }
 

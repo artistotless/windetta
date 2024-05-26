@@ -12,7 +12,7 @@ public class SignalRLobbyEventsOutput : ILobbyObserverOutput
     private readonly IHubContext<MainHub> _context;
 
     public SignalRLobbyEventsOutput(
-        ILogger<SignalRLobbyEventsOutput> logger, 
+        ILogger<SignalRLobbyEventsOutput> logger,
         IHubContext<MainHub> context)
     {
         _logger = logger;
@@ -23,14 +23,23 @@ public class SignalRLobbyEventsOutput : ILobbyObserverOutput
     {
         _logger.LogDebug($"Lobby added: {lobby.Id}");
 
-        await _context.Clients.All.SendAsync("onAddedLobby", lobby.Id.ToString());
+        var dto = new LobbyDto(lobby);
+
+        await _context.Clients.All.SendAsync("onAddedLobby", dto);
     }
 
     public async Task WriteLobbyDeleted(ILobby lobby)
     {
         _logger.LogDebug($"Lobby deleted: {lobby.Id}");
 
-        await _context.Clients.All.SendAsync("onDeletedLobby", lobby.Id.ToString());
+        var tasks = new[]
+        {
+         _context.Clients.Group(lobby.Id.ToString()).SendToMirrorAsync<Guid>(new
+         (MainHub.Methods.UnsubscribeFromLobbyFlow,lobby.Id)),
+        _context.Clients.All.SendAsync("onDeletedLobby", lobby.Id.ToString())
+        };
+
+        await Task.WhenAll(tasks);
     }
 
     public async Task WriteLobbyReady(ILobby lobby)

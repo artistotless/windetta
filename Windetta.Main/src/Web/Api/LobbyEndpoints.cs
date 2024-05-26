@@ -62,11 +62,8 @@ public static class LobbyEndpoints
             var lobby = await interactor.CreateAsync(createRequest);
             observer.AddToTracking(lobby);
 
-            await hub.Clients.User(userId.ToString()).SendToMirrorAsync(new
-            {
-                method = MainHub.Methods.SubscribeOnLobbyFlow,
-                data = lobby.Id
-            });
+            await hub.Clients.User(userId.ToString()).SendToMirrorAsync<Guid>(new
+            (MainHub.Methods.SubscribeOnLobbyFlow, lobby.Id));
 
             var response = new BaseResponse<ILobby>(lobby);
 
@@ -86,11 +83,8 @@ public static class LobbyEndpoints
             await interactor.JoinMemberAsync
             (userId, lobbyId, roomIndex);
 
-            await hub.Clients.User(userId.ToString()).SendToMirrorAsync(new
-            {
-                method = MainHub.Methods.SubscribeOnLobbyFlow,
-                data = lobbyId
-            });
+            await hub.Clients.User(userId.ToString()).SendToMirrorAsync<Guid>(new
+                (MainHub.Methods.SubscribeOnLobbyFlow, lobbyId));
 
             return Results.NoContent();
         });
@@ -108,11 +102,8 @@ public static class LobbyEndpoints
             await interactor.LeaveMemberAsync
             (userId, lobbyId, roomIndex);
 
-            await hub.Clients.User(userId.ToString()).SendToMirrorAsync(new
-            {
-                method = MainHub.Methods.UnsubscribeFromLobbyFlow,
-                data = lobbyId
-            });
+            await hub.Clients.User(userId.ToString()).SendToMirrorAsync<Guid>(new
+                (MainHub.Methods.SubscribeOnLobbyFlow, lobbyId));
 
             return Results.NoContent();
         });
