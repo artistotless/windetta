@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Windetta.Common.Authentication;
+using Windetta.Common.Configuration;
 
 namespace Windetta.Main.Infrastructure.Config;
 
@@ -29,9 +31,12 @@ public static class AuthenticationConfiguration
                 .GetValue<bool>(nameof(RealtimeTokenOptions.ValidateLifetime));
             });
 
+        var clusterMap = services.BuildServiceProvider()
+            .GetRequiredService<IOptions<ClusterMap>>();
+
         authBuilder.AddJwtBearer(options =>
         {
-            options.Authority = "https://localhost:7159";
+            options.Authority = clusterMap.Value.IdentityUrl;
             options.RequireHttpsMetadata = false;
             options.MapInboundClaims = false;
             options.TokenValidationParameters = new TokenValidationParameters

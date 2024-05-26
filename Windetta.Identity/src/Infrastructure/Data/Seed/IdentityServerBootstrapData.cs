@@ -44,9 +44,9 @@ public static class IdentityServerBootstrapData
                {"verified", "true"}
             },
                 // where to redirect to after login
-                RedirectUris = { "https://localhost:55004/signin-oidc" },
+                RedirectUris = { "https://feed78.com:55004/signin-oidc" },
                 // where to redirect to after logout
-                PostLogoutRedirectUris = { "https://localhost:55004/signout-callback-oidc" },
+                PostLogoutRedirectUris = { "https://feed78.com:55004/signout-callback-oidc" },
                 AllowOfflineAccess = true,
                 AllowedScopes = new List<string>
             {

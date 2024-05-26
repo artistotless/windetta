@@ -17,6 +17,7 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 builder.Host.UseSerilog();
+builder.ConfigureClusterMap();
 builder.ConfigureComponentLaunchSettings();
 builder.AddInfrastructureLayer();
 
