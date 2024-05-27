@@ -1,5 +1,7 @@
-﻿using IdentityServer4.EntityFramework.DbContexts;
+﻿using IdentityServer4;
+using IdentityServer4.EntityFramework.DbContexts;
 using IdentityServer4.EntityFramework.Mappers;
+using IdentityServer4.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Windetta.Identity.Infrastructure.Data.Seed;
@@ -12,6 +14,7 @@ public static class IdentityServerConfigurationSeeder
             .GetService<IServiceScopeFactory>()!.CreateScope();
 
         var provider = serviceScope.ServiceProvider;
+        var cfg = provider.GetRequiredService<IConfiguration>();
         var dbContext = provider.GetRequiredService<ConfigurationDbContext>();
         var persisteddbContext = provider.GetRequiredService<PersistedGrantDbContext>();
 
@@ -42,8 +45,43 @@ public static class IdentityServerConfigurationSeeder
             dbContext.SaveChanges();
         }
 
-        foreach (var client in IdentityServerBootstrapData.Clients)
+        var initialClients = cfg
+            .GetSection("InitialClients")
+            .Get<IEnumerable<InitialClient>>();
+
+        foreach (var item in initialClients)
+        {
+            // interactive ASP.NET Core MVC client
+            var client = new Client
+            {
+                Description = item.Description,
+                ClientId = item.ClientId,
+                ClientSecrets = { new Secret(item.Secrets.Sha256()) },
+                AllowedGrantTypes = GrantTypes.CodeAndClientCredentials,
+                RequireConsent = item.RequireConsent,
+                Properties = new Dictionary<string, string>(){
+               {"verified", "true"}
+            },
+                // where to redirect to after login
+                RedirectUris = item.RedirectUris,
+                // where to redirect to after logout
+                PostLogoutRedirectUris = item.PostLogoutRedirectUris,
+                AllowOfflineAccess = true,
+                AllowedScopes = new List<string>
+            {
+                IdentityServerConstants.StandardScopes.OpenId,
+                IdentityServerConstants.StandardScopes.Profile,
+                IdentityServerConstants.StandardScopes.Email,
+                IdentityServerConstants.StandardScopes.Address,
+                IdentityServerConstants.StandardScopes.OfflineAccess,
+                "realtime",
+            }
+            };
+
+            client.AllowedCorsOrigins.Add("https://hoppscotch.io");
+
             dbContext.Clients.Add(client.ToEntity());
+        }
 
         dbContext.SaveChanges();
         #endregion

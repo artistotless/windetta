@@ -27,42 +27,4 @@ public static class IdentityServerBootstrapData
                 Description = "Manage lobbies: create, join, leave"
             },
         };
-
-    public static IEnumerable<Client> Clients
-    {
-        get
-        {
-            // interactive ASP.NET Core MVC client
-            var client1 = new Client
-            {
-                Description = "Official windetta web appliccation",
-                ClientId = "windetta.web",
-                ClientSecrets = { new Secret("secret".Sha256()) },
-                AllowedGrantTypes = GrantTypes.CodeAndClientCredentials,
-                RequireConsent = false,
-                Properties = new Dictionary<string, string>(){
-               {"verified", "true"}
-            },
-                // where to redirect to after login
-                RedirectUris = { "https://feed78.com:55004/signin-oidc" },
-                // where to redirect to after logout
-                PostLogoutRedirectUris = { "https://feed78.com:55004/signout-callback-oidc" },
-                AllowOfflineAccess = true,
-                AllowedScopes = new List<string>
-            {
-                IdentityServerConstants.StandardScopes.OpenId,
-                IdentityServerConstants.StandardScopes.Profile,
-                IdentityServerConstants.StandardScopes.Email,
-                IdentityServerConstants.StandardScopes.Address,
-                IdentityServerConstants.StandardScopes.OfflineAccess,
-                "realtime",
-            }
-            };
-
-            client1.AllowedCorsOrigins.Add("https://hoppscotch.io");
-
-            return new Client[] { client1};
-        }
-    }
-
 }
