@@ -56,7 +56,7 @@ public static class IdentityServerConfigurationSeeder
             {
                 Description = item.Description,
                 ClientId = item.ClientId,
-                ClientSecrets = { new Secret(item.Secrets.Sha256()) },
+                ClientSecrets = { new Secret(item.ClientSecrets.Sha256()) },
                 AllowedGrantTypes = GrantTypes.CodeAndClientCredentials,
                 RequireConsent = item.RequireConsent,
                 Properties = new Dictionary<string, string>(){
