@@ -52,6 +52,7 @@
 
   <ItemGroup>
     <Folder Include="Infrastructure\Data\Migrations\SagasDb\" />
+    <Folder Include="Logs\" />
   </ItemGroup>
 
   <ItemGroup>
