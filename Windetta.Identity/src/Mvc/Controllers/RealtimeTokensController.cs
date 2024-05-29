@@ -67,10 +67,11 @@ public class RealtimeTokensController : BaseController
         var result = Convert.ToBase64String(jsonBytes);
         var uri = new Uri($"http://{HttpContext.Request.Host.Value}");
         var host = uri.Host;
+        var dotIndex = host.IndexOf('.');
 
         Response.Cookies.Append("rt", result, new()
         {
-            Domain = host.Substring(host.IndexOf('.')),
+            Domain = dotIndex < 1 ? host : host.Substring(dotIndex),
             HttpOnly = true,
             SameSite = SameSiteMode.Strict,
             Secure = true,
