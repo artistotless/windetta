@@ -65,13 +65,16 @@ public class RealtimeTokensController : BaseController
 
         var jsonBytes = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(tokenData));
         var result = Convert.ToBase64String(jsonBytes);
+        var uri = new Uri($"http://{HttpContext.Request.Host.Value}");
+        var host = uri.Host;
 
         Response.Cookies.Append("rt", result, new()
         {
+            Domain = host.Substring(host.IndexOf('.')),
             HttpOnly = true,
             SameSite = SameSiteMode.Strict,
             Secure = true,
-            MaxAge = TimeSpan.FromSeconds(15)
+            MaxAge = TimeSpan.FromSeconds(6)
         });
 
         return Ok(tokenId);

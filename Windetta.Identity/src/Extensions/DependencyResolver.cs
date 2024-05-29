@@ -61,7 +61,12 @@ public static class DependencyResolver
 
         authBuilder.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
         {
+            // TODO: remove directives, fetch authority from appsettings or environment
+#if DEBUG
             options.Authority = "https://localhost:55002";
+#else
+            options.Authority = "https://identity.feed78.com";
+#endif
             options.MapInboundClaims = false;
             options.TokenValidationParameters = new TokenValidationParameters
             {
