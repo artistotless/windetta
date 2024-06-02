@@ -10,12 +10,18 @@
         <div class="w-full max-w-md mr-auto ml-auto mt-4">
             <div class="bg-white shadow-lg rounded-md px-8 py-8 mb-4 ml-auto mr-auto">
                 <form asp-route="Register">
+                    <div class="mb-4">
+                        <label asp-for="Username" class="block text-gray-700 text-sm font-medium mb-2" for="username">
+                            Username
+                        </label>
+                        <input asp-for="Username" autofocus class="shadow-sm appearance-none border border-gray-400 rounded w-full py-3 px-3 text-gray-700 text-sm leading-tight focus:outline-none focus:border-indigo-300" id="username" type="text" placeholder="mr-beast778">
+                    </div>
                         <div class="mb-4">
                         <label asp-for="Email" class="block text-gray-700 text-sm font-medium mb-2" for="email">
                                 Email
                                 address
                             </label>
-                            <input asp-for="Email" autofocus class="shadow-sm appearance-none border border-gray-400 rounded w-full py-3 px-3 text-gray-700 text-sm leading-tight focus:outline-none focus:border-indigo-300" id="email" type="text" placeholder="user@example.com">
+                            <input asp-for="Email" class="shadow-sm appearance-none border border-gray-400 rounded w-full py-3 px-3 text-gray-700 text-sm leading-tight focus:outline-none focus:border-indigo-300" id="email" type="text" placeholder="user@example.com">
                         </div>
                         <div class="mb-6">
                             <label asp-for="Password" class="block text-gray-700 text-sm font-medium mb-2" for="password"> Password </label>
