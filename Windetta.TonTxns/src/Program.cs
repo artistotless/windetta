@@ -24,8 +24,8 @@ builder.ConfigureComponentLaunchSettings();
 
 var assembly = Assembly.GetExecutingAssembly();
 
-builder.Services.AddMysqlDbContext<TonDbContext>(assembly);
-builder.Services.AddMysqlDbContext<SagasDbContext>(assembly);
+builder.Services.AddMysqlDbContext<TonDbContext>(assembly, applyMigrations: true);
+builder.Services.AddMysqlDbContext<SagasDbContext>(assembly, applyMigrations: true);
 builder.Services.AddHostedService<DepositPollerService>();
 builder.Services.AddDepositAddress();
 builder.Services.AddHttpTonApi();

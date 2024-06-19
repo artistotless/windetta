@@ -39,7 +39,7 @@ public static class DependencyResolver
         services.AddLobbyPlugins();
         services.AddMongo();
         services.AddPolyRetries();
-        services.AddMysqlDbContext<SagasDbContext>(assembly);
+        services.AddMysqlDbContext<SagasDbContext>(assembly, applyMigrations: true);
         services.AddInMemoryLspms();
         services.AddConfigureMassTransit(assembly);
     }

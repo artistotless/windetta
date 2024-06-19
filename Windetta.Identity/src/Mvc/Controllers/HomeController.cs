@@ -1,12 +1,12 @@
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Windetta.Common.IdentityServer;
+using Windetta.Common.Constants;
 using Windetta.Identity.Models;
 
 namespace IdentityServerHost.Quickstart.UI
 {
-    [Authorize(AuthenticationSchemes = BearerCookies.Scheme)]
+    [Authorize(AuthenticationSchemes = AuthSchemes.BearerCookies)]
     [Route("[controller]/[action]")]
     public class HomeController : Controller
     {

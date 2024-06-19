@@ -1,12 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Serilog;
+using Windetta.Common.Constants;
 using Windetta.Main.Core.Lobbies;
 using IUserIdProvider = Windetta.Common.Authentication.IUserIdProvider;
 
 namespace Windetta.Main.Infrastructure.SignalR;
 
-[Authorize(AuthenticationSchemes = "FirstConnectionAuth")]
+[Authorize(AuthenticationSchemes = AuthSchemes.FirstConnectionAuth)]
 [Authorize(Policy = "RequireRealtimeScope")]
 public class MainHub : Hub
 {

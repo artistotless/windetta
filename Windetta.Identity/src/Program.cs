@@ -1,5 +1,4 @@
 using Autofac.Extensions.DependencyInjection;
-using IdentityModel;
 using MassTransit;
 using Microsoft.AspNetCore.HttpOverrides;
 using Serilog;
@@ -28,8 +27,8 @@ builder.ConfigureComponentLaunchSettings();
 
 var assemby = Assembly.GetExecutingAssembly();
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
-builder.Services.AddMysqlDbContext<IdentityDbContext>(assemby);
-builder.Services.AddMysqlDbContext<SagasDbContext>(assemby);
+builder.Services.AddMysqlDbContext<IdentityDbContext>(assemby, applyMigrations: true);
+builder.Services.AddMysqlDbContext<SagasDbContext>(assemby, applyMigrations: true);
 builder.Services.AddIdentityStore();
 builder.Services.AddControllersWithViews();
 builder.Services.AddIdentityServer4();

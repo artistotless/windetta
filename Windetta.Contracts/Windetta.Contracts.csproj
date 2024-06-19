@@ -9,7 +9,7 @@
     <Version>1.3.0</Version>
     <Company>Windetta</Company>
     <Description>Contract classes for Windetta project</Description>
-    <PackageOutputPath>C:\Projects\windetta-misc\nugets</PackageOutputPath>
+    <PackageOutputPath>..\..\..\windetta-misc\nugets</PackageOutputPath>
     <IncludeSymbols>True</IncludeSymbols>
   </PropertyGroup>
 
