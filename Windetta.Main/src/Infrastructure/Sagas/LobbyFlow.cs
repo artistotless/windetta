@@ -54,11 +54,12 @@ public class LobbyFlowStateMachine : MassTransitStateMachine<LobbyFlow>
             When(GameServerReservationFailed)
                 .NotifyMatchAwaitingExpired()
                 .NotifyCancelMatch(reason => "GameServers unavailable"),
+
              When(GameServerFound)
                 .NotifyServerFound()
                 .CreateMatchFlow()
                 .DeleteLobby(interactor)
-                .TransitionTo(ServerFound)); ;
+                .TransitionTo(ServerFound));
 
         SetCompletedWhenFinalized();
     }
@@ -132,8 +133,8 @@ public static class LobbyFlowStateMachineExtensions
         }));
     }
 
-    public static EventActivityBinder<LobbyFlow, IGameServerFound> DeleteLobby(
-    this EventActivityBinder<LobbyFlow, IGameServerFound> binder, LobbiesInteractor interactor)
+    public static EventActivityBinder<LobbyFlow, TData> DeleteLobby<TData>(
+        this EventActivityBinder<LobbyFlow, TData> binder, LobbiesInteractor interactor) where TData : class
     {
         return binder.ThenAsync(ctx => interactor.DeleteAsync(ctx.Saga.LobbyId));
     }

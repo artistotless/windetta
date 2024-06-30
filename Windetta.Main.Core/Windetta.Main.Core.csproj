@@ -7,14 +7,14 @@
     <Version>1.9.0</Version>
     <Platforms>AnyCPU;x86;x64;ARM32</Platforms>
     <Description>Core library for Main service</Description>
-    <PackageOutputPath>..\..\..\windetta-misc\nugets</PackageOutputPath>
+    <PackageOutputPath>E:\Projects\windetta-misc\nugets</PackageOutputPath>
     <IncludeSymbols>True</IncludeSymbols>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Windetta.Common" Version="1.25.0" />
-    <PackageReference Include="Windetta.Contracts" Version="1.3.0" />
+    <PackageReference Include="Windetta.Contracts" Version="1.10.0" />
     <PackageReference Include="Windetta.LSPM.Models" Version="1.2.0" />
   </ItemGroup>
 

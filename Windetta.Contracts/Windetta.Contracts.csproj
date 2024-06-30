@@ -6,10 +6,10 @@
     <Nullable>enable</Nullable>
     <Platforms>AnyCPU;x86;x64;ARM32</Platforms>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-    <Version>1.3.0</Version>
+    <Version>1.10.0</Version>
     <Company>Windetta</Company>
     <Description>Contract classes for Windetta project</Description>
-    <PackageOutputPath>..\..\..\windetta-misc\nugets</PackageOutputPath>
+    <PackageOutputPath>E:\Projects\windetta-misc\nugets</PackageOutputPath>
     <IncludeSymbols>True</IncludeSymbols>
   </PropertyGroup>
 

@@ -1,6 +1,4 @@
-﻿using Windetta.Contracts.Responses;
-
-namespace LSPM.Models;
+﻿namespace Windetta.Contracts.Responses;
 
 public sealed class GameServerResponse : ServiceResponse
 {

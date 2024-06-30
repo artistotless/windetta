@@ -1,8 +1,8 @@
-﻿using LSPM.Models;
-using MassTransit;
+﻿using MassTransit;
 using Polly.Registry;
 using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
+using Windetta.Contracts.Responses;
 using Windetta.Main.Core.Exceptions;
 using Windetta.Main.Core.Services.LSPM;
 
