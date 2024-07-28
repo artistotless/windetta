@@ -26,12 +26,15 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Windetta.Common" Version="1.25.0" />
-    <PackageReference Include="Windetta.Main.Core" Version="1.9.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Logs\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Windetta.Common\src\Windetta.Common.csproj" />
+    <ProjectReference Include="..\..\Windetta.Main.Core\Windetta.Main.Core.csproj" />
   </ItemGroup>
 
 </Project>

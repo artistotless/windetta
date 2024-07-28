@@ -62,8 +62,10 @@ public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
 
         During(Running,
             When(CancellationRequested)
+                .RemoveOngoingMatch(matches)
                 .CancelMatch(reason => reason.Reason),
             When(MatchCompleted)
+                .RemoveOngoingMatch(matches)
                 .TransitionTo(ProcessingWinnings)
                 .ProcessWinnings());
 
@@ -190,10 +192,22 @@ public static class MatchFlowStateMachineExtensions
     {
         return binder.Then(async ctx =>
         {
-            var endpoint = ctx.Saga.GameServerEndpoint;
-            var players = ctx.Saga.Players.Select(x => x.Id);
+            var ongoingMatch = new OngoingMatchPlayersReference(
+                ctx.Message.CorrelationId,
+                ctx.Saga.Players);
 
-            await matches.SetRangeAsync(ctx.Message.CorrelationId, players);
+            await matches.AddAsync(ongoingMatch);
+        });
+    }
+
+    public static EventActivityBinder<MatchFlow, TData> RemoveOngoingMatch<TData>(
+        this EventActivityBinder<MatchFlow, TData> binder, IOngoingMatches matches) where TData : class
+    {
+        return binder.Then(async ctx =>
+        {
+            var endpoint = ctx.Saga.GameServerEndpoint;
+
+            await matches.RemoveAsync(ctx.Saga.CorrelationId);
         });
     }
 

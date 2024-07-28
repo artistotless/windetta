@@ -16,7 +16,7 @@ public static class OngoingMatchesEndpoints
         web.MapGet("api/matches/ongoing", async (
             [FromServices] IOngoingMatches matches) =>
         {
-            var ids = await matches.GetAllAsync();
+            var ids = await matches.GetAllIdsAsync();
             var response = new BaseResponse<IEnumerable<Guid>>(ids);
 
             return Results.Ok(response);
@@ -28,7 +28,7 @@ public static class OngoingMatchesEndpoints
             [FromServices] IOngoingMatches matches,
             [FromServices] IUserIdProvider userIdProvider) =>
         {
-            var matchId = await matches.GetAsync(playerId);
+            var matchId = await matches.GetMatchIdOfPlayerAsync(playerId);
             var response = new BaseResponse<Guid>(matchId);
 
             return Results.Ok(response);
@@ -48,13 +48,13 @@ public static class OngoingMatchesEndpoints
             || !matchInfoResponse.Message.Success)
                 return Results.NotFound();
 
-            var match = new OngoingMatch()
+            var gameId = matchInfoResponse.Message.GameId;
+            var players = matchInfoResponse.Message.Players;
+
+            var match = new OngoingMatch(matchId, gameId, players)
             {
                 Bet = matchInfoResponse.Message.Bet,
                 Created = matchInfoResponse.Message.Created,
-                GameId = matchInfoResponse.Message.GameId,
-                MatchId = matchInfoResponse.Message.MatchId,
-                Players = matchInfoResponse.Message.Players,
                 GameServerEndpoint = matchInfoResponse.Message.GameServerEndpoint,
             };
 

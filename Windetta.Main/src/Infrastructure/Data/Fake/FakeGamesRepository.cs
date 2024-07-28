@@ -26,6 +26,21 @@ public class FakeGamesRepository : IGames
                     new SupportedCurrency() {
                         CurrencyId = 1, MaxBet = 1000, MinBet = 100
                     }}
+            },
+                        new Game()
+            {
+                Id = Guid.Parse("b9d9e5fd-0079-4f45-9347-d09b005ed498"),
+                Description = "TestGame",
+                IconPath = "/test_game.png",
+                Configuration = new GameConfiguration(1, 1)
+                {
+                    MinTeams=2, MaxTeams=2
+                },
+                Title = "TestGame",
+                SupportedCurrencies = new[] {
+                    new SupportedCurrency() {
+                        CurrencyId = 1, MaxBet = 1000, MinBet = 10
+                    }}
             }
         };
     }

@@ -46,12 +46,15 @@
     <PackageReference Include="MongoDB.Driver" Version="2.22.0" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.2" />
     <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
-    <PackageReference Include="Windetta.Common" Version="1.25.0" />
-    <PackageReference Include="Windetta.Contracts" Version="1.10.0" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Infrastructure\Data\Migrations\SagasDb\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Windetta.Common\src\Windetta.Common.csproj" />
+    <ProjectReference Include="..\..\Windetta.Contracts\Windetta.Contracts.csproj" />
   </ItemGroup>
 
   <ItemGroup>

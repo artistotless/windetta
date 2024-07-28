@@ -13,9 +13,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Windetta.Common" Version="1.25.0" />
-    <PackageReference Include="Windetta.Contracts" Version="1.10.0" />
-    <PackageReference Include="Windetta.LSPM.Models" Version="1.2.0" />
+    <ProjectReference Include="..\..\lspm-models\src\LSPM.Models.csproj" />
+    <ProjectReference Include="..\Windetta.Common\src\Windetta.Common.csproj" />
+    <ProjectReference Include="..\Windetta.Contracts\Windetta.Contracts.csproj" />
   </ItemGroup>
 
 </Project>
