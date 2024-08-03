@@ -7,7 +7,7 @@ using ILogger = Serilog.ILogger;
 
 namespace Windetta.Main.Infrastructure.Lobby;
 
-public class SignalRSagaLobbyFlowEventsOutput { }
+public class SignalRSagaEventsOutput { }
 
 public class MatchBegunNotifier : IConsumer<INotifyReadyToConnect>
 {
@@ -16,11 +16,11 @@ public class MatchBegunNotifier : IConsumer<INotifyReadyToConnect>
 
     public MatchBegunNotifier(IHubContext<MainHub> context)
     {
-        _logger = Log.ForContext<SignalRSagaLobbyFlowEventsOutput>();
+        _logger = Log.ForContext<SignalRSagaEventsOutput>();
         _context = context;
     }
 
-    public async Task Consume(ConsumeContext<INotifyReadyToConnect> context)
+    public Task Consume(ConsumeContext<INotifyReadyToConnect> context)
     {
         _logger.Debug("Saga Event: {event}", "ready_connect");
 
@@ -34,7 +34,7 @@ public class MatchBegunNotifier : IConsumer<INotifyReadyToConnect>
         var notifyTasks = context.Message.PlayersIds
             .Select(GetPersonalNotifyTask);
 
-        await Task.WhenAll(notifyTasks);
+        return Task.WhenAll(notifyTasks);
     }
 }
 
@@ -45,7 +45,7 @@ public class ServerFoundNotifier : IConsumer<INotifyServerFound>
 
     public ServerFoundNotifier(IHubContext<MainHub> context)
     {
-        _logger = Log.ForContext<SignalRSagaLobbyFlowEventsOutput>();
+        _logger = Log.ForContext<SignalRSagaEventsOutput>();
         _context = context;
     }
 
@@ -65,7 +65,7 @@ public class MatchCanceledNotifier : IConsumer<INotifyMatchCanceled>
 
     public MatchCanceledNotifier(IHubContext<MainHub> context)
     {
-        _logger = Log.ForContext<SignalRSagaLobbyFlowEventsOutput>();
+        _logger = Log.ForContext<SignalRSagaEventsOutput>();
         _context = context;
     }
 
@@ -73,29 +73,16 @@ public class MatchCanceledNotifier : IConsumer<INotifyMatchCanceled>
     {
         _logger.Debug("Saga Event: {event}", "match_canceled");
 
-        return _context.Clients
-            .Group(context.Message.LobbyId.ToString())
-            .SendAsync("onMatchCanceled");
-    }
-}
+        Task GetPersonalNotifyTask(Guid userId)
+        {
+            return _context.Clients
+             .Group(userId.ToString())
+             .SendAsync("onMatchCanceled", context.Message.Reason);
+        }
 
-public class MatchAwaitingExpiredNotifier : IConsumer<INotifyMatchAwaitingExpired>
-{
-    private readonly ILogger _logger;
-    private readonly IHubContext<MainHub> _context;
+        var notifyTasks = context.Message.UsersIds
+            .Select(GetPersonalNotifyTask);
 
-    public MatchAwaitingExpiredNotifier(IHubContext<MainHub> context)
-    {
-        _logger = Log.ForContext<SignalRSagaLobbyFlowEventsOutput>();
-        _context = context;
-    }
-
-    public Task Consume(ConsumeContext<INotifyMatchAwaitingExpired> context)
-    {
-        _logger.Debug("Saga Event: {event}", "awaiting_expired");
-
-        return _context.Clients
-            .Group(context.Message.LobbyId.ToString())
-            .SendAsync("onAwaitingExpired");
+        return Task.WhenAll(notifyTasks);
     }
 }

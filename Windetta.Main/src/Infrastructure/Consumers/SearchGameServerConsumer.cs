@@ -30,16 +30,15 @@ public class SearchGameServerConsumer : IConsumer<ISearchGameServer>
     public async Task Consume(ConsumeContext<ISearchGameServer> context)
     {
         var allLspms = await _lspms.GetAllAsync();
-        var pipeline = _retryPolicy?.GetPipeline
-            (typeof(SearchGameServerConsumer));
+        var pipeline = _retryPolicy?.GetPipeline(typeof(SearchGameServerConsumer));
 
         GameServerResponse result;
 
         if (pipeline is null)
             result = await RequestGameServer(context.Message, allLspms);
         else
-            result = await pipeline.ExecuteAsync(
-            async token => await RequestGameServer(context.Message, allLspms));
+            result = await pipeline.ExecuteAsync(async token =>
+            await RequestGameServer(context.Message, allLspms));
 
         await context.Publish<IGameServerFound>(new
         {
@@ -50,8 +49,7 @@ public class SearchGameServerConsumer : IConsumer<ISearchGameServer>
         });
     }
 
-    private async Task<GameServerResponse> RequestGameServer
-       (ISearchGameServer message, IEnumerable<Lspm> allLspms)
+    private async Task<GameServerResponse> RequestGameServer(ISearchGameServer message, IEnumerable<Lspm> allLspms)
     {
         if (allLspms is null || allLspms.Count() == 0)
             throw LspmException.NotFound;
@@ -67,7 +65,9 @@ public class SearchGameServerConsumer : IConsumer<ISearchGameServer>
         foreach (var item in allLspms)
         {
             _current_lspm = item.Endpoint.DnsSafeHost;
+
             request.LspmIp = _current_lspm;
+
             var response = await SendDurableRequest(request);
 
             if (response is not null && response.Success)
@@ -90,9 +90,10 @@ public class SearchGameServerConsumer : IConsumer<ISearchGameServer>
         try
         {
             request.TimeStamp = DateTime.UtcNow;
-            var response = await _client.GetResponse<GameServerResponse>
-            (request, x => x.UseExecute(setExpirationHeader),
-            timeout: RequestTimeout.After(s: REQUEST_TIMEOUT_SECONDS));
+
+            var response = await _client.GetResponse<GameServerResponse>(request,
+                x => x.UseExecute(setExpirationHeader),
+                timeout: RequestTimeout.After(s: REQUEST_TIMEOUT_SECONDS));
 
             return response.Message;
         }

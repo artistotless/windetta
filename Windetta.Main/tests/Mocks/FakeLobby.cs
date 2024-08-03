@@ -67,13 +67,13 @@ public class ProxyLobby : ILobby
         _original.Dispose();
     }
 
-    void ILobbyReadyListener.OnAutoReady()
+    void ILobbyReadyListener.CallReady()
     {
         State = LobbyState.Ready;
         Ready?.Invoke(this, null);
     }
 
-    void ILobbyDisposeListener.OnAutoDisposed()
+    void ILobbyDisposeListener.CallDispose()
     {
         Dispose();
     }

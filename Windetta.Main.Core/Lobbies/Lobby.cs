@@ -133,13 +133,13 @@ public sealed class Lobby : ILobby
         IsDisposed = true;
     }
 
-    void ILobbyReadyListener.OnAutoReady()
+    void ILobbyReadyListener.CallReady()
     {
         State = LobbyState.Ready;
         Ready?.Invoke(this, null);
     }
 
-    void ILobbyDisposeListener.OnAutoDisposed()
+    void ILobbyDisposeListener.CallDispose()
     {
         Dispose();
     }

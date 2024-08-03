@@ -25,7 +25,7 @@ public abstract class ConfigurableAutoReadyStrategy : ConfigurableLobbyPlugin, I
         if (CheckReady())
         {
             _timer.Dispose();
-            Lobby.OnAutoReady();
+            Lobby.CallReady();
         }
     }
 

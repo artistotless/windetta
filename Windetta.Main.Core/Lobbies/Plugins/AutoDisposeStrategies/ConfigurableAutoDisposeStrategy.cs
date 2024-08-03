@@ -25,7 +25,7 @@ public abstract class ConfigurableAutoDisposeStrategy : ConfigurableLobbyPlugin,
         if (CheckDisposed())
         {
             _timer.Dispose();
-            Lobby.OnAutoDisposed();
+            Lobby.CallDispose();
         }
     }
 
