@@ -24,7 +24,7 @@ var assembly = Assembly.GetExecutingAssembly();
 builder.Services.AddControllers();
 builder.Services.AddReadyMassTransit(assembly, Svc.Wallet);
 builder.Services.AddMysqlDbContext<WalletDbContext>(assembly, applyMigrations: true);
-builder.Services.AddScoped<UnitOfWorkCommittable, DbUnitOfWork>();
+builder.Services.AddScoped<UnitOfWork, DbUnitOfWork>();
 
 builder.Host.UseServiceProviderFactory(
     new AutofacServiceProviderFactory(builder =>

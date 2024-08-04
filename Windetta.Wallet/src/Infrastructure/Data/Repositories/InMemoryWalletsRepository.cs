@@ -43,11 +43,9 @@ public sealed class InMemoryWalletsRepository : IWallets
         });
     }
 
-    public Task AddAsync(UserWallet wallet)
+    public void Add(UserWallet wallet)
     {
         _store.TryAdd(wallet.UserId, wallet);
-
-        return Task.CompletedTask;
     }
 
     public Task<IEnumerable<UserWallet>> GetAllAsync(IEnumerable<Guid> userIds)

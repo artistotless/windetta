@@ -5,6 +5,6 @@ namespace Windetta.Wallet.Application.DAL;
 
 public interface ITransactions : IScopedService
 {
-    public Task AddAsync(Transaction txn);
+    public void Add(Transaction txn);
     public Task<Transaction?> GetAsync(Guid id);
 }

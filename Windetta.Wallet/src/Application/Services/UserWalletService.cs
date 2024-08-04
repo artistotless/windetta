@@ -12,15 +12,16 @@ namespace Windetta.Wallet.Application.Services;
 [AutoInjectExclude]
 public class UserWalletService : IUserWalletService
 {
-    private readonly UnitOfWorkCommittable _uow;
+    private readonly UnitOfWork _uow;
 
-    public UserWalletService(UnitOfWorkCommittable uow)
+    public UserWalletService(UnitOfWork uow)
     {
         _uow = uow;
     }
+
     public async Task<UserBalance> GetBalance(Guid userId, int currencyId)
     {
-        var wallet = await _uow.Wallets.GetAsync(userId);
+        var wallet = await _uow.Wallets.Value.GetAsync(userId);
 
         if (wallet is null)
             throw new WalletNotFoundException();
@@ -48,19 +49,19 @@ public class UserWalletService : IUserWalletService
             }
         };
 
-        var foundWallet = await _uow.Wallets.GetAsync(userId);
+        var foundWallet = await _uow.Wallets.Value.GetAsync(userId);
 
         if (foundWallet is not null)
             return;
 
-        await _uow.Wallets.AddAsync(userWallet);
+        _uow.Wallets.Value.Add(userWallet);
 
         await _uow.SaveChangesAsync();
     }
 
     public async Task HoldBalanceAsync(Guid userId, FundsInfo funds)
     {
-        var wallet = await _uow.Wallets.GetAsync(userId);
+        var wallet = await _uow.Wallets.Value.GetAsync(userId);
 
         if (wallet is null)
             throw new WalletNotFoundException();
@@ -77,19 +78,19 @@ public class UserWalletService : IUserWalletService
 
     public async Task IncreaseBalance(IncreaseArgument arg)
     {
+        var wallets = await _uow.Wallets.Value.GetAllAsync(arg.Data.Select(x => x.UserId));
+        var usersCount = arg.Data.Count();
+
+        var balances = wallets.SelectMany(w => w.Balances
+            .Where(b => b.CurrencyId == arg.Data.First(x => x.UserId == w.UserId).Funds.CurrencyId));
+
+        using var transaction = _uow.BeginTransaction(IsolationLevel.Serializable);
+
         try
         {
-            var wallets = await _uow.Wallets.GetAllAsync(arg.Data.Select(x => x.UserId));
-            var usersCount = arg.Data.Count();
-
-            var balances = wallets.SelectMany(w => w.Balances
-                .Where(b => b.CurrencyId == arg.Data.First(x => x.UserId == w.UserId).Funds.CurrencyId));
-
-            _uow.BeginTransaction(IsolationLevel.Serializable);
-
             foreach (var operation in arg.Data)
             {
-                if (await _uow.Transactions.GetAsync(operation.OperationId) is not null)
+                if (await _uow.Transactions.Value.GetAsync(operation.OperationId) is not null)
                     continue;
 
                 var wallet = wallets.FirstOrDefault(x => x.UserId == operation.UserId);
@@ -104,7 +105,7 @@ public class UserWalletService : IUserWalletService
 
                 balance.Increase(operation.Funds.Amount);
 
-                await _uow.Transactions.AddAsync(new()
+                _uow.Transactions.Value.Add(new()
                 {
                     Id = operation.OperationId,
                     CurrencyId = operation.Funds.CurrencyId,
@@ -117,26 +118,26 @@ public class UserWalletService : IUserWalletService
                 await _uow.SaveChangesAsync();
             }
 
-            _uow.Commit();
+            transaction.Commit();
         }
         catch
         {
-            _uow.Rollback();
+            transaction.Rollback();
         }
     }
 
     public async Task TransferAsync(TransferArgument arg)
     {
-        if ((await _uow.Transactions
-            .GetAsync(arg.OperationId)) is not null) return;
+        if ((await _uow.Transactions.Value.GetAsync(arg.OperationId)) is not null)
+            return;
 
-        var user1Wallet = await _uow.Wallets.GetAsync(arg.userId);
-        var user2Wallet = await _uow.Wallets.GetAsync(arg.destinationUserId);
+        var user1Wallet = await _uow.Wallets.Value.GetAsync(arg.userId);
+        var user2Wallet = await _uow.Wallets.Value.GetAsync(arg.destinationUserId);
 
         if (user1Wallet is null || user2Wallet is null)
             throw new WalletNotFoundException();
 
-        _uow.BeginTransaction(IsolationLevel.Serializable);
+        using var transaction = _uow.BeginTransaction(IsolationLevel.Serializable);
 
         try
         {
@@ -164,26 +165,25 @@ public class UserWalletService : IUserWalletService
                 UserId = arg.destinationUserId
             };
 
-            await Task.WhenAll(
-             _uow.Transactions.AddAsync(txnOut),
-             _uow.Transactions.AddAsync(txnIn));
+            _uow.Transactions.Value.Add(txnOut);
+            _uow.Transactions.Value.Add(txnIn);
 
             await _uow.SaveChangesAsync();
 
-            _uow.Commit();
+            transaction.Commit();
         }
         catch
         {
-            _uow.Rollback();
+            transaction.Rollback();
         }
     }
 
     public async Task DeductAsync(DeductArgument arg)
     {
-        if (await _uow.Transactions
-           .GetAsync(arg.OperationId) is not null) return;
+        if (await _uow.Transactions.Value.GetAsync(arg.OperationId) is not null)
+            return;
 
-        var wallet = await _uow.Wallets.GetAsync(arg.userId);
+        var wallet = await _uow.Wallets.Value.GetAsync(arg.userId);
 
         if (wallet is null)
             throw new WalletNotFoundException();
@@ -193,13 +193,13 @@ public class UserWalletService : IUserWalletService
         if (balance is null)
             throw new BalanceNotFoundException();
 
-        _uow.BeginTransaction(IsolationLevel.Serializable);
+        using var transaction = _uow.BeginTransaction(IsolationLevel.Serializable);
 
         try
         {
             balance.Decrease(arg.funds.Amount);
 
-            await _uow.Transactions.AddAsync(new()
+            _uow.Transactions.Value.Add(new()
             {
                 Id = arg.OperationId,
                 Amount = arg.funds.Amount,
@@ -211,29 +211,29 @@ public class UserWalletService : IUserWalletService
 
             await _uow.SaveChangesAsync();
 
-            _uow.Commit();
+            transaction.Commit();
         }
         catch
         {
-            _uow.Rollback();
+            transaction.Rollback();
         }
     }
 
     public async Task DeductUnHoldAsync(DeductUnHoldArgument arg)
     {
+        var wallets = await _uow.Wallets.Value.GetAllAsync(arg.Data.Select(x => x.UserId));
+        var usersCount = arg.Data.Count();
+
+        var balances = wallets.SelectMany(w => w.Balances
+            .Where(b => b.CurrencyId == arg.Data.First(x => x.UserId == w.UserId).Funds.CurrencyId));
+
+        using var transaction = _uow.BeginTransaction(IsolationLevel.Serializable);
+
         try
         {
-            var wallets = await _uow.Wallets.GetAllAsync(arg.Data.Select(x => x.UserId));
-            var usersCount = arg.Data.Count();
-
-            var balances = wallets.SelectMany(w => w.Balances
-                .Where(b => b.CurrencyId == arg.Data.First(x => x.UserId == w.UserId).Funds.CurrencyId));
-
-            _uow.BeginTransaction(IsolationLevel.Serializable);
-
             foreach (var operation in arg.Data)
             {
-                if (await _uow.Transactions.GetAsync(operation.OperationId) is not null)
+                if (await _uow.Transactions.Value.GetAsync(operation.OperationId) is not null)
                     continue;
 
                 var wallet = wallets.FirstOrDefault(x => x.UserId == operation.UserId);
@@ -252,21 +252,21 @@ public class UserWalletService : IUserWalletService
                 await _uow.SaveChangesAsync();
             }
 
-            _uow.Commit();
+            transaction.Commit();
         }
         catch
         {
-            _uow.Rollback();
+            transaction.Rollback();
         }
     }
 
     public async Task CancelDeductAsync(Guid operationId)
     {
-        var txn = await _uow.Transactions.GetAsync(operationId);
+        var txn = await _uow.Transactions.Value.GetAsync(operationId);
 
         if (txn is null) return;
 
-        var wallet = await _uow.Wallets.GetAsync(txn.UserId);
+        var wallet = await _uow.Wallets.Value.GetAsync(txn.UserId);
 
         if (wallet is null)
             throw new WalletNotFoundException();
@@ -276,7 +276,7 @@ public class UserWalletService : IUserWalletService
         if (balance is null)
             throw new BalanceNotFoundException();
 
-        _uow.BeginTransaction(IsolationLevel.Serializable);
+        using var transaction = _uow.BeginTransaction(IsolationLevel.Serializable);
 
         try
         {
@@ -287,17 +287,17 @@ public class UserWalletService : IUserWalletService
 
             await _uow.SaveChangesAsync();
 
-            _uow.Commit();
+            transaction.Commit();
         }
         catch
         {
-            _uow.Rollback();
+            transaction.Rollback();
         }
     }
 
     public async Task UnHoldBalanceAsync(Guid userId, FundsInfo funds)
     {
-        var wallet = await _uow.Wallets.GetAsync(userId);
+        var wallet = await _uow.Wallets.Value.GetAsync(userId);
 
         if (wallet is null)
             throw new WalletNotFoundException();
@@ -314,7 +314,7 @@ public class UserWalletService : IUserWalletService
 
     public async Task UnHoldBalanceAsync(IEnumerable<Guid> userIds, FundsInfo funds)
     {
-        var wallets = await _uow.Wallets.GetAllAsync(userIds);
+        var wallets = await _uow.Wallets.Value.GetAllAsync(userIds);
         var usersCount = userIds.Count();
 
         if (!wallets.Any() || wallets.Count() != usersCount)
@@ -334,7 +334,7 @@ public class UserWalletService : IUserWalletService
 
     public async Task HoldBalanceAsync(IEnumerable<Guid> userIds, FundsInfo funds)
     {
-        var wallets = await _uow.Wallets.GetAllAsync(userIds);
+        var wallets = await _uow.Wallets.Value.GetAllAsync(userIds);
         var usersCount = userIds.Count();
 
         if (!wallets.Any() || wallets.Count() != usersCount)

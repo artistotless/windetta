@@ -1,38 +1,33 @@
-﻿using System.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
+using System.Data;
 using Windetta.Wallet.Application.DAL;
+using Windetta.Wallet.Infrastructure.Data.Repositories;
 
 namespace Windetta.Wallet.Infrastructure.Data;
 
-public class DbUnitOfWork : UnitOfWorkCommittable
+public class DbUnitOfWork : UnitOfWork
 {
-    public IWallets Wallets { get; set; }
-    public ITransactions Transactions { get; set; }
+    public Lazy<IWallets> Wallets { get; init; }
+    public Lazy<ITransactions> Transactions { get; init; }
 
-    public DbUnitOfWork(IWallets wallets, ITransactions transactions)
+    private WalletDbContext _dbContext;
+
+    public DbUnitOfWork(WalletDbContext dbContext)
     {
-        Wallets = wallets;
-        Transactions = transactions;
+        _dbContext = dbContext;
+
+        Wallets = new Lazy<IWallets>(() => new WalletsRepository(dbContext));
+        Transactions = new Lazy<ITransactions>(() => new TxnsRepository(dbContext));
     }
 
-    public void BeginTransaction(IsolationLevel level)
+    public IDbTransaction BeginTransaction(IsolationLevel level)
     {
-        // TODO: implement it
+        return _dbContext.Database.BeginTransaction(level).GetDbTransaction();
     }
 
-    public void Commit()
+    public async Task SaveChangesAsync()
     {
-        // TODO: implement it
-    }
-
-    public void Rollback()
-    {
-        // TODO: implement it
-    }
-
-    public Task SaveChangesAsync()
-    {
-        // TODO: implement it
-
-        return Task.CompletedTask;
+        await _dbContext.SaveChangesAsync();
     }
 }
