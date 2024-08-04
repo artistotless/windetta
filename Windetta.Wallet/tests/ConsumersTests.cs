@@ -38,7 +38,7 @@ public class ConsumersTests : IUseHarness
             cfg.AddConsumer<CreateConsumer>();
             cfg.AddConsumer<DeductConsumer>();
             cfg.AddConsumer<UnDeductConsumer>();
-            cfg.AddConsumer<TopUpConsumer>();
+            cfg.AddConsumer<IncreaseConsumer>();
             cfg.AddConsumer<TransferConsumer>();
         };
     }
@@ -60,7 +60,9 @@ public class ConsumersTests : IUseHarness
     public async Task DeductConsumer_ShouldRespondsToEvent()
     {
         // arrange
-        var command = new Fixture().Create<BalanceOperationImpl>();
+        var command = new Fixture().Create<DeductBalanceImpl>();
+
+        command.Type = NegativeBalanceOperationType.Withdrawal;
 
         // act, assert
         await ShouldRespondsToCommand<IDeductBalance, DeductConsumer>(command);
@@ -71,17 +73,17 @@ public class ConsumersTests : IUseHarness
     }
 
     [Fact]
-    public async Task TopUpConsumer_ShouldRespondsToEvent()
+    public async Task IncreaseConsumer_ShouldRespondsToEvent()
     {
         // arrange
-        var @event = new Fixture().Create<BalanceOperationImpl>();
+        var command = new Fixture().Create<IncreaseBalanceImpl>();
 
         // act, assert
-        await ShouldRespondsToEvent<IFundsAdded, TopUpConsumer>(@event);
+        await ShouldRespondsToEvent<IIncreaseBalance, IncreaseConsumer>(command);
 
         _walletSvcMock.Verify(
-            x => x.TopUpBalance(
-                It.Is<TopUpArgument>(x => x.OperationId == @event.CorrelationId)));
+            x => x.IncreaseBalance(
+                It.Is<IncreaseArgument>(x => x.Data.First().OperationId == command.CorrelationId)));
     }
 
     [Fact]
@@ -159,11 +161,19 @@ public class CreateUserWalletImpl : ICreateUserWallet
     public Guid CorrelationId { get; set; }
 }
 
-public class BalanceOperationImpl : IDeductBalance, IFundsAdded
+public class DeductBalanceImpl : IDeductBalance
 {
     public Guid UserId { get; set; }
     public FundsInfo Funds { get; set; }
     public Guid CorrelationId { get; set; }
+    public NegativeBalanceOperationType Type { get; set; }
+}
+
+public class IncreaseBalanceImpl : IIncreaseBalance
+{
+    public Guid CorrelationId { get; set; }
+    public PositiveBalanceOperationType Type { get; set; }
+    public IEnumerable<BalanceOperationData> Data { get; set; }
 }
 
 public class UnDeductBalanceImpl : IUnDeductBalance

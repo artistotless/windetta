@@ -2,7 +2,6 @@
 using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
 using Windetta.Wallet.Application.Services;
-using Windetta.Wallet.Domain.Exceptions;
 using Windetta.Wallet.Exceptions;
 
 namespace Windetta.Wallet.Infrastructure.Consumers;

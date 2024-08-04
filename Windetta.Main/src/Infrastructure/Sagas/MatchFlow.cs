@@ -66,15 +66,8 @@ public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
                 .CancelMatch(reason => reason.Reason),
             When(MatchCompleted)
                 .RemoveOngoingMatch(matches)
-                .TransitionTo(ProcessingWinnings)
-                .ProcessWinnings());
-
-        During(ProcessingWinnings,
-            When(WinningsProcessed)
-                .Finalize(),
-            When(ProcessingWinningsFailed)
-                .NotifyProccessingWinningsFailed()
-                .TransitionTo(ProcessingWinningsFail));
+                .CreateWinningsFlow()
+                .Finalize());
 
         WhenEnter(Final, x =>
         {
@@ -87,18 +80,13 @@ public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
 
     public State CreatingMatch { get; set; }
     public State Running { get; set; }
-    public State ProcessingWinnings { get; set; }
-    public State ProcessingWinningsFail { get; set; }
 
     public Event<ICreateMatchFlowRequested> FlowCreated { get; }
     public Event<IMatchCreated> MatchCreated { get; }
-    public Event<IWinningsProcessed> WinningsProcessed { get; }
+    public Event<IBalanceIncreased> WinningsProcessed { get; }
     public Event<ICancellationMatchRequested> CancellationRequested { get; }
     public Event<IMatchCompleted> MatchCompleted { get; }
     public Event<IMatchInfoRequested> MatchInfoRequested { get; }
-
-    // Faults
-    public Event<Fault<IProcessWinnings>> ProcessingWinningsFailed { get; }
 }
 
 public class MatchFlowDefinition : SagaDefinition<MatchFlow>
@@ -166,21 +154,12 @@ public static class MatchFlowStateMachineExtensions
         }));
     }
 
-    public static EventActivityBinder<MatchFlow, Fault<IProcessWinnings>> NotifyProccessingWinningsFailed(
-    this EventActivityBinder<MatchFlow, Fault<IProcessWinnings>> binder)
-    {
-        return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<INotifyProccessingWinningsFailed>(new
-        {
-            ctx.Message.Message.CorrelationId,
-            FaultMessage = ctx.Message
-        }));
-    }
-
-    public static EventActivityBinder<MatchFlow, IMatchCompleted> ProcessWinnings(
+    public static EventActivityBinder<MatchFlow, IMatchCompleted> CreateWinningsFlow(
     this EventActivityBinder<MatchFlow, IMatchCompleted> binder)
     {
-        return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<IProcessWinnings>(new
+        return binder.PublishAsync(ctx => ctx.Init<ICreateWinningsFlowRequested>(new
         {
+            Losers = ctx.Saga.Players.Select(p => p.Id).Except(ctx.Message.Winners),
             Funds = new FundsInfo(ctx.Saga.BetCurrencyId, ctx.Saga.BetAmount),
             ctx.Message.Winners,
             ctx.Message.CorrelationId

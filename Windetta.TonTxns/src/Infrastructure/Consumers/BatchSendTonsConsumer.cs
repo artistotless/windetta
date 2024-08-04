@@ -9,8 +9,7 @@ public class BatchSendTonsConsumer : IConsumer<Batch<ISendTons>>
 {
     public async Task Consume(ConsumeContext<Batch<ISendTons>> context)
     {
-        var endpoint = MyEndpointNameFormatter
-        .CommandUri<IPackedSendTons>(Svc.TonTxns);
+        var endpoint = MyEndpointNameFormatter.CommandUri<IPackedSendTons>(Svc.TonTxns);
 
         await context.Send<IPackedSendTons>(endpoint, new
         {

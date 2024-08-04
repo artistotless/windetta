@@ -197,8 +197,7 @@ public class LobyFlowTests : IUseHarness
             .HasValue.ShouldBeTrue();
         (await harness.Published.Any<Fault<ISearchGameServer>>())
             .ShouldBeTrue();
-        (await harness.Sent.Any<INotifyMatchAwaitingExpired>())
-              .ShouldBeTrue();
+
         await harness.OutputTimeline(_output, x => x.Now());
     }
 
@@ -261,8 +260,6 @@ public class LobyFlowTests : IUseHarness
         await sagaHarness.Consumed.Any<ISearchGameServer>();
 
         // assert
-        (await harness.Sent.Any<INotifyMatchAwaitingExpired>())
-            .ShouldBeTrue();
 
         await harness.OutputTimeline(_output, x => x.Now());
     }

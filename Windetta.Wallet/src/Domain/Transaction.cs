@@ -1,14 +1,6 @@
 ﻿namespace Windetta.Wallet.Domain;
 
-public enum TransactionType
-{
-    TopUp,
-    Withdrawal,
-    CancelWithdrawal,
-    Transfer
-}
-
-public class Transaction
+public sealed class Transaction
 {
     public Guid UserId { get; set; }
     public Guid Id { get; init; }

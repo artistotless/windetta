@@ -7,32 +7,28 @@ using Windetta.Wallet.Infrastructure.Consumers;
 
 namespace Windetta.Wallet.Infrastructure.Consumers
 {
-    public class TopUpConsumer : IConsumer<IFundsAdded>
+    public class IncreaseConsumer : IConsumer<IIncreaseBalance>
     {
         private readonly IUserWalletService _walletService;
 
-        public TopUpConsumer(IUserWalletService walletService)
+        public IncreaseConsumer(IUserWalletService walletService)
         {
             _walletService = walletService;
         }
 
-        public async Task Consume(ConsumeContext<IFundsAdded> context)
+        public async Task Consume(ConsumeContext<IIncreaseBalance> context)
         {
-            var userId = context.Message.UserId;
-            var funds = context.Message.Funds;
+            var arg = new IncreaseArgument(context.Message.Data, context.Message.Type);
 
-            await _walletService.TopUpBalance(new TopUpArgument(userId, funds)
-            {
-                OperationId = context.Message.CorrelationId,
-            });
+            await _walletService.IncreaseBalance(arg);
         }
     }
 }
 
-public class TopUpConsumerDefinition : ConsumerDefinition<TopUpConsumer>
+public class TopUpConsumerDefinition : ConsumerDefinition<IncreaseConsumer>
 {
     protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator,
-    IConsumerConfigurator<TopUpConsumer> consumerConfigurator, IRegistrationContext context)
+    IConsumerConfigurator<IncreaseConsumer> consumerConfigurator, IRegistrationContext context)
     {
         consumerConfigurator.UseScheduledRedelivery(r =>
         {

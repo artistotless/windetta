@@ -2,12 +2,13 @@
 
 namespace Windetta.Wallet.Domain;
 
-public class UserBalance
+public sealed class UserBalance
 {
     public Guid WalletId { get; init; }
     public int CurrencyId { get; init; }
     public ulong Amount { get; private set; } = 0;
     public ulong HeldAmount { get; private set; } = 0;
+
     private ulong _availableAmount => Amount - HeldAmount;
 
     public void Increase(ulong value)

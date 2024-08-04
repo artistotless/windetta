@@ -2,10 +2,16 @@
 
 namespace Windetta.Wallet.Domain;
 
-public class UserWallet
+public sealed class UserWallet
 {
     public Guid UserId { get; init; }
+    public DateTime Created { get; set; }
     public List<UserBalance> Balances { get; set; }
+
+    public UserWallet()
+    {
+        Created = DateTime.UtcNow;
+    }
 
     public void TransferToWallet(UserWallet to, FundsInfo funds)
     {

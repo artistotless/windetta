@@ -11,3 +11,15 @@ public class FundsInfo
         Amount = amount;
     }
 }
+
+public enum PositiveBalanceOperationType
+{
+    TopUp,
+    Winnings,
+}
+
+public enum NegativeBalanceOperationType
+{
+    Withdrawal,
+    Loss
+}

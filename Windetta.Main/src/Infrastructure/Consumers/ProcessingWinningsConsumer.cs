@@ -3,9 +3,9 @@ using Windetta.Contracts.Commands;
 
 namespace Windetta.Main.Infrastructure.Consumers;
 
-public class ProcessingWinningsConsumer : IConsumer<IProcessWinnings>
+public class ProcessingWinningsConsumer : IConsumer<ICreateWinningsFlowRequested>
 {
-    public async Task Consume(ConsumeContext<IProcessWinnings> context)
+    public async Task Consume(ConsumeContext<ICreateWinningsFlowRequested> context)
     {
         // TODO: implement it
         throw new NotImplementedException();

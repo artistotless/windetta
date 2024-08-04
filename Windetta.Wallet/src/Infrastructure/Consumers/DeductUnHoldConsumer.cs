@@ -1,39 +1,38 @@
 ﻿using MassTransit;
 using Windetta.Contracts.Commands;
 using Windetta.Contracts.Events;
+using Windetta.Wallet.Application.Dto;
 using Windetta.Wallet.Application.Services;
 using Windetta.Wallet.Exceptions;
 
 namespace Windetta.Wallet.Infrastructure.Consumers;
 
-public class DeductConsumer : IConsumer<IDeductBalance>
+/// <summary>
+/// Burns off funds on hold
+/// </summary>
+public class DeductUnHoldConsumer : IConsumer<IDeductUnHoldBalance>
 {
     private readonly IUserWalletService _walletService;
 
-    public DeductConsumer(IUserWalletService walletService)
+    public DeductUnHoldConsumer(IUserWalletService walletService)
     {
         _walletService = walletService;
     }
 
-    public async Task Consume(ConsumeContext<IDeductBalance> context)
+    public async Task Consume(ConsumeContext<IDeductUnHoldBalance> context)
     {
-        var userId = context.Message.UserId;
-        var funds = context.Message.Funds;
+        var arg = new DeductUnHoldArgument(context.Message.Data, context.Message.Type);
 
-        await _walletService.DeductAsync(new(userId, funds)
-        {
-            Type = context.Message.Type,
-            OperationId = context.Message.CorrelationId
-        });
+        await _walletService.DeductUnHoldAsync(arg);
 
-        await context.Publish<IBalanceDeducted>(new
+        await context.Publish<IBalanceDeductedUnHeld>(new
         {
             context.Message.CorrelationId
         });
     }
 }
 
-public class DeductConsumerDefinition : ConsumerDefinition<DeductConsumer>
+public class DeductUnHoldConsumerDefinition : ConsumerDefinition<DeductConsumer>
 {
     protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator,
     IConsumerConfigurator<DeductConsumer> consumerConfigurator, IRegistrationContext context)

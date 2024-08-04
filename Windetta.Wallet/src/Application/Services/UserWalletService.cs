@@ -75,38 +75,47 @@ public class UserWalletService : IUserWalletService
         await _uow.SaveChangesAsync();
     }
 
-    public async Task TopUpBalance(TopUpArgument arg)
+    public async Task IncreaseBalance(IncreaseArgument arg)
     {
-        if (await _uow.Transactions
-            .GetAsync(arg.OperationId) is not null) return;
-
-        var wallet = await _uow.Wallets.GetAsync(arg.userId);
-
-        if (wallet is null)
-            throw new WalletNotFoundException();
-
-        var balance = wallet.GetBalance(arg.funds.CurrencyId);
-
-        if (balance is null)
-            throw new BalanceNotFoundException();
-
-        _uow.BeginTransaction(IsolationLevel.Serializable);
-
         try
         {
-            balance.Increase(arg.funds.Amount);
+            var wallets = await _uow.Wallets.GetAllAsync(arg.Data.Select(x => x.UserId));
+            var usersCount = arg.Data.Count();
 
-            await _uow.Transactions.AddAsync(new()
+            var balances = wallets.SelectMany(w => w.Balances
+                .Where(b => b.CurrencyId == arg.Data.First(x => x.UserId == w.UserId).Funds.CurrencyId));
+
+            _uow.BeginTransaction(IsolationLevel.Serializable);
+
+            foreach (var operation in arg.Data)
             {
-                Id = arg.OperationId,
-                CurrencyId = arg.funds.CurrencyId,
-                Amount = arg.funds.Amount,
-                TimeStamp = DateTime.UtcNow,
-                Type = TransactionType.TopUp,
-                UserId = arg.userId
-            });
+                if (await _uow.Transactions.GetAsync(operation.OperationId) is not null)
+                    continue;
 
-            await _uow.SaveChangesAsync();
+                var wallet = wallets.FirstOrDefault(x => x.UserId == operation.UserId);
+
+                if (wallet is null)
+                    throw new WalletNotFoundException();
+
+                var balance = wallet.GetBalance(operation.Funds.CurrencyId);
+
+                if (balance is null)
+                    throw new BalanceNotFoundException();
+
+                balance.Increase(operation.Funds.Amount);
+
+                await _uow.Transactions.AddAsync(new()
+                {
+                    Id = operation.OperationId,
+                    CurrencyId = operation.Funds.CurrencyId,
+                    Amount = operation.Funds.Amount,
+                    TimeStamp = DateTime.UtcNow,
+                    Type = arg.Type.ToTransactionType(),
+                    UserId = operation.UserId,
+                });
+
+                await _uow.SaveChangesAsync();
+            }
 
             _uow.Commit();
         }
@@ -133,15 +142,31 @@ public class UserWalletService : IUserWalletService
         {
             user1Wallet.TransferToWallet(user2Wallet, arg.funds);
 
-            await _uow.Transactions.AddAsync(new()
+            var timestamp = DateTime.UtcNow;
+
+            var txnOut = new Transaction()
             {
                 Id = arg.OperationId,
                 Amount = arg.funds.Amount,
                 CurrencyId = arg.funds.CurrencyId,
-                TimeStamp = DateTime.UtcNow,
-                Type = TransactionType.Transfer,
+                TimeStamp = timestamp,
+                Type = TransactionType.TransferOut,
                 UserId = arg.userId
-            });
+            };
+
+            var txnIn = new Transaction()
+            {
+                Id = arg.OperationId,
+                Amount = arg.funds.Amount,
+                CurrencyId = arg.funds.CurrencyId,
+                TimeStamp = timestamp,
+                Type = TransactionType.TransferIn,
+                UserId = arg.destinationUserId
+            };
+
+            await Task.WhenAll(
+             _uow.Transactions.AddAsync(txnOut),
+             _uow.Transactions.AddAsync(txnIn));
 
             await _uow.SaveChangesAsync();
 
@@ -180,11 +205,52 @@ public class UserWalletService : IUserWalletService
                 Amount = arg.funds.Amount,
                 CurrencyId = arg.funds.CurrencyId,
                 TimeStamp = DateTime.UtcNow,
-                Type = TransactionType.Withdrawal,
+                Type = arg.Type.ToTransactionType(),
                 UserId = arg.userId
             });
 
             await _uow.SaveChangesAsync();
+
+            _uow.Commit();
+        }
+        catch
+        {
+            _uow.Rollback();
+        }
+    }
+
+    public async Task DeductUnHoldAsync(DeductUnHoldArgument arg)
+    {
+        try
+        {
+            var wallets = await _uow.Wallets.GetAllAsync(arg.Data.Select(x => x.UserId));
+            var usersCount = arg.Data.Count();
+
+            var balances = wallets.SelectMany(w => w.Balances
+                .Where(b => b.CurrencyId == arg.Data.First(x => x.UserId == w.UserId).Funds.CurrencyId));
+
+            _uow.BeginTransaction(IsolationLevel.Serializable);
+
+            foreach (var operation in arg.Data)
+            {
+                if (await _uow.Transactions.GetAsync(operation.OperationId) is not null)
+                    continue;
+
+                var wallet = wallets.FirstOrDefault(x => x.UserId == operation.UserId);
+
+                if (wallet is null)
+                    throw new WalletNotFoundException();
+
+                var balance = wallet.GetBalance(operation.Funds.CurrencyId);
+
+                if (balance is null)
+                    throw new BalanceNotFoundException();
+
+                balance.UnHold(operation.Funds.Amount);
+                balance.Decrease(operation.Funds.Amount);
+
+                await _uow.SaveChangesAsync();
+            }
 
             _uow.Commit();
         }
@@ -260,8 +326,8 @@ public class UserWalletService : IUserWalletService
         if (balances.Count() != usersCount)
             throw new BalanceNotFoundException();
 
-        foreach (var item in balances)
-            item.UnHold(funds.Amount);
+        foreach (var balance in balances)
+            balance.UnHold(funds.Amount);
 
         await _uow.SaveChangesAsync();
     }

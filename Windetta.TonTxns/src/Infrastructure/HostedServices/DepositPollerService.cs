@@ -1,6 +1,7 @@
 ﻿using MassTransit;
 using Polly;
 using Windetta.Common.Constants;
+using Windetta.Common.MassTransit;
 using Windetta.Contracts;
 using Windetta.Contracts.Events;
 using Windetta.TonTxns.Application.Services;
@@ -12,6 +13,8 @@ public class DepositPollerService : BackgroundService
     private readonly ILogger<DepositPollerService> _logger;
     private readonly DepositPoller _poller;
     private readonly IPublishEndpoint _publishEndpoint;
+    private readonly ISendEndpointProvider _sendEndpoint;
+
 
     private int _executionCount;
     private const int _executionPeriodSeconds = 10;
@@ -19,11 +22,14 @@ public class DepositPollerService : BackgroundService
     public DepositPollerService(
         ILogger<DepositPollerService> logger,
         DepositPoller poller,
-        IPublishEndpoint publishEndpoint)
+        IPublishEndpoint publishEndpoint,
+        ISendEndpointProvider sendEndpoint
+        )
     {
         _logger = logger;
         _poller = poller;
         _publishEndpoint = publishEndpoint;
+        _sendEndpoint = sendEndpoint;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -64,7 +70,6 @@ public class DepositPollerService : BackgroundService
         }
     }
 
-    // Could also be a async method, that can be awaited in ExecuteAsync above
     private async Task PollAsync()
     {
         var result = await _poller.ProcessAsync();
@@ -72,12 +77,30 @@ public class DepositPollerService : BackgroundService
         var batchEvents = result.Values.Select(x => new FundsAddedImpl()
         {
             UserId = x.UserId,
-            Funds = new FundsInfo((int)Currency.Ton, x.Amount)
+            Funds = new FundsInfo((int)Currency.Ton, x.Amount),
+            CorrelationId = x.Id,
         });
+
+        var increaseCommand = new IncreaseBalanceImpl()
+        {
+            Data = result.Values.Select(x => new BalanceOperationData()
+            {
+                Funds = new FundsInfo((int)Currency.Ton, x.Amount),
+                OperationId = x.Id,
+                UserId = x.UserId
+            }),
+            CorrelationId = Guid.NewGuid(),
+            Type = PositiveBalanceOperationType.TopUp,
+        };
 
         if (batchEvents.Any())
         {
             await _publishEndpoint.PublishBatch<IFundsAdded>(batchEvents);
+
+            var walletEndpoint = MyEndpointNameFormatter.CommandUri<IIncreaseBalance>(Svc.Wallet);
+            var sendEndpoint = await _sendEndpoint.GetSendEndpoint(walletEndpoint);
+            await sendEndpoint.Send(increaseCommand);
+
             _logger.LogInformation($"Handled new deposits: {batchEvents.Count()}");
         }
 
@@ -103,4 +126,11 @@ public class FundsAddedImpl : IFundsAdded
     public Guid UserId { get; set; }
     public FundsInfo Funds { get; set; }
     public Guid CorrelationId { get; set; }
+}
+
+public class IncreaseBalanceImpl : IIncreaseBalance
+{
+    public Guid CorrelationId { get; set; }
+    public PositiveBalanceOperationType Type { get; set; }
+    public IEnumerable<BalanceOperationData> Data { get; set; }
 }

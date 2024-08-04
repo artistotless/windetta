@@ -3,9 +3,8 @@ using Windetta.Contracts.Base;
 
 namespace Windetta.Contracts.Commands;
 
-public interface IDeductBalance : ICommand, CorrelatedBy<Guid>
+public interface IDeductUnHoldBalance : ICommand, CorrelatedBy<Guid>
 {
     public NegativeBalanceOperationType Type { get; set; }
-    public Guid UserId { get; set; }
-    public FundsInfo Funds { get; set; }
+    public IEnumerable<BalanceOperationData> Data { get; set; }
 }

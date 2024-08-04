@@ -153,7 +153,7 @@ public class MatchFlowTests : IUseHarness
         await sagaHarness.Consumed.Any<IMatchCompleted>();
 
         // assert
-        (await sagaHarness.Exists(_correllationId, s => s.ProcessingWinnings))
+        (await sagaHarness.Exists(_correllationId, s => s.Final))
             .HasValue.ShouldBeTrue();
 
         await harness.OutputTimeline(_output, x => x.Now());

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Windetta.Wallet.Infrastructure.Data;
 
@@ -10,9 +11,11 @@ using Windetta.Wallet.Infrastructure.Data;
 namespace Windetta.Wallet.Migrations
 {
     [DbContext(typeof(WalletDbContext))]
-    partial class WalletDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240804091338_AddedUserBalances")]
+    partial class AddedUserBalances
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -69,9 +72,6 @@ namespace Windetta.Wallet.Migrations
                     b.Property<Guid>("UserId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("CHAR(36)");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime(6)");
 
                     b.HasKey("UserId");
 
