@@ -9,4 +9,5 @@ public class UserCreated : IUserCreated
     public string Email { get; set; }
     public string Role { get; set; }
     public DateTime TimeStamp { get; set; }
+    public Guid CorrelationId { get; set; }
 }

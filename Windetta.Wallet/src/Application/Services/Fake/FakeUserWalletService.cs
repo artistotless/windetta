@@ -1,9 +1,11 @@
-﻿using Windetta.Contracts;
+﻿using Windetta.Common.Types;
+using Windetta.Contracts;
 using Windetta.Wallet.Application.Dto;
 using Windetta.Wallet.Domain;
 
 namespace Windetta.Wallet.Application.Services.Fake;
 
+[AutoInjectExclude]
 public class FakeUserWalletService : IUserWalletService
 {
     public Task CancelDeductAsync(Guid operationId)

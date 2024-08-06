@@ -1,6 +1,5 @@
 ﻿using System.Data;
 using Windetta.Common.Constants;
-using Windetta.Common.Types;
 using Windetta.Contracts;
 using Windetta.Wallet.Application.DAL;
 using Windetta.Wallet.Application.Dto;
@@ -9,7 +8,6 @@ using Windetta.Wallet.Exceptions;
 
 namespace Windetta.Wallet.Application.Services;
 
-[AutoInjectExclude]
 public class UserWalletService : IUserWalletService
 {
     private readonly UnitOfWork _uow;
@@ -157,7 +155,7 @@ public class UserWalletService : IUserWalletService
 
             var txnIn = new Transaction()
             {
-                Id = arg.OperationId,
+                Id = Guid.NewGuid(),
                 Amount = arg.funds.Amount,
                 CurrencyId = arg.funds.CurrencyId,
                 TimeStamp = timestamp,
@@ -264,7 +262,16 @@ public class UserWalletService : IUserWalletService
     {
         var txn = await _uow.Transactions.Value.GetAsync(operationId);
 
-        if (txn is null) return;
+        if (txn is null)
+            return;
+
+        // If the transaction has already been canceled - return
+        if (txn.Type == TransactionType.CancelDeduct)
+            return;
+
+        // Only the withdraw can be canceled
+        if (txn.Type != TransactionType.Withdrawal)
+            return;
 
         var wallet = await _uow.Wallets.Value.GetAsync(txn.UserId);
 
@@ -283,7 +290,7 @@ public class UserWalletService : IUserWalletService
             balance.Increase(txn.Amount);
 
             txn.TimeStamp = DateTime.UtcNow;
-            txn.Type = TransactionType.CancelWithdrawal;
+            txn.Type = TransactionType.CancelDeduct;
 
             await _uow.SaveChangesAsync();
 

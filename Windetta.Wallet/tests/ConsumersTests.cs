@@ -47,13 +47,13 @@ public class ConsumersTests : IUseHarness
     public async Task CreateConsumer_ShouldRespondsToEvent()
     {
         // arrange
-        var command = new Fixture().Create<CreateUserWalletImpl>();
+        var @event = new Fixture().Create<UserCreatedImpl>();
 
         // act, assert
-        await ShouldRespondsToCommand<ICreateUserWallet, CreateConsumer>(command);
+        await ShouldRespondsToEvent<IUserCreated, CreateConsumer>(@event);
 
         _walletSvcMock.Verify(
-            x => x.CreateWalletAsync(It.Is<Guid>(x => x == command.UserId), null));
+            x => x.CreateWalletAsync(It.Is<Guid>(x => x == @event.Id), null));
     }
 
     [Fact]
@@ -154,10 +154,13 @@ public class ConsumersTests : IUseHarness
     }
 }
 
-public class CreateUserWalletImpl : ICreateUserWallet
+public class UserCreatedImpl : IUserCreated
 {
-    public Guid UserId { get; set; }
-
+    public Guid Id { get; set; }
+    public string UserName { get; set; }
+    public string Email { get; set; }
+    public string Role { get; set; }
+    public DateTime TimeStamp { get; set; }
     public Guid CorrelationId { get; set; }
 }
 

@@ -85,8 +85,6 @@ public class NewUserFlowTests : IUseHarness
                         .ShouldBeTrue();
         (await harness.Sent.Any<INotifyUserCreated>())
                         .ShouldBeTrue();
-        (await harness.Sent.Any<ICreateUserWallet>())
-                        .ShouldBeTrue();
 
         await harness.OutputTimeline(_output, x => x.Now());
     }

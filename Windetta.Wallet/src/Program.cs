@@ -6,6 +6,7 @@ using Windetta.Common.Constants;
 using Windetta.Common.Database;
 using Windetta.Common.MassTransit;
 using Windetta.Common.Types;
+using Windetta.Contracts.Events;
 using Windetta.Wallet.Application.DAL;
 using Windetta.Wallet.Infrastructure.Data;
 
@@ -22,7 +23,11 @@ builder.ConfigureComponentLaunchSettings();
 var assembly = Assembly.GetExecutingAssembly();
 
 builder.Services.AddControllers();
-builder.Services.AddReadyMassTransit(assembly, Svc.Wallet);
+builder.Services.AddReadyMassTransit(assembly, Svc.Wallet, regCfg =>
+{
+    regCfg.AddRequestClient<IBalanceRequested>();
+});
+
 builder.Services.AddMysqlDbContext<WalletDbContext>(assembly, applyMigrations: true);
 builder.Services.AddScoped<UnitOfWork, DbUnitOfWork>();
 
@@ -35,5 +40,9 @@ builder.Host.UseServiceProviderFactory(
 var app = builder.Build();
 
 app.MapGet("/", () => "Windetta.Wallet Service");
-app.MapControllers();
+app.UseRouting();
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+
 app.Run();

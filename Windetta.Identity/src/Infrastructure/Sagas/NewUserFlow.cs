@@ -38,7 +38,6 @@ public class NewUserFlowStateMachine : MassTransitStateMachine<NewUserFlow>
             })
             .NotifyEmailConfirmation()
             .NotifyUserCreated()
-            .CreateWallet()
             .TransitionTo(AwaitingConfirmation));
 
         During(AwaitingConfirmation,
@@ -57,15 +56,6 @@ public class NewUserFlowStateMachine : MassTransitStateMachine<NewUserFlow>
 
 public static class NewUserFlowStateMachineExtensions
 {
-    public static EventActivityBinder<NewUserFlow, IUserCreated> CreateWallet(
-       this EventActivityBinder<NewUserFlow, IUserCreated> binder)
-    {
-        return binder.SendCommandAsync(Svc.Wallet, ctx => ctx.Init<ICreateUserWallet>(new
-        {
-            ctx.Saga.UserId,
-        }));
-    }
-
     public static EventActivityBinder<NewUserFlow, IUserCreated> NotifyEmailConfirmation(
         this EventActivityBinder<NewUserFlow, IUserCreated> binder)
     {
