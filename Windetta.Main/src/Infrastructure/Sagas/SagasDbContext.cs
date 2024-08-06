@@ -2,6 +2,7 @@
 using MassTransit.EntityFrameworkCoreIntegration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Windetta.Main.Infrastructure.Sagas.Converters;
 
 namespace Windetta.Main.Infrastructure.Sagas;
 public class MatchFlowMap : SagaClassMap<MatchFlow>
@@ -36,6 +37,20 @@ public class LobbyFlowMap : SagaClassMap<LobbyFlow>
     }
 }
 
+public class ProcessingWinningsFlowMap : SagaClassMap<ProcessingWinningsFlow>
+{
+    protected override void Configure(EntityTypeBuilder<ProcessingWinningsFlow> entity, ModelBuilder model)
+    {
+        //TODO: доделать
+        entity.Property(x => x.CurrentState)
+            .HasColumnType("TINYINT");
+        entity.HasIndex(x => x.CorrelationId);
+        entity.Property(x => x.Winners)
+            .HasConversion<GuidCollectionDbModelConverter>();
+        entity.Property(x => x.Losers)
+            .HasConversion<GuidCollectionDbModelConverter>();
+    }
+}
 
 public class SagasDbContext : SagaDbContext
 {
@@ -47,6 +62,7 @@ public class SagasDbContext : SagaDbContext
         {
             yield return new MatchFlowMap();
             yield return new LobbyFlowMap();
+            yield return new ProcessingWinningsFlowMap();
         }
     }
 }

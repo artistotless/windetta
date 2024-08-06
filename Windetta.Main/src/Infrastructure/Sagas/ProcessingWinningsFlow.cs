@@ -34,11 +34,11 @@ public class ProcessingWinningsFlowStateMachine : MassTransitStateMachine<Proces
         Initially(
             When(FlowCreated)
                 .CopyDataToInstance()
-                .TransitionTo(ProcessingWinnings));
+                .ProcessWinnings());
 
         During(ProcessingWinnings,
             When(WinningsProcessed)
-                .Finalize(),
+                .TransitionTo(ProcessingWinningsSuccess),
             When(IncreaseBalancesFailed)
                 .NotifyProccessingWinningsFailed("IncreaseBalancesFailed")
                 .TransitionTo(ProcessingWinningsFail),
@@ -91,6 +91,7 @@ public static class ProcessingWinningsFlowStateMachineExtensions
         return binder.Then(ctx =>
         {
             ctx.Saga.BetCurrencyId = ctx.Message.Funds.CurrencyId;
+            ctx.Saga.CurrentState = (int)ProcessingWinningsFlowState.ProcessingWinnings;
             ctx.Saga.BetAmount = ctx.Message.Funds.Amount;
             ctx.Saga.Winners = ctx.Message.Winners;
             ctx.Saga.Losers = ctx.Message.Losers;

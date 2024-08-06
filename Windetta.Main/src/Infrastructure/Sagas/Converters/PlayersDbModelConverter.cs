@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using System.Text.Json;
 
-namespace Windetta.Main.Infrastructure.Sagas;
+namespace Windetta.Main.Infrastructure.Sagas.Converters;
 
 public class PlayersDbModelConverter : ValueConverter<IEnumerable<Player>, string>
 {
