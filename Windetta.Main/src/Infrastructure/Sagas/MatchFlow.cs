@@ -131,6 +131,7 @@ public static class MatchFlowStateMachineExtensions
             .SendCommandAsync(Svc.Main, ctx => ctx.Init<INotifyMatchCanceled>(new
             {
                 ctx.Saga.CorrelationId,
+                UsersIds = ctx.Saga.Players.Select(x => x.Id),
                 Reason = selectReason.Invoke(ctx.Message)
             }))
             .SendCommandAsync(Svc.Wallet, ctx => ctx.Init<IUnHoldBalances>(new

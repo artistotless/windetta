@@ -25,7 +25,6 @@ public class LobbyDispatcherTests
         var request = new CreateLobbyDto()
         {
             GameId = ExampleGuids.GameId,
-            InitiatorId = ExampleGuids.UserId,
             Bet = new FundsInfo(currencyId: 1, amount: 100),
         };
 
@@ -34,12 +33,12 @@ public class LobbyDispatcherTests
             .GetRequiredService<LobbiesInteractor>();
         var outputChannel = new LobbyDebugOutput(_output, ref buffer);
         var dispatcher = new LobbyObserver(new Mock<ILobbies>().Object, outputChannel, null);
-        var lobby = await interactor.CreateAsync(request);
+        var lobby = await interactor.CreateAsync(request, ExampleGuids.UserId);
 
         // act
         dispatcher.AddToTracking(lobby);
-        await interactor.LeaveMemberAsync(request.InitiatorId, lobby.Id);
-        await interactor.JoinMemberAsync(request.InitiatorId, lobby.Id, roomIndex: 0);
+        await interactor.LeaveMemberAsync(ExampleGuids.UserId, lobby.Id);
+        await interactor.JoinMemberAsync(ExampleGuids.UserId, lobby.Id, roomIndex: 0);
 
         // assert
         var text = $"Lobby updated: {lobby.Id}";
@@ -55,7 +54,6 @@ public class LobbyDispatcherTests
         {
             Bet = new FundsInfo(1, 1000),
             GameId = ExampleGuids.GameId,
-            InitiatorId = ExampleGuids.UserId
         };
 
         var buffer = new Queue<string>();
@@ -63,7 +61,7 @@ public class LobbyDispatcherTests
         var interactor = provider.GetRequiredService<LobbiesInteractor>();
         var outputChannel = new LobbyDebugOutput(_output, ref buffer);
         var dispatcher = new LobbyObserver(storage, outputChannel, null);
-        var lobby = await interactor.CreateAsync(request);
+        var lobby = await interactor.CreateAsync(request, ExampleGuids.UserId);
 
         // act
         dispatcher.AddToTracking(lobby);
@@ -97,7 +95,6 @@ public class LobbyDispatcherTests
         var request = new CreateLobbyDto()
         {
             GameId = ExampleGuids.GameId,
-            InitiatorId = ExampleGuids.UserId,
             Bet = new FundsInfo(currencyId: 1, amount: 100),
             AutoReadyStrategy = new PluginSetDto(nameof(FullRoomsReadyStrategy)),
         };
@@ -107,7 +104,7 @@ public class LobbyDispatcherTests
         var interactor = provider.GetRequiredService<LobbiesInteractor>();
         var outputChannel = new LobbyDebugOutput(_output, ref buffer);
         var dispatcher = new LobbyObserver(storage, outputChannel, null);
-        var lobby = await interactor.CreateAsync(request);
+        var lobby = await interactor.CreateAsync(request, ExampleGuids.UserId);
 
         // act
         dispatcher.AddToTracking(lobby);

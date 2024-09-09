@@ -19,13 +19,12 @@ public class AutoStrategiesTests
             Bet = new FundsInfo(1, 1000),
             AutoReadyStrategy = new PluginSetDto(nameof(FullRoomsReadyStrategy)),
             GameId = ExampleGuids.GameId,
-            InitiatorId = ExampleGuids.UserId
         };
 
         var interactor = SharedServiceProvider.GetInstance()
             .GetRequiredService<LobbiesInteractor>();
 
-        ILobby lobby = await interactor.CreateAsync(request);
+        ILobby lobby = await interactor.CreateAsync(request, ExampleGuids.UserId);
 
         var member2Id = Guid.NewGuid();
 
@@ -58,13 +57,12 @@ public class AutoStrategiesTests
             Bet = new FundsInfo(1, 800),
             AutoDisposeStrategy = new PluginSetDto(nameof(DateDisposeStrategy)),
             GameId = ExampleGuids.GameId,
-            InitiatorId = ExampleGuids.UserId
         };
 
         var interactor = SharedServiceProvider.GetInstance()
             .GetRequiredService<LobbiesInteractor>();
 
-        ILobby lobby = await interactor.CreateAsync(request);
+        ILobby lobby = await interactor.CreateAsync(request, ExampleGuids.UserId);
         bool autoStrategyWorkedOut = false;
         var tcs = new TaskCompletionSource<bool>();
 
@@ -76,7 +74,7 @@ public class AutoStrategiesTests
 
 
         lobby.Disposed += callback;
-        await interactor.LeaveMemberAsync(request.InitiatorId, lobby.Id);
+        await interactor.LeaveMemberAsync(ExampleGuids.UserId, lobby.Id);
 
         // act
         await tcs.Task;

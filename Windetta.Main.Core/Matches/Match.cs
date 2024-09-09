@@ -37,4 +37,14 @@ public class Match
     /// List of winners in the match
     /// </summary>
     public IEnumerable<Guid>? Winners { get; set; }
+
+    /// <summary>
+    /// Date and time when the match started
+    /// </summary>
+    public DateTimeOffset StartDate { get; set; }
+
+    /// <summary>
+    /// Date and time when the match ended
+    /// </summary>
+    public DateTimeOffset EndDate { get; set; }
 }

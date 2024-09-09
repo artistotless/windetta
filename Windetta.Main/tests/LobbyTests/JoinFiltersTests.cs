@@ -18,7 +18,6 @@ public class JoinFiltersTests
         var request = new CreateLobbyDto()
         {
             GameId = ExampleGuids.GameId,
-            InitiatorId = ExampleGuids.UserId,
             Bet = new FundsInfo(1, 100),
             JoinFilters = new[] { new PluginSetDto(nameof(AlwaysFalseJoinFilter)) }
         };
@@ -27,7 +26,7 @@ public class JoinFiltersTests
             .GetRequiredService<LobbiesInteractor>();
 
         var memberId = Guid.NewGuid();
-        var lobby = await interactor.CreateAsync(request);
+        var lobby = await interactor.CreateAsync(request, ExampleGuids.UserId);
         var room = lobby.Rooms.First();
 
         // act

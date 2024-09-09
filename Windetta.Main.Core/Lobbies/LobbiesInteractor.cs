@@ -45,17 +45,23 @@ public sealed class LobbiesInteractor : IScopedService
         await _useCasesFactory.Get<IDeleteLobbyUseCase>().ExecuteAsync(lobbyId);
     }
 
-    public async Task<ILobby> CreateAsync(CreateLobbyDto request)
+    public async Task<ILobby> CreateAsync(CreateLobbyDto request, Guid initiatorId)
     {
-        if (_lobbyUserMaps.Get(request.InitiatorId).HasValue)
+        if (_lobbyUserMaps.Get(initiatorId).HasValue)
             throw LobbyException.AlreadyMemberOfLobby;
 
-        var options = await BuildLobbyOptions(request);
+        (GameConfiguration cfg, IEnumerable<SupportedCurrency> sc) configurations;
+        configurations = await _gamesRepository.GetConfigurationsAsync(request.GameId);
+
+        ValidateBet(configurations.sc, request.Bet);
+        ValidateSlots(configurations.cfg, request);
+
+        var options = await BuildLobbyOptions(request, initiatorId);
 
         var lobby = await _useCasesFactory.Get<ICreateLobbyUseCase>()
              .ExecuteAsync(options);
 
-        _lobbyUserMaps.Set(new(request.InitiatorId, lobby.Id, roomIndex: 0));
+        _lobbyUserMaps.Set(new(initiatorId, lobby.Id, roomIndex: 0));
 
         return lobby;
     }
@@ -86,22 +92,18 @@ public sealed class LobbiesInteractor : IScopedService
         _lobbyUserMaps.Unset(userId);
     }
 
-    private async Task<LobbyOptions> BuildLobbyOptions(CreateLobbyDto request)
+    private async Task<LobbyOptions> BuildLobbyOptions(CreateLobbyDto request, Guid InitiatorId)
     {
-        (GameConfiguration cfg, IEnumerable<SupportedCurrency> sc) configurations;
-
-        configurations = await _gamesRepository.GetConfigurationsAsync(request.GameId);
-
-        ValidateBet(configurations.sc, request.Bet);
-
         var options = new LobbyOptions()
         {
             Private = request.Private,
             GameId = request.GameId,
-            GameConfiguration = configurations.cfg,
             Properties = request.Properties,
+
             Bet = request.Bet,
-            InitiatorId = request.InitiatorId,
+            InitiatorId = InitiatorId,
+            Teams = request.Teams,
+            Slots = request.Slots,
 
             AutoDisposeStrategy = request.AutoDisposeStrategy is null ? null :
             _pluginsFactory.Get<IAutoDisposeStrategy>(
@@ -130,5 +132,20 @@ public sealed class LobbiesInteractor : IScopedService
         {
             throw LobbyException.BetValidationFail;
         }
+    }
+
+    private static void ValidateSlots(GameConfiguration cfg, CreateLobbyDto createDto)
+    {
+        if (createDto.Teams > cfg.MaxTeams)
+            throw LobbyException.TeamsAreGreaterMaximumAllowed;
+
+        else if (createDto.Teams < cfg.MinTeams)
+            throw LobbyException.TeamsAreLessMinimumRequired;
+
+        else if (createDto.Slots > cfg.MaxPlayersInTeam)
+            throw LobbyException.SlotsAreGreaterMaximumAllowed;
+
+        else if (createDto.Slots < cfg.MinTeams)
+            throw LobbyException.SlotsAreLessMinimumRequired;
     }
 }

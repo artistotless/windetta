@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Windetta.Common.Types;
-using Windetta.Main.Core.Clients.Dtos;
 using Windetta.Main.Core.Lobbies;
 using Windetta.Main.Core.Lobbies.Dtos;
 using Windetta.Main.Infrastructure.Services;
@@ -40,26 +39,14 @@ public static class LobbyEndpoints
 
         // Create lobby
         group.MapPost("/", async (
-            [FromBody] CreateLobbyRequestDto body,
+            [FromBody] CreateLobbyDto createRequest,
             [FromServices] IHubContext<MainHub> hub,
             [FromServices] IUserIdProvider userIdProvider,
             [FromServices] LobbyObserver observer,
             [FromServices] LobbiesInteractor interactor) =>
         {
             var userId = userIdProvider.UserId;
-            var createRequest = new CreateLobbyDto()
-            {
-                Bet = body.Bet,
-                InitiatorId = userId,
-                GameId = body.GameId,
-                Private = body.Private,
-                Properties = body.Properties,
-                JoinFilters = body.JoinFilters,
-                AutoDisposeStrategy = body.AutoDisposeStrategy,
-                AutoReadyStrategy = body.AutoReadyStrategy,
-            };
-
-            var lobby = await interactor.CreateAsync(createRequest);
+            var lobby = await interactor.CreateAsync(createRequest, userId);
             observer.AddToTracking(lobby);
 
             await hub.Clients.User(userId.ToString()).SendToMirrorAsync<Guid>(new
@@ -103,7 +90,7 @@ public static class LobbyEndpoints
             (userId, lobbyId, roomIndex);
 
             await hub.Clients.User(userId.ToString()).SendToMirrorAsync<Guid>(new
-                (MainHub.Methods.SubscribeOnLobbyFlow, lobbyId));
+                (MainHub.Methods.UnsubscribeFromLobbyFlow, lobbyId));
 
             return Results.NoContent();
         });

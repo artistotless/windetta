@@ -14,8 +14,11 @@ public static class Errors
         public const string LobbyNotFound = "lobby_notfound";
         public const string MemberAreNotInRoom = "member_are_not_in_the_room";
         public const string BetIsLessMinimumAllowed = "bet_is_less_minimum_allowed";
+        public const string TeamsAreGreaterMaximumAllowed = "teams_are_greater_maximum_allowed";
+        public const string TeamsAreLessMinimumRequired = "teams_are_less_minimum_allowed";
+        public const string SlotsAreGreaterMaximumAllowed = "slots_are_greater_maximum_allowed";
+        public const string SlotsAreLessMinimumRequired = "slots_are_less_minimum_allowed";
         #endregion
-
         #region LobbyPlugin
         public const string InvalidPluginName = "invalid_plugin_name";
         public const string RequirementTypeNotAllowed = "requirement_type_not_allowed";

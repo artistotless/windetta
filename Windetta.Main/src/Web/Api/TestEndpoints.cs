@@ -23,8 +23,7 @@ namespace Windetta.Main.Web.Api
                 {
                     Bet = new FundsInfo(1, 100),
                     GameId = gameId,
-                    InitiatorId = player1Id
-                });
+                }, player1Id);
 
                 await interactor.JoinMemberAsync(player2Id, lobby.Id, lobby.Rooms.First().Index);
 
