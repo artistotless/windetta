@@ -19,8 +19,6 @@ public class RealtimeTokenHandler : AuthenticationHandler<RealtimeTokenOptions>
     {
     }
 
-    private readonly string _role;
-
     private const string VALIDATION_FAIL = "Validation of realtime token failed";
 
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()

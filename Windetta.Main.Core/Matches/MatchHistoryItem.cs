@@ -6,7 +6,7 @@ namespace Windetta.Main.Core.Matches;
 /// <summary>
 /// Represents a match that is preserved in history
 /// </summary>
-public class Match
+public class MatchHistoryItem
 {
     /// <summary>
     /// Match ID

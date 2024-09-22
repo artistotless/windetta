@@ -14,5 +14,5 @@ public interface IMatchesHistory
     /// <param name="playerId">Only matches in which this player participated</param>
     /// <param name="gameId">Only matches for this game</param>
     /// <returns>List of matches for a certain period</returns>
-    Task<IEnumerable<Match>> GetAsync(DateRange dateRange, Guid? playerId = null, Guid? gameId = null);
+    Task<IEnumerable<MatchHistoryItem>> GetAsync(DateRange dateRange, Guid? playerId = null, Guid? gameId = null);
 }
