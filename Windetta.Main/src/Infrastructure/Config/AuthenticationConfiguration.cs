@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using System.Diagnostics;
 using Windetta.Common.Authentication;
 using Windetta.Common.Configuration;
 using Windetta.Common.Constants;
@@ -13,9 +14,19 @@ public static class AuthenticationConfiguration
     {
         var authBuilder = services.AddAuthentication(options =>
         {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultAuthenticateScheme = AuthSchemes.Bearer;
+            options.DefaultChallengeScheme = AuthSchemes.Bearer;
         });
+
+        var useFakeAuth = Environment.GetEnvironmentVariable("FAKE_AUTH") == "Enabled";
+
+        if (useFakeAuth)
+        {
+            authBuilder.AddScheme<FakeTokenOptions, FakeTokenHandler>(AuthSchemes.FirstConnectionAuth, null);
+            authBuilder.AddScheme<FakeTokenOptions, FakeTokenHandler>(AuthSchemes.Bearer, null);
+
+            return;
+        }
 
         var cfg = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
 

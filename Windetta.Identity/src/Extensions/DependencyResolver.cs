@@ -7,7 +7,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using System.Diagnostics;
 using System.Reflection;
+using Windetta.Common.Authentication;
+using Windetta.Common.Constants;
 using Windetta.Common.Database;
 using Windetta.Common.Options;
 using Windetta.Identity.Domain.Entities;
@@ -59,6 +62,24 @@ public static class DependencyResolver
         var authBuilder = services.AddAuthentication(IdentityConstants.ApplicationScheme);
         var configuration = provider.GetRequiredService<IConfiguration>();
 
+        services.ConfigureApplicationCookie(options =>
+        {
+            options.Cookie.Name = "windetta.identity";
+            options.LoginPath = "/account/login";
+        });
+
+        authBuilder.AddVk(configuration);
+        authBuilder.AddGoogle(configuration);
+
+        var useFakeAuth = Environment.GetEnvironmentVariable("FAKE_AUTH") == "Enabled";
+
+        if (useFakeAuth)
+        {
+            authBuilder.AddScheme<FakeTokenOptions, FakeTokenHandler>(AuthSchemes.Bearer, null);
+            
+            return;
+        }
+
         authBuilder.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
         {
             // TODO: remove directives, fetch authority from appsettings or environment
@@ -74,15 +95,6 @@ public static class DependencyResolver
                 ValidateLifetime = false,
             };
         });
-
-        services.ConfigureApplicationCookie(options =>
-        {
-            options.Cookie.Name = "windetta.identity";
-            options.LoginPath = "/account/login";
-        });
-
-        authBuilder.AddVk(configuration);
-        authBuilder.AddGoogle(configuration);
     }
 
     // Add  external authentication provider 'vk.com'

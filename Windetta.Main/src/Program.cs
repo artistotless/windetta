@@ -1,6 +1,7 @@
 ﻿using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Serilog;
+using System.Diagnostics;
 using System.Reflection;
 using Windetta.Common.Configuration;
 using Windetta.Common.Middlewares;

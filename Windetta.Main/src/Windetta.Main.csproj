@@ -39,7 +39,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Update="Infrastructure\GameUIs\b9d9e5fd-0079-4f45-9347-d09b005ed498 - Copy.json">
+    <Content Update="Infrastructure\GameUIs\e5586b7b-4cc0-490d-8b11-220274e7ce83.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

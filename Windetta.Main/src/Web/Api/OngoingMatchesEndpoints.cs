@@ -14,13 +14,17 @@ public static class OngoingMatchesEndpoints
     {
         // Get all ongoing matches IDs
         web.MapGet("api/matches/ongoing", async (
-            [FromServices] IOngoingMatches matches) =>
+            [FromServices] IOngoingMatches matches,
+            [FromServices] IHttpContextAccessor ctx,
+            [FromServices] IUserIdProvider userIdProvider) =>
         {
+            var user = ctx.HttpContext.User;
+            var userId = userIdProvider.UserId;
             var ids = await matches.GetAllIdsAsync();
             var response = new BaseResponse<IEnumerable<Guid>>(ids);
 
             return Results.Ok(response);
-        });
+        }).RequireAuthorization();
 
         // Get ongoing match ID by playerID
         web.MapGet("api/players/{playerId:Guid}/matches/ongoing", async (

@@ -145,7 +145,7 @@ public sealed class LobbiesInteractor : IScopedService
         else if (createDto.Slots > cfg.MaxPlayersInTeam)
             throw LobbyException.SlotsAreGreaterMaximumAllowed;
 
-        else if (createDto.Slots < cfg.MinTeams)
+        else if (createDto.Slots < cfg.MinPlayersInTeam)
             throw LobbyException.SlotsAreLessMinimumRequired;
     }
 }
