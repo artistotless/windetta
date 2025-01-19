@@ -5,7 +5,6 @@ using Windetta.Wallet.Domain;
 
 namespace Windetta.Wallet.Application.Services.Fake;
 
-[AutoInjectExclude]
 public class FakeUserWalletService : IUserWalletService
 {
     public Task CancelDeductAsync(Guid operationId)

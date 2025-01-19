@@ -5,6 +5,7 @@ using Newtonsoft.Json;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
+using Windetta.Common.Constants;
 using Windetta.Common.Helpers;
 using Windetta.Common.Types;
 
@@ -32,10 +33,13 @@ public class FakeTokenHandler : AuthenticationHandler<FakeTokenOptions>
         token ??= Context.Request.Query[JwtClaimTypes.AccessToken].ToNullableString();
         token ??= Context.Request.Headers.Authorization.ToNullableString();
 
-        if (token is null)
+        if (string.IsNullOrEmpty(token))
             return AuthenticateResult.Fail("No X-Auth token");
 
         FakeToken? tokenData = null;
+
+        if (token.StartsWith(AuthSchemes.Bearer))
+            token = token.Remove(0, 7);
 
         try
         {

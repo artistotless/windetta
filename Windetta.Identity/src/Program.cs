@@ -6,6 +6,7 @@ using System.Reflection;
 using Windetta.Common.Configuration;
 using Windetta.Common.Constants;
 using Windetta.Common.Database;
+using Windetta.Common.Host;
 using Windetta.Common.MassTransit;
 using Windetta.Common.Redis;
 using Windetta.Common.Types;
@@ -89,4 +90,5 @@ app.MapGet("/", (ctx) =>
 }).RequireAuthorization();
 
 app.MapGet("/ping", () => Results.Ok());
+app.UseOnlySingleInstanceLaunching();
 app.Run();

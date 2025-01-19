@@ -4,6 +4,7 @@ using System.Reflection;
 using Windetta.Common.Configuration;
 using Windetta.Common.Constants;
 using Windetta.Common.Database;
+using Windetta.Common.Host;
 using Windetta.Common.MassTransit;
 using Windetta.Common.Types;
 using Windetta.Contracts.Events;
@@ -45,4 +46,5 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
+app.UseOnlySingleInstanceLaunching();
 app.Run();

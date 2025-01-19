@@ -5,6 +5,7 @@ using System.Reflection;
 using Windetta.Common.Configuration;
 using Windetta.Common.Constants;
 using Windetta.Common.Database;
+using Windetta.Common.Host;
 using Windetta.Common.MassTransit;
 using Windetta.Common.Types;
 using Windetta.TonTxns.Application.DAL;
@@ -54,4 +55,5 @@ builder.Host.UseServiceProviderFactory(
 var app = builder.Build();
 
 app.MapGet("/", () => "Windetta.TonTxns Service");
+app.UseOnlySingleInstanceLaunching();
 app.Run();

@@ -58,6 +58,8 @@ public sealed class LobbiesInteractor : IScopedService
 
         var options = await BuildLobbyOptions(request, initiatorId);
 
+        options.GameConfiguration = configurations.cfg;
+
         var lobby = await _useCasesFactory.Get<ICreateLobbyUseCase>()
              .ExecuteAsync(options);
 

@@ -8,4 +8,5 @@ public static class Svc
     public const string Notifications = "notifications";
     public const string Main = "main";
     public const string Lspm = "lspm";
+    public const string Web = "web";
 }

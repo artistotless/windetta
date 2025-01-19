@@ -28,9 +28,6 @@ public static class DependencyResolver
 
         services.AddTransient<IClaimsService, CustomClaimsService>();
 
-        if (EnvVars.FakeAuthEnabled)
-            services.AddTransient<ITokenCreationService, FakeTokenCreationService>();
-
         var builder = services.AddIdentityServer(options =>
         {
             // see https://identityserver4.readthedocs.io/en/latest/topics/resources.html

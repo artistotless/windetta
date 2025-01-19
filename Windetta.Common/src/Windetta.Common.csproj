@@ -5,10 +5,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <Platforms>AnyCPU;x86;x64;ARM32</Platforms>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <!--<GeneratePackageOnBuild>True</GeneratePackageOnBuild>-->
     <Description>Common classes for Windetta project</Description>
-    <PackageOutputPath>E:\Projects\windetta-misc\nugets</PackageOutputPath>
-    <Version>1.25.0</Version>
+    <!--<PackageOutputPath>E:\Projects\windetta-misc\nugets</PackageOutputPath>
+    <Version>1.25.0</Version>-->
     <IncludeSymbols>True</IncludeSymbols>
   </PropertyGroup>
 

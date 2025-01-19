@@ -29,6 +29,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Windetta.Web", "..\windetta
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IdentityServer4", "..\IdentityServer4Net8\IdentityServer4\IdentityServer4.csproj", "{F7A0A61C-C7E8-47D3-8419-72131AF49A9B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Windetta.Main.Core", "Windetta.Main.Core\Windetta.Main.Core.csproj", "{76261D7A-0A2A-4C39-90AF-21F1D321661B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -233,6 +235,22 @@ Global
 		{F7A0A61C-C7E8-47D3-8419-72131AF49A9B}.Release|x64.Build.0 = Release|Any CPU
 		{F7A0A61C-C7E8-47D3-8419-72131AF49A9B}.Release|x86.ActiveCfg = Release|Any CPU
 		{F7A0A61C-C7E8-47D3-8419-72131AF49A9B}.Release|x86.Build.0 = Release|Any CPU
+		{76261D7A-0A2A-4C39-90AF-21F1D321661B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{76261D7A-0A2A-4C39-90AF-21F1D321661B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{76261D7A-0A2A-4C39-90AF-21F1D321661B}.Debug|ARM32.ActiveCfg = Debug|ARM32
+		{76261D7A-0A2A-4C39-90AF-21F1D321661B}.Debug|ARM32.Build.0 = Debug|ARM32
+		{76261D7A-0A2A-4C39-90AF-21F1D321661B}.Debug|x64.ActiveCfg = Debug|x64
+		{76261D7A-0A2A-4C39-90AF-21F1D321661B}.Debug|x64.Build.0 = Debug|x64
+		{76261D7A-0A2A-4C39-90AF-21F1D321661B}.Debug|x86.ActiveCfg = Debug|x86
+		{76261D7A-0A2A-4C39-90AF-21F1D321661B}.Debug|x86.Build.0 = Debug|x86
+		{76261D7A-0A2A-4C39-90AF-21F1D321661B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{76261D7A-0A2A-4C39-90AF-21F1D321661B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{76261D7A-0A2A-4C39-90AF-21F1D321661B}.Release|ARM32.ActiveCfg = Release|ARM32
+		{76261D7A-0A2A-4C39-90AF-21F1D321661B}.Release|ARM32.Build.0 = Release|ARM32
+		{76261D7A-0A2A-4C39-90AF-21F1D321661B}.Release|x64.ActiveCfg = Release|x64
+		{76261D7A-0A2A-4C39-90AF-21F1D321661B}.Release|x64.Build.0 = Release|x64
+		{76261D7A-0A2A-4C39-90AF-21F1D321661B}.Release|x86.ActiveCfg = Release|x86
+		{76261D7A-0A2A-4C39-90AF-21F1D321661B}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

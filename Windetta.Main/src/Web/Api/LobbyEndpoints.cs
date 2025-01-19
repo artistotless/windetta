@@ -29,9 +29,9 @@ public static class LobbyEndpoints
         });
 
         // Get lobbies
-        group.MapGet("/", async ([FromServices] ILobbies lobbies) =>
+        group.MapGet("/", async ([FromServices] LobbiesInteractor interactor ) =>
         {
-            var result = await lobbies.GetAllAsync();
+            var result = await interactor.GetAllAsync();
             var response = new BaseResponse<IEnumerable<LobbyDto>>(result);
 
             return Results.Ok(response);
@@ -52,7 +52,7 @@ public static class LobbyEndpoints
             await hub.Clients.User(userId.ToString()).SendToMirrorAsync<Guid>(new
             (MainHub.Methods.SubscribeOnLobbyFlow, lobby.Id));
 
-            var response = new BaseResponse<ILobby>(lobby);
+            var response = new BaseResponse<LobbyDto>(new LobbyDto(lobby));
 
             return Results.Ok(response);
         });

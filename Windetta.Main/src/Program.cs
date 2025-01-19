@@ -4,6 +4,7 @@ using Serilog;
 using System.Reflection;
 using Windetta.Common.Configuration;
 using Windetta.Common.Constants;
+using Windetta.Common.Host;
 using Windetta.Common.Middlewares;
 using Windetta.Common.Types;
 using Windetta.Main.Core.Lobbies;
@@ -44,5 +45,6 @@ app.UseOngoingMatchesEndpoints();
 app.UseGameUIsEndpoints();
 app.MapGet("/", () => "Windetta");
 app.MapHub<MainHub>("/mainHub");
+app.UseOnlySingleInstanceLaunching();
 
 app.Run();

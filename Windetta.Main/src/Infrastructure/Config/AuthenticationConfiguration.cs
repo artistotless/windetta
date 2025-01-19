@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using System.Diagnostics;
 using Windetta.Common.Authentication;
 using Windetta.Common.Configuration;
 using Windetta.Common.Constants;
@@ -20,10 +18,24 @@ public static class AuthenticationConfiguration
 
         if (EnvVars.FakeAuthEnabled)
         {
-            authBuilder.AddScheme<FakeTokenOptions, FakeTokenHandler>(AuthSchemes.FirstConnectionAuth, null);
             authBuilder.AddScheme<FakeTokenOptions, FakeTokenHandler>(AuthSchemes.Bearer, null);
+        }
+        else
+        {
+            var clusterMap = services.BuildServiceProvider().GetRequiredService<IOptions<ClusterMap>>();
 
-            return;
+            authBuilder.AddJwtBearer(options =>
+            {
+                options.Authority = clusterMap.Value.IdentityUrl;
+                options.RequireHttpsMetadata = false;
+                options.MapInboundClaims = false;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateAudience = false,
+                    //TODO: set TRUE in production
+                    ValidateLifetime = false,
+                };
+            });
         }
 
         var cfg = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
@@ -40,21 +52,5 @@ public static class AuthenticationConfiguration
                 options.ValidateLifetime = section
                 .GetValue<bool>(nameof(RealtimeTokenOptions.ValidateLifetime));
             });
-
-        var clusterMap = services.BuildServiceProvider()
-            .GetRequiredService<IOptions<ClusterMap>>();
-
-        authBuilder.AddJwtBearer(options =>
-        {
-            options.Authority = clusterMap.Value.IdentityUrl;
-            options.RequireHttpsMetadata = false;
-            options.MapInboundClaims = false;
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateAudience = false,
-                //TODO: set TRUE
-                ValidateLifetime = false,
-            };
-        });
     }
 }

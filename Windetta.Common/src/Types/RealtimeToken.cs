@@ -6,11 +6,6 @@
 public class RealtimeToken
 {
     /// <summary>
-    /// Token ID
-    /// </summary>
-    public string Id { get; set; }
-
-    /// <summary>
     /// User's displayName 
     /// </summary>
     public string Nickname { get; set; }
