@@ -1,9 +1,9 @@
 ﻿using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.HttpOverrides;
 using Serilog;
-using System.Diagnostics;
 using System.Reflection;
 using Windetta.Common.Configuration;
+using Windetta.Common.Constants;
 using Windetta.Common.Middlewares;
 using Windetta.Common.Types;
 using Windetta.Main.Core.Lobbies;
@@ -36,7 +36,7 @@ app.UseForwardedHeaders(new ForwardedHeadersOptions
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 });
 app.UseMiddleware<ErrorHandlerMiddleware>();
-app.UseCors("allow_any_origins");
+app.UseCors(CorsPolicyNames.ALLOW_ANY);
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseLobbyEndpoints();

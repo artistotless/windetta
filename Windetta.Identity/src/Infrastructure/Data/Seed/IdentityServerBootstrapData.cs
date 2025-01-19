@@ -12,7 +12,7 @@ public static class IdentityServerBootstrapData
         new IdentityResources.Profile(),
         new IdentityResources.Email(),
     };
-
+    
     public static IEnumerable<ApiResource> ApiResources =>
       new ApiResource[]
       {

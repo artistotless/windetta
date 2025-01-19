@@ -1,10 +1,12 @@
-﻿namespace Windetta.Main.Infrastructure.Config;
+﻿using Windetta.Common.Constants;
+
+namespace Windetta.Main.Infrastructure.Config;
 
 public static class CorsConfiguration
 {
     public static void Configure(IServiceCollection services)
     {
-        services.AddCors(o => o.AddPolicy("allow_any_origins", builder =>
+        services.AddCors(o => o.AddPolicy(CorsPolicyNames.ALLOW_ANY, builder =>
         {
             builder.AllowAnyHeader();
             builder.AllowAnyMethod();

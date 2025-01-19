@@ -1,4 +1,5 @@
-﻿using Windetta.Common.Constants;
+﻿using Windetta.Common.Configuration;
+using Windetta.Common.Constants;
 using Windetta.Common.Types;
 
 namespace Windetta.Main.Infrastructure.Services;
@@ -15,12 +16,12 @@ public class DefaultInstanceIdProvider : IInstanceIdProvider
 
     public string GetId()
     {
-        var envValue = Environment.GetEnvironmentVariable("InstanceId");
+        var instanceIdFromEnv = EnvVars.InstanceID;
         var template = (Guid id) => $"Windetta.{nameof(Svc.Main)}.{id}";
 
         // Get value from Environment
-        if (!string.IsNullOrEmpty(envValue))
-            return template(new Guid(envValue));
+        if (!string.IsNullOrEmpty(instanceIdFromEnv))
+            return template(new Guid(instanceIdFromEnv));
 
         // Get value from configuration
         if (!string.IsNullOrEmpty(_instanceId))

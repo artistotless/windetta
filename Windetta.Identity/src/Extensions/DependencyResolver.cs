@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using System.Diagnostics;
 using System.Reflection;
 using Windetta.Common.Authentication;
+using Windetta.Common.Configuration;
 using Windetta.Common.Constants;
 using Windetta.Common.Database;
 using Windetta.Common.Options;
@@ -28,10 +28,16 @@ public static class DependencyResolver
 
         services.AddTransient<IClaimsService, CustomClaimsService>();
 
+        if (EnvVars.FakeAuthEnabled)
+            services.AddTransient<ITokenCreationService, FakeTokenCreationService>();
+
         var builder = services.AddIdentityServer(options =>
         {
             // see https://identityserver4.readthedocs.io/en/latest/topics/resources.html
-            options.EmitStaticAudienceClaim = true;
+            options.EmitStaticAudienceClaim = false;
+            options.Events.RaiseSuccessEvents = true;
+            options.Events.RaiseErrorEvents = true;
+            options.Events.RaiseInformationEvents = true;
         });
 
         using var provider = services.BuildServiceProvider();
@@ -71,12 +77,10 @@ public static class DependencyResolver
         authBuilder.AddVk(configuration);
         authBuilder.AddGoogle(configuration);
 
-        var useFakeAuth = Environment.GetEnvironmentVariable("FAKE_AUTH") == "Enabled";
-
-        if (useFakeAuth)
+        if (EnvVars.FakeAuthEnabled)
         {
             authBuilder.AddScheme<FakeTokenOptions, FakeTokenHandler>(AuthSchemes.Bearer, null);
-            
+
             return;
         }
 

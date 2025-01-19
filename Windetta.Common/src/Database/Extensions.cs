@@ -25,7 +25,7 @@ public static class Extensions
 
         services.AddDbContext<T>(options => options.UseMySql(connString, new MySqlServerVersion(settings.Version),
              b => b.MigrationsAssembly(assembly.FullName))
-             .EnableSensitiveDataLogging(enableSensitiveDataLogging));
+            /* .EnableSensitiveDataLogging(enableSensitiveDataLogging)*/);
 
         provider.Dispose();
 

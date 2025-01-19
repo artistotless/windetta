@@ -37,6 +37,7 @@ public static class Errors
         public const string UserNotFound = "user_not_found";
         public const string AuthCodeNotFound = "auth_code_not_found";
         public const string IsAllowedOnlyForUser = "allowed_only_for_user";
+        public const string FakeAuthInvalidTokenType = "for_fake_auth_only_access_token_compatible";
     }
 
     public static class Wallet

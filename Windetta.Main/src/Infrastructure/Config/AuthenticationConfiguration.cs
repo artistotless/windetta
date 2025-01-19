@@ -18,9 +18,7 @@ public static class AuthenticationConfiguration
             options.DefaultChallengeScheme = AuthSchemes.Bearer;
         });
 
-        var useFakeAuth = Environment.GetEnvironmentVariable("FAKE_AUTH") == "Enabled";
-
-        if (useFakeAuth)
+        if (EnvVars.FakeAuthEnabled)
         {
             authBuilder.AddScheme<FakeTokenOptions, FakeTokenHandler>(AuthSchemes.FirstConnectionAuth, null);
             authBuilder.AddScheme<FakeTokenOptions, FakeTokenHandler>(AuthSchemes.Bearer, null);
