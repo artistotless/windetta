@@ -12,19 +12,56 @@ using Windetta.Common.Types;
 namespace Windetta.Common.Authentication;
 
 public sealed record FakeToken(Guid UserId, string Nickname, string[] Scopes);
-public sealed class FakeTokenOptions : AuthenticationSchemeOptions { }
+public sealed class FakeTokenOptions : AuthenticationSchemeOptions
+{
+    /// <summary>
+    /// Authenticates with this scheme in case fake authentication cannot be performed.
+    /// </summary>
+    public string FallbackScheme = string.Empty;
+}
 
 public class FakeTokenHandler : AuthenticationHandler<FakeTokenOptions>
 {
-    public FakeTokenHandler(IOptionsMonitor<FakeTokenOptions> options, ILoggerFactory logger, UrlEncoder encoder)
+    private readonly IAuthenticationService _authenticationService;
+    private readonly IAuthenticationSchemeProvider _schemeProvider;
+
+    public FakeTokenHandler(
+        IAuthenticationService authenticationService,
+        IAuthenticationSchemeProvider schemeProvider,
+        IOptionsMonitor<FakeTokenOptions> options,
+        ILoggerFactory logger,
+        UrlEncoder encoder)
         : base(options, logger, encoder)
     {
+        _authenticationService = authenticationService;
+        _schemeProvider = schemeProvider;
     }
 
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         Logger.LogDebug("FakeTokenHandler: begins");
 
+        AuthenticateResult result = null!;
+
+        try
+        {
+            result = await HandleAsync();
+        }
+        catch (Exception e)
+        {
+            var fallBackScheme = await _schemeProvider.GetSchemeAsync(Options.FallbackScheme);
+
+            if (fallBackScheme is null)
+                return AuthenticateResult.Fail(e.Message);
+
+            result = await _authenticationService.AuthenticateAsync(Context, Options.FallbackScheme);
+        }
+
+        return result;
+    }
+
+    private async Task<AuthenticateResult> HandleAsync()
+    {
         string? token = null;
 
         Context.Request.Headers.TryGetValue("X-Auth", out var tokenFromCustomHeader);
@@ -33,10 +70,10 @@ public class FakeTokenHandler : AuthenticationHandler<FakeTokenOptions>
         token ??= Context.Request.Query[JwtClaimTypes.AccessToken].ToNullableString();
         token ??= Context.Request.Headers.Authorization.ToNullableString();
 
-        if (string.IsNullOrEmpty(token))
-            return AuthenticateResult.Fail("No X-Auth token");
-
         FakeToken? tokenData = null;
+
+        if (string.IsNullOrEmpty(token))
+            throw new Exception("No X-Auth token");
 
         if (token.StartsWith(AuthSchemes.Bearer))
             token = token.Remove(0, 7);
@@ -47,13 +84,13 @@ public class FakeTokenHandler : AuthenticationHandler<FakeTokenOptions>
             var fromBase64Text = Encoding.UTF8.GetString(fromBase64Bytes);
             tokenData = JsonConvert.DeserializeObject<FakeToken>(fromBase64Text);
         }
-        catch
+        catch (Exception e)
         {
-            return AuthenticateResult.Fail("Cannot deserialize the fake token");
+            throw new Exception("Cannot deserialize fake token", e);
         }
 
         if (tokenData is null)
-            return AuthenticateResult.Fail("Fake token is empty");
+            throw new Exception("Fake token is empty");
 
         Logger.LogDebug("FakeTokenHandler: successfully verified");
 

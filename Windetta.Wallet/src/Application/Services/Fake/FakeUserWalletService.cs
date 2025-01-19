@@ -24,12 +24,12 @@ public class FakeUserWalletService : IUserWalletService
 
     public Task DeductUnHoldAsync(IEnumerable<Guid> userIds, FundsInfo funds)
     {
-        throw new NotImplementedException();
+        return Task.CompletedTask;
     }
 
     public Task DeductUnHoldAsync(DeductUnHoldArgument arg)
     {
-        throw new NotImplementedException();
+        return Task.CompletedTask;
     }
 
     public Task<UserBalance> GetBalance(Guid userId, int currencyId)

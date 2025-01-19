@@ -74,14 +74,18 @@ public static class DependencyResolver
         authBuilder.AddVk(configuration);
         authBuilder.AddGoogle(configuration);
 
+        var authScheme = AuthSchemes.Bearer;
+
         if (EnvVars.FakeAuthEnabled)
         {
-            authBuilder.AddScheme<FakeTokenOptions, FakeTokenHandler>(AuthSchemes.Bearer, null);
-
-            return;
+            authScheme = nameof(JwtBearerHandler);
+            authBuilder.AddScheme<FakeTokenOptions, FakeTokenHandler>(AuthSchemes.Bearer, o =>
+            {
+                o.FallbackScheme = authScheme;
+            });
         }
 
-        authBuilder.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+        authBuilder.AddJwtBearer(authScheme, options =>
         {
             // TODO: remove directives, fetch authority from appsettings or environment
 #if DEBUG

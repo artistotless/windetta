@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Windetta.Common.Authentication;
 using Windetta.Common.Configuration;
@@ -16,27 +17,31 @@ public static class AuthenticationConfiguration
             options.DefaultChallengeScheme = AuthSchemes.Bearer;
         });
 
+        var authScheme = AuthSchemes.Bearer;
+
         if (EnvVars.FakeAuthEnabled)
         {
-            authBuilder.AddScheme<FakeTokenOptions, FakeTokenHandler>(AuthSchemes.Bearer, null);
-        }
-        else
-        {
-            var clusterMap = services.BuildServiceProvider().GetRequiredService<IOptions<ClusterMap>>();
-
-            authBuilder.AddJwtBearer(options =>
+            authScheme = nameof(JwtBearerHandler);
+            authBuilder.AddScheme<FakeTokenOptions, FakeTokenHandler>(AuthSchemes.Bearer, o =>
             {
-                options.Authority = clusterMap.Value.IdentityUrl;
-                options.RequireHttpsMetadata = false;
-                options.MapInboundClaims = false;
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateAudience = false,
-                    //TODO: set TRUE in production
-                    ValidateLifetime = false,
-                };
+                o.FallbackScheme = authScheme;
             });
         }
+
+        var clusterMap = services.BuildServiceProvider().GetRequiredService<IOptions<ClusterMap>>();
+
+        authBuilder.AddJwtBearer(authScheme, options =>
+        {
+            options.Authority = clusterMap.Value.IdentityUrl;
+            options.RequireHttpsMetadata = false;
+            options.MapInboundClaims = false;
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false,
+                //TODO: set TRUE in production
+                ValidateLifetime = false,
+            };
+        });
 
         var cfg = services.BuildServiceProvider().GetRequiredService<IConfiguration>();
 
