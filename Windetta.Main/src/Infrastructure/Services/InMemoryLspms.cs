@@ -13,14 +13,15 @@ public sealed class InMemoryLspms : ILspms
         {
             new Lspm()
             {
-                Endpoint = new Uri("https://gs1-node.feed78.com:55005"),
+                Endpoint = new Uri("https://localhost:55005"),
                 Id = Guid.NewGuid(),
                 Load = 0,
                 SupportedGames = [ ExampleGuids.GameId],
             },
+
             new Lspm()
             {
-                Endpoint = new Uri("https://localhost:55005"),
+                Endpoint = new Uri("https://gs1-node.feed78.com:55005"),
                 Id = Guid.NewGuid(),
                 Load = 0,
                 SupportedGames = [ ExampleGuids.GameId],

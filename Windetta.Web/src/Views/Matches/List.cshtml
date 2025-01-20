@@ -1,0 +1,14 @@
+﻿@model IEnumerable<Guid>
+
+<div id="matches">Matches</div>
+<br />
+
+<ul>
+@{
+
+foreach (var matchId in Model)
+    {
+        <li>@matchId</li>
+    }
+}
+</ul>

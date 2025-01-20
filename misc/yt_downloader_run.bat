@@ -1,0 +1,1 @@
+docker run -d --cap-add SYS_ADMIN --device /dev/fuse --restart always --name yt_downloader_dev -p 7002:443 -p 5011:80 -e RABBIT_HOST=rabbit_dev -e VOLUME_PATH=/s2s-videos -e VOLUME_NAME=gluster-volume1 -e GLUSTER_SERVICE=80.87.197.76 -v D:\BusyBox\certs:/app/SecurityKeys artistotless/s2s-yt-downloader:latest

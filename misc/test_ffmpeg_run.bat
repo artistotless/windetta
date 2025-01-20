@@ -1,0 +1,1 @@
+docker run --net=host --privileged --restart always --name ffmpeg_dev -p 1935:1935 -p 80:80 -v E:\BusyBox\gluster\storage:/mnt artistotless/s2s-webui:latest

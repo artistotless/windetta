@@ -1,0 +1,237 @@
+{
+    "$help": "https://aka.ms/terminal-documentation",
+    "$schema": "https://aka.ms/terminal-profiles-schema",
+    "actions": 
+    [
+        {
+            "command": 
+            {
+                "action": "copy",
+                "singleLine": false
+            },
+            "id": "User.copy.644BA8F2",
+            "keys": "ctrl+c"
+        },
+        {
+            "command": "paste",
+            "id": "User.paste",
+            "keys": "ctrl+v"
+        },
+        {
+            "command": 
+            {
+                "action": "splitPane",
+                "split": "auto",
+                "splitMode": "duplicate"
+            },
+            "id": "User.splitPane.A6751878",
+            "keys": "alt+shift+d"
+        },
+        {
+            "command": "find",
+            "id": "User.find",
+            "keys": "ctrl+shift+f"
+        }
+    ],
+    "copyFormatting": "none",
+    "copyOnSelect": false,
+    "defaultProfile": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+    "firstWindowPreference": "defaultProfile",
+    "focusFollowMouse": false,
+    "newTabMenu": 
+    [
+        {
+            "allowEmpty": false,
+            "entries": 
+            [
+                {
+                    "profile": "{9f423b33-6c63-4c99-8929-fe7f907764c8}",
+                    "type": "profile"
+                },
+                {
+                    "profile": "{ddb5e3ae-fe16-4961-b04d-4b313198a086}",
+                    "type": "profile"
+                },
+                {
+                    "profile": "{8d10a177-4fa3-4ba7-a207-3c9f0ede3530}",
+                    "type": "profile"
+                },
+                {
+                    "profile": "{c9ca446d-187b-4ced-b41f-ec450b999f31}",
+                    "type": "profile"
+                },
+                {
+                    "profile": "{2aa3e463-297a-482e-904f-bfe11eef4a3b}",
+                    "type": "profile"
+                },
+                {
+                    "profile": "{5a182624-c061-4488-98f4-8c5b75eeab10}",
+                    "type": "profile"
+                },
+                {
+                    "profile": "{cfb8460a-031c-487c-b9f7-6e1a61ba44e4}",
+                    "type": "profile"
+                },
+                {
+                    "profile": "{9307f793-33b1-4334-8e69-6598e975dff6}",
+                    "type": "profile"
+                },
+                {
+                    "profile": "{8e46d6cb-b2e9-498a-9240-fcfe78146770}",
+                    "type": "profile"
+                }
+            ],
+            "icon": null,
+            "inline": "never",
+            "name": "Windetta",
+            "type": "folder"
+        }
+    ],
+    "profiles": 
+    {
+        "defaults": 
+        {
+            "colorScheme": "One Half Dark",
+            "cursorShape": "vintage",
+            "experimental.retroTerminalEffect": false,
+            "font": 
+            {
+                "face": "Cascadia Mono"
+            }
+        },
+        "list": 
+        [
+            {
+                "commandline": "%SystemRoot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+                "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+                "hidden": false,
+                "name": "Windows PowerShell"
+            },
+            {
+                "commandline": "%SystemRoot%\\System32\\cmd.exe",
+                "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
+                "hidden": false,
+                "name": "\u041a\u043e\u043c\u0430\u043d\u0434\u043d\u0430\u044f \u0441\u0442\u0440\u043e\u043a\u0430"
+            },
+            {
+                "guid": "{b453ae62-4e3d-5e58-b989-0a998ec441b8}",
+                "hidden": false,
+                "name": "Azure Cloud Shell",
+                "source": "Windows.Terminal.Azure"
+            },
+            {
+                "commandline": "cmd /k \"E:\\Projects\\windetta\\misc\\windetta-services_run_fake_auth.bat\"",
+                "guid": "{9f423b33-6c63-4c99-8929-fe7f907764c8}",
+                "hidden": false,
+                "icon": "E:\\Projects\\windetta\\icons\\main.png",
+                "name": "Windetta-FakeAuth-AllServices"
+            },
+            {
+                "commandline": "cmd /k \"E: && set ASPNETCORE_ENVIRONMENT=Development && cd E:\\Projects\\windetta\\Windetta.Main\\src\\bin\\Debug\\net8.0\\ && dotnet Windetta.Main.dll \"",
+                "guid": "{ddb5e3ae-fe16-4961-b04d-4b313198a086}",
+                "hidden": false,
+                "icon": "E:\\Projects\\windetta\\icons\\main.png",
+                "name": "Main"
+            },
+            {
+                "commandline": "cmd /k \"E: && set ASPNETCORE_ENVIRONMENT=Development && cd E:\\Projects\\lspm\\src\\bin\\Debug\\net8.0\\ && dotnet LSPM.dll \"",
+                "guid": "{8d10a177-4fa3-4ba7-a207-3c9f0ede3530}",
+                "hidden": false,
+                "icon": "E:\\Projects\\lspm\\src\\bin\\Debug\\net8.0\\process.ico",
+                "name": "Lspm",
+                "startingDirectory": null,
+                "tabTitle": "LSPM"
+            },
+            {
+                "commandline": "cmd /k \"E: && set ASPNETCORE_ENVIRONMENT=Development && set TEST_MODE=Enabled && cd E:\\Projects\\lspm\\src\\bin\\Debug\\net8.0\\ && dotnet LSPM.dll \"",
+                "guid": "{c9ca446d-187b-4ced-b41f-ec450b999f31}",
+                "hidden": false,
+                "icon": "E:\\Projects\\windetta\\icons\\lspm.ico",
+                "name": "Lspm (TestMode)"
+            },
+            {
+                "commandline": "cmd /k \"E: && set ASPNETCORE_ENVIRONMENT=Development && cd E:\\Projects\\windetta\\Windetta.TonTxns\\src\\bin\\Debug\\net8.0\\ && dotnet Windetta.TonTxns.dll \"",
+                "guid": "{2aa3e463-297a-482e-904f-bfe11eef4a3b}",
+                "hidden": false,
+                "name": "TonTxns"
+            },
+            {
+                "commandline": "cmd /k \"E: && set ASPNETCORE_ENVIRONMENT=Development && cd E:\\Projects\\windetta\\Windetta.Wallet\\src\\bin\\Debug\\net8.0\\ && dotnet Windetta.Wallet.dll \"",
+                "guid": "{5a182624-c061-4488-98f4-8c5b75eeab10}",
+                "hidden": false,
+                "icon": "E:\\Projects\\windetta\\icons\\wallet.png",
+                "name": "Wallet"
+            },
+            {
+                "commandline": "cmd /k \"E: && set ASPNETCORE_ENVIRONMENT=Development && cd E:\\Projects\\windetta\\Windetta.Identity\\src\\bin\\Debug\\net8.0\\ && dotnet Identity.dll \"",
+                "guid": "{cfb8460a-031c-487c-b9f7-6e1a61ba44e4}",
+                "hidden": false,
+                "icon": "E:\\Projects\\windetta\\icons\\identity.png",
+                "name": "Identity"
+            },
+            {
+                "commandline": "cmd /k \"E: && set ASPNETCORE_ENVIRONMENT=Development && cd E:\\Projects\\windetta-mvc\\src\\bin\\Debug\\net9.0\\ && dotnet Windetta.Web.dll \"",
+                "guid": "{9307f793-33b1-4334-8e69-6598e975dff6}",
+                "hidden": false,
+                "name": "Web"
+            },
+            {
+                "commandline": "cmd /k \"E: && set ASPNETCORE_ENVIRONMENT=Development && set TEST_MODE=Enabled && cd E:\\Projects\\gameservers\\sea-battle\\src\\bin\\Debug\\net8.0\\ && dotnet SeaBattle.dll 54575fee-c3bb-4e00-bc08-b35b6be53a7d http://localhost:65274 20002 E:\\Projects\\gameservers\\sea-battle\\src\bin\\Debug\\net8.0\\ 20001 \"",
+                "guid": "{8e46d6cb-b2e9-498a-9240-fcfe78146770}",
+                "hidden": false,
+                "name": "Games.SeaBattle (TestMode)"
+            },
+            {
+                "guid": "{9da03113-9c20-58ea-adf7-ee9583bfdf48}",
+                "hidden": false,
+                "name": "Developer Command Prompt for VS 2022",
+                "source": "Windows.Terminal.VisualStudio"
+            },
+            {
+                "guid": "{84897238-5b65-5de3-97c7-f6bc207cebda}",
+                "hidden": false,
+                "name": "Developer PowerShell for VS 2022",
+                "source": "Windows.Terminal.VisualStudio"
+            },
+            {
+                "guid": "{16208362-94fc-5b1f-a491-5b2624d5ab56}",
+                "hidden": true,
+                "name": "Visual Studio Debug Console",
+                "source": "VSDebugConsole"
+            },
+            {
+                "commandline": "cmd /k \"E: && set ASPNETCORE_ENVIRONMENT=Development && set FAKE_AUTH=Enabled && cd E:\\Projects\\gameservers\\sea-battle\\src\\bin\\Debug\\net8.0\\ && dotnet SeaBattle.dll 54575fee-c3bb-4e00-bc08-b35b6be53a7d http://localhost:65274 20002 E:\\Projects\\gameservers\\sea-battle\\src\bin\\Debug\\net8.0\\ 20001 \"",
+                "guid": "{82108d1c-7da5-41d9-8943-a770cf61355a}",
+                "hidden": false,
+                "name": "Games.SeaBattle (TestMode) (Copy)"
+            },
+            {
+                "guid": "{c1159038-5ad7-58b3-b178-4b8b0f3a9bbc}",
+                "hidden": false,
+                "name": "Developer Command Prompt for VS 2022",
+                "source": "Windows.Terminal.VisualStudio"
+            },
+            {
+                "guid": "{4e1b07f1-c969-5b77-9bc4-787a008288bd}",
+                "hidden": false,
+                "name": "Developer PowerShell for VS 2022",
+                "source": "Windows.Terminal.VisualStudio"
+            },
+            {
+                "guid": "{6d9b1058-c36b-5550-bf84-7238dcc164c2}",
+                "hidden": false,
+                "name": "Developer Command Prompt for VS 2022 [Preview]",
+                "source": "Windows.Terminal.VisualStudio"
+            },
+            {
+                "guid": "{08ec9a30-1b4e-533d-91ea-a2546fbf025a}",
+                "hidden": false,
+                "name": "Developer PowerShell for VS 2022 [Preview]",
+                "source": "Windows.Terminal.VisualStudio"
+            }
+        ]
+    },
+    "schemes": [],
+    "theme": "dark",
+    "themes": []
+}

@@ -1,0 +1,32 @@
+﻿@using LSPM.Models;
+@using Windetta.Main.Core.Matches;
+@model OngoingMatch
+
+<div id="players">
+    <ul>
+    @foreach (var player in Model.Players)
+    {
+        <li>@player.Name : @player.Id</li>
+    }
+    </ul>
+</div>
+
+<hr />
+GameId : @Model.GameId
+<hr />
+Bet : @Model.Bet.Amount TON
+<hr />
+Created : @Model.Created
+<hr />
+
+<div id="gameContent"></div>
+
+<script>
+    var playerId = '@(ViewBag.PlayerId)';
+    var matchId = '@(ViewBag.MatchId)';
+</script>
+
+@section Scripts {
+    <script src="~/js/consts.js"></script>
+    <script src="~/js/match.js"></script>
+}

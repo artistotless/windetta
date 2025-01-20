@@ -1,0 +1,46 @@
+
+<div class="container">
+    <div class="row p-1">
+        <div class="col-6 text-end">
+            <input type="button" id="create_lobby" value="Create lobby">
+            <input type="button" id="get_lobbies" value="Get lobbies">
+        </div>
+    </div>
+    <div class="row p-1">
+        <div class="col-6">
+            <hr>
+        </div>
+    </div>
+    <div class="row p-1">
+        <div class="col-6">
+            <ul id="messagesList"></ul>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row p-1">
+        <div class="col-1">User Id</div>
+        <div class="col-5"><input type="text" class="w-100" id="user_id"></div>
+    </div>
+    <div class="row p-1">
+        <div class="col-1">Lobby Id</div>
+        <div class="col-5"><input type="text" class="w-100" id="lobby_id"></div>
+    </div>
+    <div class="row p-1">
+        <div class="col-1">Room Index</div>
+        <div class="col-5"><input type="text" class="w-100" id="room_index"></div>
+    </div>
+    <div class="row p-1">
+        <div class="col-6 text-end">
+            <input type="button" id="join_lobby" value="Join">
+            <input type="button" id="leave_lobby" value="Leave">
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/consts.js"></script>
+    <script src="~/js/signalr/dist/browser/signalr.js"></script>
+    <script src="~/js/lobby.js"></script>
+}

@@ -1,0 +1,273 @@
+// Установка .NET 8
+
+apt update
+apt upgrade
+apt install git
+apt-get install -y dotnet-sdk-8.0
+apt-get install -y aspnetcore-runtime-8.0 или apt-get install -y dotnet-runtime-8.0
+dotnet tool install --global dotnet-ef
+export PATH="$PATH:/root/.dotnet/tools"
+ssh-keygen -t ed25519 -C "neuralink7232050@gmail.com"
+
+
+// Добавить в файл /root/.bashrc агента для работы с гитом.
+
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519
+// после сохранения ввести в терминал source "$HOME/.bashrc"
+
+git config --global user.name "artistotless"
+git config --global user.email "neuralink7232050@gmail.com"
+
+// Сборка Windetta проекта
+
+cd /home
+mkdir projects
+cd projects
+
+git clone git@github.com:artistotless/windetta.git
+git clone git@github.com:artistotless/windetta-misc.git
+git clone git@github.com:artistotless/windetta-angular.git
+git clone git@github.com:artistotless/windetta-mvc.git
+
+cd windetta
+git checkout dev
+dotnet restore
+dotnet restore -s ../windetta-misc/nugets
+сd <Путь до папки в котором лежит общее решение Windetta>
+dotnet build
+
+// Установка Angular
+
+wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+
+export NVM_DIR="$HOME/.nvm" [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+nvm install 20
+npm install -g @angular/cli
+
+// Установка Docker
+
+sudo apt-get install ca-certificates curl
+sudo install -m 0755 -d /etc/apt/keyrings
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+sudo chmod a+r /etc/apt/keyrings/docker.asc
+# Add the repository to Apt sources:
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+
+sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+//  Запуск docker контейнеров
+
+cd /var
+mkdir mysql_8_init 
+cp /home/projects/windetta-misc/mysql_8_init/init.sql /var/mysql_8_init/init.sql
+
+docker run -d -p 3506:3306 -v /var/mysql_8_volume:/var/lib/mysql -v /var/mysql_8_init:/etc/mysql/conf.d -v /var/mysql_8_init:/docker-entrypoint-initdb.d -e "MYSQL_USER=user" -e "MYSQL_PASSWORD=userPass" -e "MYSQL_ROOT_PASSWORD=rootPass" --name mysql_dev_8_0 mysql:8.0
+
+docker run -d -p 5674:5672 -p 15674:15672 -v /var/rabbit_volume:/var/lib/rabbitmq -e "RABBITMQ_DEFAULT_PASS=@admin@" -e "RABBITMQ_DEFAULT_USER=admin" --name rabbit_dev rabbitmq:3-management
+
+// Обновление БД с миграций
+
+cd /home/projects/windetta/Windetta.Identity/src
+dotnet ef database update --context IdentityDbContext
+dotnet ef database update --context SagasDbContext
+
+cd /home/projects/windetta/Windetta.Main/src
+dotnet ef database update --context SagasDbContext
+
+cd /home/projects/windetta/Windetta.Wallet/src
+dotnet ef database update --context WalletDbContext
+
+cd /home/projects/windetta/Windetta.TonTxns/src
+dotnet ef database update --context TonDbContext
+dotnet ef database update --context SagasDbContext
+
+// Установка Nginx
+
+sudo apt-get install nginx
+sudo service nginx start
+vim /etc/nginx/sites-available/windetta
+
+server {
+  server_name identity.feed78.com;
+  location / {
+    proxy_pass http://127.0.0.1:56002;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Host $host;
+    proxy_cache_bypass $http_upgrade;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+  }
+
+  listen 443 ssl; # managed by Certbot
+  ssl_certificate /etc/letsencrypt/live/feed78.com/fullchain.pem; # managed by Certbot
+  ssl_certificate_key /etc/letsencrypt/live/feed78.com/privkey.pem; # managed by Certbot
+  include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+  ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+}
+
+server {
+  server_name main.feed78.com;
+  location / {
+    proxy_pass http://127.0.0.1:56001;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Host $host;
+    proxy_cache_bypass $http_upgrade;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+
+    # Configuration for WebSockets
+    proxy_set_header Connection $connection_upgrade;
+    proxy_cache off;
+  }
+
+  listen 443 ssl; # managed by Certbot
+  ssl_certificate /etc/letsencrypt/live/feed78.com/fullchain.pem; # managed by Certbot
+  ssl_certificate_key /etc/letsencrypt/live/feed78.com/privkey.pem; # managed by Certbot
+  include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+  ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+}
+
+server {
+  server_name spa-proxy.feed78.com;
+  location / {
+    proxy_pass http://127.0.0.1:56004;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Host $host;
+    proxy_cache_bypass $http_upgrade;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+  }
+
+  listen 443 ssl; # managed by Certbot
+  ssl_certificate /etc/letsencrypt/live/feed78.com/fullchain.pem; # managed by Certbot
+  ssl_certificate_key /etc/letsencrypt/live/feed78.com/privkey.pem; # managed by Certbot
+  include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+  ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+}
+
+server {
+  server_name gs1-node.feed78.com;
+
+  # game servers
+  location ~ ^/(?<port>[2-5]2[0-9][0-9][0-9])(?:/|$) {
+    rewrite "^/\d{5}(?:/(.*))?" /$1 break;
+    proxy_pass http://127.0.0.1:$port;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Host $host;
+    proxy_cache_bypass $http_upgrade;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+
+    # Configuration for WebSockets
+    proxy_set_header Connection $connection_upgrade;
+    proxy_cache off;
+  }
+
+  # # lspm
+  # location / {
+  #   proxy_pass http://127.0.0.1:56005;
+  #   proxy_http_version 1.1;
+  #   proxy_set_header Host $host;
+  #   proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  #   proxy_set_header X-Forwarded-Proto $scheme;
+  # }
+
+  listen 443 ssl; # managed by Certbot
+  ssl_certificate /etc/letsencrypt/live/feed78.com/fullchain.pem; # managed by Certbot
+  ssl_certificate_key /etc/letsencrypt/live/feed78.com/privkey.pem; # managed by Certbot
+  include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+  ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+}
+
+
+## ЭТО для SPA
+server {
+  server_name spa.feed78.com;
+
+  root /var/www/spa;
+  index index.html;
+
+  location /game {
+    # First attempt to serve request as file, then
+    # as directory, then fall back to redirecting to index.html
+    try_files $uri /game/client.html;
+  }
+  location / {
+    # First attempt to serve request as file, then
+    # as directory, then fall back to redirecting to index.html
+    try_files $uri /index.html;
+  }
+
+  listen 443 ssl; # managed by Certbot
+  ssl_certificate /etc/letsencrypt/live/feed78.com/fullchain.pem; # managed by Certbot
+  ssl_certificate_key /etc/letsencrypt/live/feed78.com/privkey.pem; # managed by Certbot
+  include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+  ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+}
+
+sudo ln -s /etc/nginx/sites-available/windetta /etc/nginx/sites-enabled/windetta
+sudo service nginx reload
+
+// Линкуем домен к ip адресу сервера
+
+...
+
+// Установка HTTPS сертификата https://certbot.eff.org/
+
+sudo apt install snapd
+sudo apt-get remove certbot
+sudo snap install --classic certbot
+sudo ln -s /snap/bin/certbot /usr/bin/certbot
+sudo snap set certbot trust-plugin-with-root=ok
+sudo snap install certbot-dns-cloudflare --------->>>> Если используется CloudFlare, иначе пропустить этот пункт
+certbot certonly --manual --domains <ДОМЕН> или <*.ДОМЕН> (если сертификат нужен для всех поддоменов)
+certbot --nginx
+
+// Установка дополнительных полезных инструментов
+
+apt install tmux
+source ~/.bashrc (внутри тмух сессии надо вызвать)
+
+// TMUX конфиг (/root/.tmux.conf (если нет - создать))
+
+set-option -g -q mouse on
+bind-key -T root WheelUpPane if-shell -F -t = "#{alternate_on}" "send-keys -M" "select-pane -t =; copy-mode -e; send-keys -M"
+bind-key -T root WheelDownPane if-shell -F -t = "#{alternate_on}" "send-keys -M" "select-pane -t =; send-keys -M"
+
+* Чтобы применить изменения - нужно в tmux сессии находясь, зажать Ctrl+B+: и ввести source ~/.tmux.conf
+
+apt install htop
+
+
+// Запуск проектов Windetta
+
+cd /home/projects/windetta/Windetta.Identity/src
+dotnet publish
+dotnet ./bin/Release/net8.0/Identity.dll --environment Production
+
+cd /home/projects/windetta/Windetta.Main/src
+dotnet publish
+dotnet ./bin/Release/net8.0/Windetta.Main.dll --environment Production
+
+cd /home/projects/windetta-mvc/src
+dotnet restore
+dotnet restore -s /home/projects/windetta-misc/nugets/
+dotnet publish
+dotnet ./bin/Release/net8.0/Windetta.Web.dll --environment Production
+
+cd /home/projects/windetta-angular
+git checkout dev
+npm i
+npm update
+ng build --configuration production
+# скопируй все из папки /home/projects/windetta-angular/dist/browser в /var/www/spa
