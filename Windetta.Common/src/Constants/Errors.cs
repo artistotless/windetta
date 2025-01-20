@@ -14,8 +14,11 @@ public static class Errors
         public const string LobbyNotFound = "lobby_notfound";
         public const string MemberAreNotInRoom = "member_are_not_in_the_room";
         public const string BetIsLessMinimumAllowed = "bet_is_less_minimum_allowed";
+        public const string TeamsAreGreaterMaximumAllowed = "teams_are_greater_maximum_allowed";
+        public const string TeamsAreLessMinimumRequired = "teams_are_less_minimum_allowed";
+        public const string SlotsAreGreaterMaximumAllowed = "slots_are_greater_maximum_allowed";
+        public const string SlotsAreLessMinimumRequired = "slots_are_less_minimum_allowed";
         #endregion
-
         #region LobbyPlugin
         public const string InvalidPluginName = "invalid_plugin_name";
         public const string RequirementTypeNotAllowed = "requirement_type_not_allowed";
@@ -33,7 +36,10 @@ public static class Errors
     {
         public const string UserNotFound = "user_not_found";
         public const string AuthCodeNotFound = "auth_code_not_found";
+        public const string IsAllowedOnlyForUser = "allowed_only_for_user";
+        public const string FakeAuthInvalidTokenType = "for_fake_auth_only_access_token_compatible";
     }
+
     public static class Wallet
     {
         public const string InvalidFreezeAmount = "invalid_freeze_amount";

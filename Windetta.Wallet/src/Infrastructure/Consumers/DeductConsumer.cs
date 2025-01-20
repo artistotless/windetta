@@ -22,6 +22,7 @@ public class DeductConsumer : IConsumer<IDeductBalance>
 
         await _walletService.DeductAsync(new(userId, funds)
         {
+            Type = context.Message.Type,
             OperationId = context.Message.CorrelationId
         });
 

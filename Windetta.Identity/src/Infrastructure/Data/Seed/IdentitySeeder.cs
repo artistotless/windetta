@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Windetta.Identity.Domain.Entities;
 using Windetta.Identity.Extensions;
 
@@ -15,7 +14,7 @@ public static class IdentitySeeder
         using var roleManager = app.ApplicationServices
          .GetRequiredService<RoleManager<Role>>();
 
-        using var dbContext =  app.ApplicationServices
+        using var dbContext = app.ApplicationServices
            .GetRequiredService<IdentityDbContext>();
 
         if (!roleManager.Roles.Any())

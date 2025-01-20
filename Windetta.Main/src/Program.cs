@@ -1,7 +1,10 @@
 ﻿using Autofac.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.HttpOverrides;
 using Serilog;
 using System.Reflection;
 using Windetta.Common.Configuration;
+using Windetta.Common.Constants;
+using Windetta.Common.Host;
 using Windetta.Common.Middlewares;
 using Windetta.Common.Types;
 using Windetta.Main.Core.Lobbies;
@@ -16,6 +19,7 @@ Log.Logger = new LoggerConfiguration()
     .CreateLogger();
 
 builder.Host.UseSerilog();
+builder.ConfigureClusterMap();
 builder.ConfigureComponentLaunchSettings();
 builder.AddInfrastructureLayer();
 
@@ -28,13 +32,19 @@ builder.Host.UseServiceProviderFactory(
 
 var app = builder.Build();
 
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
 app.UseMiddleware<ErrorHandlerMiddleware>();
-app.UseCors("allow_any_origins");
+app.UseCors(CorsPolicyNames.ALLOW_ANY);
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseLobbyEndpoints();
 app.UseOngoingMatchesEndpoints();
+app.UseGameUIsEndpoints();
 app.MapGet("/", () => "Windetta");
 app.MapHub<MainHub>("/mainHub");
+app.UseOnlySingleInstanceLaunching();
 
 app.Run();

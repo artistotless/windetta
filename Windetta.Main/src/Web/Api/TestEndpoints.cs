@@ -1,4 +1,5 @@
 ﻿using MassTransit;
+using Windetta.Common.Types;
 using Windetta.Contracts;
 using Windetta.Contracts.Events;
 using Windetta.Main.Core.Lobbies;
@@ -22,8 +23,7 @@ namespace Windetta.Main.Web.Api
                 {
                     Bet = new FundsInfo(1, 100),
                     GameId = gameId,
-                    InitiatorId = player1Id
-                });
+                }, player1Id);
 
                 await interactor.JoinMemberAsync(player2Id, lobby.Id, lobby.Rooms.First().Index);
 
@@ -33,7 +33,9 @@ namespace Windetta.Main.Web.Api
                     CorrelationId = lobby.Id,
                 });
 
-                return Results.Ok(lobby);
+                var response = new BaseResponse<ILobby>(lobby);
+
+                return Results.Ok(response);
             });
         }
     }

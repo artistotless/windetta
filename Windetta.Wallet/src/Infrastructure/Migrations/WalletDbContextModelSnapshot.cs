@@ -28,6 +28,9 @@ namespace Windetta.Wallet.Migrations
                     b.Property<long>("Amount")
                         .HasColumnType("BIGINT");
 
+                    b.Property<int>("CurrencyId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("TimeStamp")
                         .HasColumnType("DATETIME(6)");
 
@@ -42,21 +45,51 @@ namespace Windetta.Wallet.Migrations
                     b.ToTable("Transactions");
                 });
 
+            modelBuilder.Entity("Windetta.Wallet.Domain.UserBalance", b =>
+                {
+                    b.Property<Guid>("WalletId")
+                        .HasColumnType("CHAR(36)");
+
+                    b.Property<long>("Amount")
+                        .HasColumnType("BIGINT");
+
+                    b.Property<int>("CurrencyId")
+                        .HasColumnType("int");
+
+                    b.Property<long>("HeldAmount")
+                        .HasColumnType("BIGINT");
+
+                    b.HasKey("WalletId");
+
+                    b.ToTable("Balances");
+                });
+
             modelBuilder.Entity("Windetta.Wallet.Domain.UserWallet", b =>
                 {
                     b.Property<Guid>("UserId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("CHAR(36)");
 
-                    b.Property<long>("Balance")
-                        .HasColumnType("BIGINT");
-
-                    b.Property<long>("HeldBalance")
-                        .HasColumnType("BIGINT");
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime(6)");
 
                     b.HasKey("UserId");
 
                     b.ToTable("Wallets");
+                });
+
+            modelBuilder.Entity("Windetta.Wallet.Domain.UserBalance", b =>
+                {
+                    b.HasOne("Windetta.Wallet.Domain.UserWallet", null)
+                        .WithMany("Balances")
+                        .HasForeignKey("WalletId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Windetta.Wallet.Domain.UserWallet", b =>
+                {
+                    b.Navigation("Balances");
                 });
 #pragma warning restore 612, 618
         }

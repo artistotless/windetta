@@ -28,4 +28,9 @@ public sealed class MatchInfoResponse : ServiceResponse
     /// When the match was created
     /// </summary>
     public DateTimeOffset Created { get; init; }
+
+    /// <summary>
+    /// GameServer endpoint
+    /// </summary>
+    public Uri GameServerEndpoint { get; set; }
 }

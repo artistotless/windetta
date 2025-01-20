@@ -25,7 +25,7 @@ public abstract class AutoReadyStrategy : IAutoReadyStrategy
         if (CheckReady())
         {
             _timer.Dispose();
-            Lobby.OnAutoReady();
+            Lobby.CallReady();
         }
     }
 

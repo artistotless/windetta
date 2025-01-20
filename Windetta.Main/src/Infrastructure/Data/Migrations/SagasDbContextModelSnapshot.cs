@@ -94,6 +94,38 @@ namespace Windetta.Main.Infrastructure.Data.Migrations
 
                     b.ToTable("MatchFlow");
                 });
+
+            modelBuilder.Entity("Windetta.Main.Infrastructure.Sagas.ProcessingWinningsFlow", b =>
+                {
+                    b.Property<Guid>("CorrelationId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<ulong>("BetAmount")
+                        .HasColumnType("bigint unsigned");
+
+                    b.Property<int>("BetCurrencyId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<sbyte>("CurrentState")
+                        .HasColumnType("TINYINT");
+
+                    b.Property<string>("Losers")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Winners")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("CorrelationId");
+
+                    b.HasIndex("CorrelationId");
+
+                    b.ToTable("ProcessingWinningsFlow");
+                });
 #pragma warning restore 612, 618
         }
     }

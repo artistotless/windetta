@@ -131,7 +131,10 @@ public class TonWithdrawFlowTests : IUseHarness
         // act
         await harness.Bus.Publish(new FaultEvent<IDeductBalance>()
         {
-            Message = new DeductBalanceImpl() { CorrelationId = correllationId, }
+            Message = new DeductBalanceImpl()
+            {
+                CorrelationId = correllationId,
+            }
         });
         await sagaHarness.Consumed.Any<Fault<IBalanceDeducted>>();
 
@@ -331,6 +334,7 @@ public class DeductBalanceImpl : IDeductBalance
     public Guid CorrelationId { get; set; }
     public Guid UserId { get; set; }
     public FundsInfo Funds { get; set; }
+    public NegativeBalanceOperationType Type { get; set; }
 }
 
 public class UnDeductBalanceImpl : IUnDeductBalance

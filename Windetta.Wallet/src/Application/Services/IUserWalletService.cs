@@ -15,6 +15,7 @@ public interface IUserWalletService : IScopedService
     Task UnHoldBalanceAsync(IEnumerable<Guid> userIds, FundsInfo funds);
     Task TransferAsync(TransferArgument arg);
     Task DeductAsync(DeductArgument arg);
+    Task DeductUnHoldAsync(DeductUnHoldArgument arg);
     Task CancelDeductAsync(Guid operationId);
-    Task TopUpBalance(TopUpArgument arg);
+    Task IncreaseBalance(IncreaseArgument arg);
 }

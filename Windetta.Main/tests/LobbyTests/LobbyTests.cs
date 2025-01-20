@@ -31,14 +31,13 @@ public class LobbyTests
         var request = new CreateLobbyDto()
         {
             GameId = ExampleGuids.GameId,
-            InitiatorId = ExampleGuids.UserId,
             Bet = new FundsInfo(currencyId: 1, amount: 100)
         };
 
         // act
         var interactor = provider.GetRequiredService<LobbiesInteractor>();
 
-        ILobby lobby = await interactor.CreateAsync(request);
+        ILobby lobby = await interactor.CreateAsync(request, ExampleGuids.UserId);
 
         // assert
         lobby.Rooms.Count().ShouldBe((int)gameCfg.MaxTeams);
@@ -52,7 +51,6 @@ public class LobbyTests
         var request = new CreateLobbyDto()
         {
             GameId = ExampleGuids.GameId,
-            InitiatorId = ExampleGuids.UserId,
             Bet = new FundsInfo(currencyId: 1, amount: 100)
         };
 
@@ -62,7 +60,7 @@ public class LobbyTests
         var memberId = Guid.NewGuid();
 
         // act
-        ILobby lobby = await interactor.CreateAsync(request);
+        ILobby lobby = await interactor.CreateAsync(request, ExampleGuids.UserId);
         var room = lobby.Rooms.First();
         await interactor.JoinMemberAsync(memberId, lobby.Id, room.Index);
 
@@ -77,14 +75,13 @@ public class LobbyTests
         var request = new CreateLobbyDto()
         {
             GameId = ExampleGuids.GameId,
-            InitiatorId = ExampleGuids.UserId,
             Bet = new FundsInfo(currencyId: 1, amount: 100)
         };
 
         var interactor = SharedServiceProvider.GetInstance()
             .GetRequiredService<LobbiesInteractor>();
 
-        ILobby lobby = await interactor.CreateAsync(request);
+        ILobby lobby = await interactor.CreateAsync(request, ExampleGuids.UserId);
         var memberId = Guid.NewGuid();
         bool updateEventRaised = false;
         var tcs = new TaskCompletionSource<bool>();
@@ -111,21 +108,18 @@ public class LobbyTests
         var request = new CreateLobbyDto()
         {
             GameId = ExampleGuids.GameId,
-            InitiatorId = ExampleGuids.UserId,
             Bet = new FundsInfo(currencyId: 1, amount: 100)
         };
 
         var interactor = SharedServiceProvider.GetInstance()
             .GetRequiredService<LobbiesInteractor>();
 
-        ILobby lobby = await interactor.CreateAsync(request);
+        ILobby lobby = await interactor.CreateAsync(request, ExampleGuids.UserId);
         var memberId = Guid.NewGuid();
         bool updateEventRaised = false;
-        var tcs = new TaskCompletionSource<bool>();
 
         EventHandler callback = delegate (object? sender, EventArgs e)
         {
-            tcs.SetResult(true);
             updateEventRaised = true;
         };
 

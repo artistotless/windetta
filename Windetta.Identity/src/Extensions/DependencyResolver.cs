@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.Reflection;
+using Windetta.Common.Authentication;
+using Windetta.Common.Configuration;
+using Windetta.Common.Constants;
 using Windetta.Common.Database;
 using Windetta.Common.Options;
 using Windetta.Identity.Domain.Entities;
@@ -28,7 +31,10 @@ public static class DependencyResolver
         var builder = services.AddIdentityServer(options =>
         {
             // see https://identityserver4.readthedocs.io/en/latest/topics/resources.html
-            options.EmitStaticAudienceClaim = true;
+            options.EmitStaticAudienceClaim = false;
+            options.Events.RaiseSuccessEvents = true;
+            options.Events.RaiseErrorEvents = true;
+            options.Events.RaiseInformationEvents = true;
         });
 
         using var provider = services.BuildServiceProvider();
@@ -59,15 +65,6 @@ public static class DependencyResolver
         var authBuilder = services.AddAuthentication(IdentityConstants.ApplicationScheme);
         var configuration = provider.GetRequiredService<IConfiguration>();
 
-        authBuilder.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
-        {
-            options.Authority = "https://localhost:7159";
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateAudience = false
-            };
-        });
-
         services.ConfigureApplicationCookie(options =>
         {
             options.Cookie.Name = "windetta.identity";
@@ -76,6 +73,29 @@ public static class DependencyResolver
 
         authBuilder.AddVk(configuration);
         authBuilder.AddGoogle(configuration);
+
+        if (EnvVars.FakeAuthEnabled)
+        {
+            authBuilder.AddScheme<FakeTokenOptions, FakeTokenHandler>(AuthSchemes.Bearer, null);
+
+            return;
+        }
+
+        authBuilder.AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
+        {
+            // TODO: remove directives, fetch authority from appsettings or environment
+#if DEBUG
+            options.Authority = "https://localhost:55002";
+#else
+            options.Authority = "https://identity.feed78.com";
+#endif
+            options.MapInboundClaims = false;
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false,
+                ValidateLifetime = false,
+            };
+        });
     }
 
     // Add  external authentication provider 'vk.com'

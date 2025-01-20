@@ -1,6 +1,7 @@
 ﻿using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 using Windetta.Common.Authentication;
+using Windetta.Common.Types;
 using Windetta.Contracts.Events;
 using Windetta.Contracts.Responses;
 using Windetta.Main.Core.Matches;
@@ -11,44 +12,59 @@ public static class OngoingMatchesEndpoints
 {
     public static void UseOngoingMatchesEndpoints(this WebApplication web)
     {
-        // Get all current matches information
+        // Get all ongoing matches IDs
         web.MapGet("api/matches/ongoing", async (
-            [FromServices] IOngoingMatches matches) =>
+            [FromServices] IOngoingMatches matches,
+            [FromServices] IHttpContextAccessor ctx,
+            [FromServices] IUserIdProvider userIdProvider) =>
         {
-            return Results.Ok(await matches.GetAllAsync());
-        });
+            var user = ctx.HttpContext.User;
+            var userId = userIdProvider.UserId;
+            var ids = await matches.GetAllIdsAsync();
+            var response = new BaseResponse<IEnumerable<Guid>>(ids);
 
-        // Get current match information
+            return Results.Ok(response);
+        }).RequireAuthorization();
+
+        // Get ongoing match ID by playerID
         web.MapGet("api/players/{playerId:Guid}/matches/ongoing", async (
             [FromRoute] Guid playerId,
             [FromServices] IOngoingMatches matches,
             [FromServices] IUserIdProvider userIdProvider) =>
         {
-            return Results.Ok(await matches.GetAsync(playerId));
+            var matchId = await matches.GetMatchIdOfPlayerAsync(playerId);
+            var response = new BaseResponse<Guid>(matchId);
+
+            return Results.Ok(response);
         });
 
-        // Get current match information
+        // Get ongoing match data by ID
         web.MapGet("api/matches/ongoing/{matchId:Guid}", async (
             [FromRoute] Guid matchId,
             [FromServices] IRequestClient<IMatchInfoRequested> client) =>
         {
-            var response = await client.GetResponse<MatchInfoResponse>(new
+            var matchInfoResponse = await client.GetResponse<MatchInfoResponse>(new
             {
                 CorrelationId = matchId
             });
 
-            if (response.Message is null || !response.Message.Success)
+            if (matchInfoResponse.Message is null
+            || !matchInfoResponse.Message.Success)
                 return Results.NotFound();
 
-            return Results.Ok(new OngoingMatch()
-            {
-                Bet = response.Message.Bet,
-                Created = response.Message.Created,
-                GameId = response.Message.GameId,
-                MatchId = response.Message.MatchId,
-                Players = response.Message.Players
-            });
+            var gameId = matchInfoResponse.Message.GameId;
+            var players = matchInfoResponse.Message.Players;
 
+            var match = new OngoingMatch(matchId, gameId, players)
+            {
+                Bet = matchInfoResponse.Message.Bet,
+                Created = matchInfoResponse.Message.Created,
+                GameServerEndpoint = matchInfoResponse.Message.GameServerEndpoint,
+            };
+
+            var response = new BaseResponse<OngoingMatch>(match);
+
+            return Results.Ok(response);
         });
     }
 }

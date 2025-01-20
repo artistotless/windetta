@@ -33,7 +33,7 @@ public enum MatchFlowState : int
 
 public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
 {
-    public MatchFlowStateMachine(IOngoingMatches matches, ITickets tickets)
+    public MatchFlowStateMachine(IOngoingMatches matches)
     {
         InstanceState(instance => instance.CurrentState);
 
@@ -51,28 +51,23 @@ public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
                 MatchId = x.Saga.CorrelationId,
                 GameId = x.Saga.GameId,
                 Players = x.Saga.Players,
+                GameServerEndpoint = x.Saga.GameServerEndpoint,
             })));
 
         During(CreatingMatch,
              When(MatchCreated)
-                .SaveTickets(tickets)
                 .SaveOngoingMatch(matches)
                 .NotifyReadyToConnect()
                 .TransitionTo(Running));
 
         During(Running,
             When(CancellationRequested)
+                .RemoveOngoingMatch(matches)
                 .CancelMatch(reason => reason.Reason),
             When(MatchCompleted)
-                .TransitionTo(ProcessingWinnings)
-                .ProcessWinnings());
-
-        During(ProcessingWinnings,
-            When(WinningsProcessed)
-                .Finalize(),
-            When(ProcessingWinningsFailed)
-                .NotifyProccessingWinningsFailed()
-                .TransitionTo(ProcessingWinningsFail));
+                .RemoveOngoingMatch(matches)
+                .CreateWinningsFlow()
+                .Finalize());
 
         WhenEnter(Final, x =>
         {
@@ -85,18 +80,13 @@ public class MatchFlowStateMachine : MassTransitStateMachine<MatchFlow>
 
     public State CreatingMatch { get; set; }
     public State Running { get; set; }
-    public State ProcessingWinnings { get; set; }
-    public State ProcessingWinningsFail { get; set; }
 
     public Event<ICreateMatchFlowRequested> FlowCreated { get; }
     public Event<IMatchCreated> MatchCreated { get; }
-    public Event<IWinningsProcessed> WinningsProcessed { get; }
+    public Event<IBalanceIncreased> WinningsProcessed { get; }
     public Event<ICancellationMatchRequested> CancellationRequested { get; }
     public Event<IMatchCompleted> MatchCompleted { get; }
     public Event<IMatchInfoRequested> MatchInfoRequested { get; }
-
-    // Faults
-    public Event<Fault<IProcessWinnings>> ProcessingWinningsFailed { get; }
 }
 
 public class MatchFlowDefinition : SagaDefinition<MatchFlow>
@@ -141,6 +131,7 @@ public static class MatchFlowStateMachineExtensions
             .SendCommandAsync(Svc.Main, ctx => ctx.Init<INotifyMatchCanceled>(new
             {
                 ctx.Saga.CorrelationId,
+                UsersIds = ctx.Saga.Players.Select(x => x.Id),
                 Reason = selectReason.Invoke(ctx.Message)
             }))
             .SendCommandAsync(Svc.Wallet, ctx => ctx.Init<IUnHoldBalances>(new
@@ -164,21 +155,12 @@ public static class MatchFlowStateMachineExtensions
         }));
     }
 
-    public static EventActivityBinder<MatchFlow, Fault<IProcessWinnings>> NotifyProccessingWinningsFailed(
-    this EventActivityBinder<MatchFlow, Fault<IProcessWinnings>> binder)
-    {
-        return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<INotifyProccessingWinningsFailed>(new
-        {
-            ctx.Message.Message.CorrelationId,
-            FaultMessage = ctx.Message
-        }));
-    }
-
-    public static EventActivityBinder<MatchFlow, IMatchCompleted> ProcessWinnings(
+    public static EventActivityBinder<MatchFlow, IMatchCompleted> CreateWinningsFlow(
     this EventActivityBinder<MatchFlow, IMatchCompleted> binder)
     {
-        return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<IProcessWinnings>(new
+        return binder.PublishAsync(ctx => ctx.Init<ICreateWinningsFlowRequested>(new
         {
+            Losers = ctx.Saga.Players.Select(p => p.Id).Except(ctx.Message.Winners),
             Funds = new FundsInfo(ctx.Saga.BetCurrencyId, ctx.Saga.BetAmount),
             ctx.Message.Winners,
             ctx.Message.CorrelationId
@@ -190,31 +172,22 @@ public static class MatchFlowStateMachineExtensions
     {
         return binder.Then(async ctx =>
         {
-            var endpoint = ctx.Saga.GameServerEndpoint;
+            var ongoingMatch = new OngoingMatchPlayersReference(
+                ctx.Message.CorrelationId,
+                ctx.Saga.Players);
 
-            IEnumerable<(Guid, Guid)> ongoingMatches = ctx.Message
-            .Tickets.Select(t => (ctx.Message.CorrelationId, t.Key));
-
-            await matches.SetRangeAsync(ongoingMatches);
+            await matches.AddAsync(ongoingMatch);
         });
     }
 
-    public static EventActivityBinder<MatchFlow, IMatchCreated> SaveTickets(
-    this EventActivityBinder<MatchFlow, IMatchCreated> binder, ITickets tickets)
+    public static EventActivityBinder<MatchFlow, TData> RemoveOngoingMatch<TData>(
+        this EventActivityBinder<MatchFlow, TData> binder, IOngoingMatches matches) where TData : class
     {
         return binder.Then(async ctx =>
         {
             var endpoint = ctx.Saga.GameServerEndpoint;
 
-            IEnumerable<Ticket> goingToSaveTickets = ctx.Message
-            .Tickets.Select(t => new Ticket()
-            {
-                MatchId = ctx.Message.CorrelationId,
-                PlayerId = t.Key,
-                Value = t.Value
-            });
-
-            await tickets.SetRangeAsync(goingToSaveTickets);
+            await matches.RemoveAsync(ctx.Saga.CorrelationId);
         });
     }
 

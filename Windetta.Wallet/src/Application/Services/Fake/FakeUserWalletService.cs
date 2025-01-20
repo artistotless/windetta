@@ -1,4 +1,5 @@
-﻿using Windetta.Contracts;
+﻿using Windetta.Common.Types;
+using Windetta.Contracts;
 using Windetta.Wallet.Application.Dto;
 using Windetta.Wallet.Domain;
 
@@ -21,6 +22,16 @@ public class FakeUserWalletService : IUserWalletService
         return Task.CompletedTask;
     }
 
+    public Task DeductUnHoldAsync(IEnumerable<Guid> userIds, FundsInfo funds)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task DeductUnHoldAsync(DeductUnHoldArgument arg)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task<UserBalance> GetBalance(Guid userId, int currencyId)
     {
         throw new NotImplementedException();
@@ -36,7 +47,7 @@ public class FakeUserWalletService : IUserWalletService
         return Task.CompletedTask;
     }
 
-    public Task TopUpBalance(TopUpArgument arg)
+    public Task IncreaseBalance(IncreaseArgument arg)
     {
         return Task.CompletedTask;
     }

@@ -1,8 +1,9 @@
-﻿using Windetta.Contracts.Base;
+﻿using MassTransit;
+using Windetta.Contracts.Base;
 
 namespace Windetta.Contracts.Events;
 
-public interface IUserCreated : IEvent
+public interface IUserCreated : IEvent, CorrelatedBy<Guid>
 {
     public Guid Id { get; set; }
     public string UserName { get; set; }

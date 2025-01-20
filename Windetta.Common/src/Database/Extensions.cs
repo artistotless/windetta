@@ -12,7 +12,7 @@ public static class Extensions
     public static void AddMysqlDbContext<T>(
         this IServiceCollection services,
         Assembly assembly,
-        bool enableSensitiveDataLogging = false) where T : DbContext
+        bool enableSensitiveDataLogging = false, bool applyMigrations = false) where T : DbContext
     {
         using var provider = services.BuildServiceProvider();
 
@@ -25,7 +25,13 @@ public static class Extensions
 
         services.AddDbContext<T>(options => options.UseMySql(connString, new MySqlServerVersion(settings.Version),
              b => b.MigrationsAssembly(assembly.FullName))
-             .EnableSensitiveDataLogging(enableSensitiveDataLogging));
+            /* .EnableSensitiveDataLogging(enableSensitiveDataLogging)*/);
+
+        provider.Dispose();
+
+        if (applyMigrations)
+            services.BuildServiceProvider().GetRequiredService<T>()
+                .Database.Migrate();
     }
 
     public static string GetConnectionString(this MysqlSettings settings)

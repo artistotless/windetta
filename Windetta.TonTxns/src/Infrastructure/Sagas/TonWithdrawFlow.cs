@@ -140,36 +140,33 @@ public static class BalanceWithdrawFlowStateMachineExtensions
     public static EventActivityBinder<TonWithdrawFlow, IWithdrawTonRequested> DeductFromBalance(
         this EventActivityBinder<TonWithdrawFlow, IWithdrawTonRequested> binder)
     {
-        return binder.SendCommandAsync(Svc.Wallet,
-            ctx => ctx.Init<IDeductBalance>(new
-            {
-                Amount = ctx.Message.Nanotons,
-                CurrencyId = (int)Currency.Ton,
-                ctx.Message.CorrelationId,
-                ctx.Message.UserId,
-            }));
+        return binder.SendCommandAsync(Svc.Wallet, ctx => ctx.Init<IDeductBalance>(new
+        {
+            Amount = ctx.Message.Nanotons,
+            CurrencyId = (int)Currency.Ton,
+            ctx.Message.CorrelationId,
+            ctx.Message.UserId,
+        }));
     }
 
     public static EventActivityBinder<TonWithdrawFlow, T> UnDeductFromBalance<T>(
      this EventActivityBinder<TonWithdrawFlow, T> binder) where T : class
     {
-        return binder.SendCommandAsync(Svc.Wallet,
-            ctx => ctx.Init<IUnDeductBalance>(new
-            {
-                ctx.Saga.CorrelationId,
-            }));
+        return binder.SendCommandAsync(Svc.Wallet, ctx => ctx.Init<IUnDeductBalance>(new
+        {
+            ctx.Saga.CorrelationId,
+        }));
     }
 
     public static EventActivityBinder<TonWithdrawFlow, T> TransferTon<T>(
     this EventActivityBinder<TonWithdrawFlow, T> binder) where T : class
     {
-        return binder.SendCommandAsync(Svc.TonTxns,
-            ctx => ctx.Init<ISendTons>(new
-            {
-                ctx.Saga.CorrelationId,
-                Destination = new TonAddress(ctx.Saga.Destination),
-                ctx.Saga.Nanotons,
-            }));
+        return binder.SendCommandAsync(Svc.TonTxns, ctx => ctx.Init<ISendTons>(new
+        {
+            ctx.Saga.CorrelationId,
+            Destination = new TonAddress(ctx.Saga.Destination),
+            ctx.Saga.Nanotons,
+        }));
     }
 
     public static EventActivityBinder<TonWithdrawFlow, T> ReturnStatus<T>(
@@ -195,25 +192,23 @@ public static class BalanceWithdrawFlowStateMachineExtensions
     public static EventActivityBinder<TonWithdrawFlow, T> NotifyWithdrawalExpired<T>(
     this EventActivityBinder<TonWithdrawFlow, T> binder) where T : class
     {
-        return binder.SendCommandAsync(Svc.Notifications,
-            ctx => ctx.Init<INotifyTonWithdrawalExpired>(new
-            {
-                ctx.Saga.CorrelationId,
-                ctx.Saga.Destination,
-                ctx.Saga.Nanotons,
-                ctx.Saga.UserId
-            }));
+        return binder.SendCommandAsync(Svc.Notifications, ctx => ctx.Init<INotifyTonWithdrawalExpired>(new
+        {
+            ctx.Saga.CorrelationId,
+            ctx.Saga.Destination,
+            ctx.Saga.Nanotons,
+            ctx.Saga.UserId
+        }));
     }
 
     public static EventActivityBinder<TonWithdrawFlow, T> NotifyUnDeductBalanceFailed<T>(
     this EventActivityBinder<TonWithdrawFlow, T> binder) where T : class
     {
-        return binder.SendCommandAsync(Svc.Notifications,
-            ctx => ctx.Init<INotifyUnDeductBalanceFailed>(new
-            {
-                ctx.Saga.CorrelationId,
-                ctx.Saga.UserId
-            }));
+        return binder.SendCommandAsync(Svc.Notifications, ctx => ctx.Init<INotifyUnDeductBalanceFailed>(new
+        {
+            ctx.Saga.CorrelationId,
+            ctx.Saga.UserId
+        }));
     }
     #endregion
 }

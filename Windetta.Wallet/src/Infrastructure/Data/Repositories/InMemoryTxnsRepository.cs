@@ -13,11 +13,9 @@ public sealed class InMemoryTxnsRepository : ITransactions
         _store = new();
     }
 
-    public Task AddAsync(Transaction txn)
+    public void Add(Transaction txn)
     {
         _store.TryAdd(txn.Id, txn);
-
-        return Task.CompletedTask;
     }
 
     public Task<Transaction?> GetAsync(Guid id)

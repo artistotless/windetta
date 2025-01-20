@@ -2,8 +2,7 @@
 
 namespace Windetta.Wallet.Application.Dto;
 
-public record TransferArgument(Guid userId, FundsInfo funds, Guid destinationUserId)
-    : IHasOperationId
+public record TransferArgument(Guid userId, FundsInfo funds, Guid destinationUserId) : IHasOperationId
 {
     public Guid OperationId { get; init; }
 }

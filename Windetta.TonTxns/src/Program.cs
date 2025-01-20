@@ -5,6 +5,7 @@ using System.Reflection;
 using Windetta.Common.Configuration;
 using Windetta.Common.Constants;
 using Windetta.Common.Database;
+using Windetta.Common.Host;
 using Windetta.Common.MassTransit;
 using Windetta.Common.Types;
 using Windetta.TonTxns.Application.DAL;
@@ -24,8 +25,8 @@ builder.ConfigureComponentLaunchSettings();
 
 var assembly = Assembly.GetExecutingAssembly();
 
-builder.Services.AddMysqlDbContext<TonDbContext>(assembly);
-builder.Services.AddMysqlDbContext<SagasDbContext>(assembly);
+builder.Services.AddMysqlDbContext<TonDbContext>(assembly, applyMigrations: true);
+builder.Services.AddMysqlDbContext<SagasDbContext>(assembly, applyMigrations: true);
 builder.Services.AddHostedService<DepositPollerService>();
 builder.Services.AddDepositAddress();
 builder.Services.AddHttpTonApi();
@@ -54,4 +55,5 @@ builder.Host.UseServiceProviderFactory(
 var app = builder.Build();
 
 app.MapGet("/", () => "Windetta.TonTxns Service");
+app.UseOnlySingleInstanceLaunching();
 app.Run();

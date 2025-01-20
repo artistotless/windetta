@@ -48,17 +48,22 @@ public class LobbyFlowStateMachine : MassTransitStateMachine<LobbyFlow>
                 .TransitionTo(GameServerSearching),
             When(HoldBalancesFailed)
                 .UnholdBalances()
-                .NotifyCancelMatch(reason => "One of the players has insufficient balance"));
+                .NotifyCancelMatch(reason => "One of the players has insufficient balance")
+                .DeleteLobby(interactor)
+                .Finalize());
 
         During(GameServerSearching,
             When(GameServerReservationFailed)
-                .NotifyMatchAwaitingExpired()
-                .NotifyCancelMatch(reason => "GameServers unavailable"),
+                .NotifyCancelMatch(reason => "GameServers unavailable")
+                .DeleteLobby(interactor)
+                .UnholdBalances()
+                .Finalize(),
+
              When(GameServerFound)
                 .NotifyServerFound()
                 .CreateMatchFlow()
                 .DeleteLobby(interactor)
-                .TransitionTo(ServerFound)); ;
+                .TransitionTo(ServerFound));
 
         SetCompletedWhenFinalized();
     }
@@ -132,8 +137,8 @@ public static class LobbyFlowStateMachineExtensions
         }));
     }
 
-    public static EventActivityBinder<LobbyFlow, IGameServerFound> DeleteLobby(
-    this EventActivityBinder<LobbyFlow, IGameServerFound> binder, LobbiesInteractor interactor)
+    public static EventActivityBinder<LobbyFlow, TData> DeleteLobby<TData>(
+        this EventActivityBinder<LobbyFlow, TData> binder, LobbiesInteractor interactor) where TData : class
     {
         return binder.ThenAsync(ctx => interactor.DeleteAsync(ctx.Saga.LobbyId));
     }
@@ -174,8 +179,8 @@ public static class LobbyFlowStateMachineExtensions
     {
         return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<INotifyMatchCanceled>(new
         {
-            ctx.Saga.LobbyId,
             ctx.Saga.CorrelationId,
+            UsersIds = ctx.Saga.Players.Select(x => x.Id),
             Reason = selectReason.Invoke(ctx.Message)
         }));
     }
@@ -187,16 +192,6 @@ public static class LobbyFlowStateMachineExtensions
         {
             Funds = new FundsInfo(ctx.Saga.BetCurrencyId, ctx.Saga.BetAmount),
             UsersIds = ctx.Saga.Players.Select(x => x.Id)
-        }));
-    }
-
-    public static EventActivityBinder<LobbyFlow, Fault<ISearchGameServer>> NotifyMatchAwaitingExpired(
-    this EventActivityBinder<LobbyFlow, Fault<ISearchGameServer>> binder)
-    {
-        return binder.SendCommandAsync(Svc.Main, ctx => ctx.Init<INotifyMatchAwaitingExpired>(new
-        {
-            ctx.Saga.LobbyId,
-            ctx.Message.Message.CorrelationId,
         }));
     }
 }

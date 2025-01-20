@@ -8,28 +8,27 @@ namespace Windetta.Main.Core.Matches;
 public interface IOngoingMatches : ISingletonService
 {
     /// <summary>
-    /// Sets the current match for the player
+    /// Adds a match
     /// </summary>
-    /// <param name="ongoingMatch">Current match</param>
-    /// <param name="playerId">Player ID</param>
-    public Task SetAsync(Guid matchId, Guid playerId);
+    /// <param name="match">Ongoing match instance</param>
+    public Task AddAsync(OngoingMatchPlayersReference match);
 
     /// <summary>
-    /// Sets the current matches for the players
+    /// Deletes the match
     /// </summary>
-    /// <param name="values">Current matches</param>
-    public Task SetRangeAsync(IEnumerable<(Guid matchId, Guid playerId)> values);
+    /// <param name="matchId">Ongoing match ID</param>
+    public Task RemoveAsync(Guid matchId);
 
     /// <summary>
     /// Gets the player's current match
     /// </summary>
     /// <param name="playerId">Player ID</param>
     /// <returns>Current match ID</returns>
-    public Task<Guid> GetAsync(Guid playerId);
+    public Task<Guid> GetMatchIdOfPlayerAsync(Guid playerId);
 
     /// <summary>
-    /// gets the IDs of all matches in progress
+    /// Gets the IDs of all matches in progress
     /// </summary>
     /// <returns>Collection of IDs</returns>
-    public Task<IEnumerable<Guid>> GetAllAsync();
+    public Task<IEnumerable<Guid>> GetAllIdsAsync();
 }

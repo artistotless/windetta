@@ -49,7 +49,7 @@ public sealed class Lobby : ILobby
         Configuration = options.GameConfiguration;
         Bet = options.Bet;
         Properties = options.Properties;
-        _rooms = CreateRooms();
+        _rooms = CreateRooms(options.Teams, options.Slots);
 
         _joinFilters = options.JoinFilters;
     }
@@ -133,13 +133,13 @@ public sealed class Lobby : ILobby
         IsDisposed = true;
     }
 
-    void ILobbyReadyListener.OnAutoReady()
+    void ILobbyReadyListener.CallReady()
     {
         State = LobbyState.Ready;
         Ready?.Invoke(this, null);
     }
 
-    void ILobbyDisposeListener.OnAutoDisposed()
+    void ILobbyDisposeListener.CallDispose()
     {
         Dispose();
     }
@@ -155,15 +155,12 @@ public sealed class Lobby : ILobby
         Updated?.Invoke(this, null);
     }
 
-    private Room[] CreateRooms()
+    private Room[] CreateRooms(uint teams, uint slots)
     {
-        var maxTeams = Math.Max(1, Configuration.MaxTeams);
-        var rooms = new Room[maxTeams];
+        var rooms = new Room[teams];
 
         for (ushort i = 0; i < rooms.Length; i++)
-        {
-            rooms[i] = new Room(i, Configuration.MaxPlayersInTeam);
-        }
+            rooms[i] = new Room(i, slots);
 
         return rooms;
     }

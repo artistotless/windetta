@@ -32,4 +32,17 @@ public sealed class OngoingMatch
     /// When the match was created
     /// </summary>
     public DateTimeOffset Created { get; init; }
+
+    /// <summary>
+    /// GameServer endpoint
+    /// </summary>
+    public Uri GameServerEndpoint { get; set; }
+
+    public OngoingMatch(Guid id, Guid gameId, IEnumerable<Player> players)
+    {
+        Created = DateTimeOffset.UtcNow;
+        MatchId = id;
+        GameId = gameId;
+        Players = players;
+    }
 }

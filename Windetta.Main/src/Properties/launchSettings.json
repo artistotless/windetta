@@ -4,7 +4,8 @@
       "commandName": "Project",
       "launchBrowser": false,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "FAKE_AUTH": "Enabled"
       },
       "applicationUrl": "https://localhost:55235;http://localhost:55236"
     }

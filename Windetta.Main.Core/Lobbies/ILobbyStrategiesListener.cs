@@ -19,11 +19,11 @@ public interface ILobbyStrategiesListener
 public interface ILobbyReadyListener : ILobbyStrategiesListener
 {
     void SetAutoReadyStrategy(IAutoReadyStrategy strategy);
-    void OnAutoReady();
+    void CallReady();
 }
 
 public interface ILobbyDisposeListener : ILobbyStrategiesListener
 {
     void SetDisposeStrategy(IAutoDisposeStrategy strategy);
-    void OnAutoDisposed();
+    void CallDispose();
 }

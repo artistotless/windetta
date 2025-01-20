@@ -25,7 +25,7 @@ public abstract class AutoDisposeStrategy : IAutoDisposeStrategy
         if (CheckDispose())
         {
             _timer.Dispose();
-            Lobby.OnAutoDisposed();
+            Lobby.CallDispose();
         }
     }
 

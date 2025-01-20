@@ -1,13 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using IdentityModel;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Windetta.Identity.Controllers;
 
 public class BaseController : Controller
 {
-    protected Guid UserId
-        => string.IsNullOrWhiteSpace(User?.Identity?.Name) ?
-            Guid.Empty :
-            Guid.Parse(User.Identity.Name);
+    protected string? UserId => User?.FindFirst(JwtClaimTypes.Subject)?.Value;
 
     protected IActionResult NoContent(Action action)
     {

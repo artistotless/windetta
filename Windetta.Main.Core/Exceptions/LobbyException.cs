@@ -22,5 +22,17 @@ public class LobbyException : WindettaException
     public static LobbyException BetIsLessMinimumAllowed
         => new LobbyException(Errors.Main.BetIsLessMinimumAllowed);
 
+    public static LobbyException TeamsAreLessMinimumRequired
+        => new LobbyException(Errors.Main.TeamsAreLessMinimumRequired);
+
+    public static LobbyException TeamsAreGreaterMaximumAllowed
+        => new LobbyException(Errors.Main.TeamsAreGreaterMaximumAllowed);
+
+    public static LobbyException SlotsAreLessMinimumRequired
+        => new LobbyException(Errors.Main.SlotsAreLessMinimumRequired);
+
+    public static LobbyException SlotsAreGreaterMaximumAllowed
+        => new LobbyException(Errors.Main.SlotsAreGreaterMaximumAllowed);
+
     public LobbyException(string errorCode) : base(errorCode) { }
 }
