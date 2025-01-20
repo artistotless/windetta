@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\lspm-models\src\LSPM.Models.csproj" />
+    <ProjectReference Include="..\lspm\lspm-models\src\LSPM.Models.csproj" />
   </ItemGroup>
 
 </Project>

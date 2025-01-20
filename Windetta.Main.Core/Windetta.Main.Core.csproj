@@ -13,7 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\lspm-models\src\LSPM.Models.csproj" />
+    <ProjectReference Include="..\lspm\lspm-models\src\LSPM.Models.csproj" />
     <ProjectReference Include="..\Windetta.Common\src\Windetta.Common.csproj" />
     <ProjectReference Include="..\Windetta.Contracts\Windetta.Contracts.csproj" />
   </ItemGroup>
