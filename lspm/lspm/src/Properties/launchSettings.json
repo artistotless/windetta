@@ -1,0 +1,22 @@
+{
+  "profiles": {
+    "LSPM": {
+      "commandName": "Project",
+      "launchBrowser": false,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:65275;http://localhost:65276"
+    },
+
+    "LSPM (TestMode)": {
+      "commandName": "Project",
+      "launchBrowser": false,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "TEST_MODE": "Enabled"
+      },
+      "applicationUrl": "https://localhost:65275;http://localhost:65276"
+    }
+  }
+}

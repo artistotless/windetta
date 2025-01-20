@@ -1,0 +1,9 @@
+global using Autofac;
+global using Autofac.Extensions.DependencyInjection;
+global using LspmTests.Helpers;
+global using LspmTests.Mocks;
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.DependencyInjection.Extensions;
+global using Moq;
+global using Shouldly;
+global using Xunit;

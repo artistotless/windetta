@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <PackageId>Windetta.$(AssemblyName)</PackageId>
+    <Version>1.2.0</Version>
+    <Description>Collection of classes for LSPM service</Description>
+    <IncludeSymbols>True</IncludeSymbols>
+    <RunAnalyzersDuringBuild>True</RunAnalyzersDuringBuild>
+    <PackageOutputPath>E:\Projects\windetta-misc\nugets</PackageOutputPath>
+  </PropertyGroup>
+
+</Project>

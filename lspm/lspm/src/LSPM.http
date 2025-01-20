@@ -1,0 +1,28 @@
+﻿@LSPM_HostAddress = https://localhost:65275
+
+POST {{LSPM_HostAddress}}/api/hooks/ping
+
+###
+
+POST {{LSPM_HostAddress}}/api/hooks/matches/{{$guid}}/cancel
+Reason: crashed
+InstanceId: {{$guid}}
+###
+
+POST {{LSPM_HostAddress}}/api/hooks/matches/{{$guid}}/complete
+Content-Type: application/json
+InstanceId: {{$guid}}
+
+{
+  "winners":["e53f32bb-5492-477f-9d21-59a6449d3e42","cfbc8949-84ba-4553-9788-06946fbfcf3f"],
+  "winnerTeamIndex":0
+}
+###
+
+GET {{LSPM_HostAddress}}/api/lspm/servers
+
+###
+
+POST {{LSPM_HostAddress}}/api/lspm/matches
+
+###
